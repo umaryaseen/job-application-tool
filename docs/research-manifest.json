@@ -1,0 +1,35 @@
+{
+  "read_date": "2026-09-08",
+  "sources": [
+    {
+      "id": "R1",
+      "filename": "01-Effective-CVs-for-Full-Time-Jobs-in-Germany-and-an-Automated-Tailored-Application-System.md",
+      "title": "Effective CVs for Full-Time Jobs in Germany and an Automated Tailored-Application System",
+      "sha256": "a5dadad8c48b7e8a698b42bc84b174d4312281a8e760e7e7a98ab3129054694c",
+      "bytes": 66161,
+      "lines": 1444,
+      "citation_id": "file_0000000069d88210baffe98ae61b7fed",
+      "library_id": "libfile_3564de53d3648191b810dd9dfcd7af72"
+    },
+    {
+      "id": "R2",
+      "filename": "02-Creating-a-High-Performance-CV-for-Full-Time-Job-Applications-in-Germany.md",
+      "title": "Creating a High-Performance CV for Full-Time Job Applications in Germany",
+      "sha256": "fdd8781ded856015ec5ed749a7a2bb6f86754daf2d29a5bc94d2105a8fa867bb",
+      "bytes": 53047,
+      "lines": 870,
+      "citation_id": "file_000000009368821098ea159e1f5529ac",
+      "library_id": "libfile_c212e281eb608191a7af76a4a84f3938"
+    },
+    {
+      "id": "R3",
+      "filename": "03-German-Ready-CV-and-Open-Source-CV-Tailoring-Application-Automation-System.md",
+      "title": "German-Ready CV and Open-Source CV Tailoring & Application Automation System",
+      "sha256": "e1e30d0e93cf30f53d70a317968b78bc829346899ecdfdedfdc5a3502d6c0773",
+      "bytes": 70195,
+      "lines": 2008,
+      "citation_id": "file_00000000719082108a4983cee2b369e1",
+      "library_id": "libfile_57eed2230c088191aaf88cfa45d3921b"
+    }
+  ]
+}
