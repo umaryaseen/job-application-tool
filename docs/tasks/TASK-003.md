@@ -20,11 +20,11 @@ profile/load.py; profile/validation.py; profile/review.py; verification/support.
 
 ## Acceptance criteria
 
-Resolve unique exact fact/evidence revisions, approved support scopes and text variants. Reject dangling/cyclic/revoked/stale bindings. Add an explicit human review operation that records exact displayed fact/variant digests; do not trust imported approved=true or provider-written approval. User attestations are identified as such. Approval edits use revision checks.
+Resolve unique exact fact/evidence revisions, approved support scopes and text variants. Approved documentary/repository evidence requires an immutable local support capture with content hash and source-file SHA-256 or pinned repository object/revision; mutable locators alone remain drafts. Reject dangling/cyclic/revoked/stale bindings and changed/missing captures. Add an explicit human review operation that records exact displayed fact/variant digests; do not trust imported approved=true or provider-written approval. User attestations are identified as such. Approval edits use revision checks.
 
 ## Tests required
 
-A02, A04, A06: unrelated real ID; same metric wrong subject; stale evidence revisions; modified wording; generated output used as source; negation/leadership variant mismatch; approval CLI records exact payload and cannot silently approve changed content.
+A02, A04, A06: unrelated real ID; same metric wrong subject; stale evidence revisions; mutated file-backed support behind the same locator; missing capture; unpinned documentary reference; modified wording; generated output used as source; negation/leadership variant mismatch; approval CLI records exact payload and cannot silently approve changed content.
 
 Run relevant tests plus Ruff and mypy once tooling exists. Record actual results and skipped checks. Test IDs refer to [ACCEPTANCE_CRITERIA.md](../ACCEPTANCE_CRITERIA.md). Use sanitized fixtures; no personal test artifacts in Git/CI.
 

@@ -23,7 +23,7 @@ The supplied three research documents contain no verified current career databas
 
 ## Evidence and wording
 
-Give each source an evidence ID/revision. A user attestation may document firsthand responsibilities where documentary evidence would be impractical; label its nature honestly. A local certificate/reference may be recorded by opaque locator and digest without copying its bytes or personal document numbers into the app.
+Give each source an evidence ID/revision. A user attestation may document firsthand responsibilities where documentary evidence would be impractical; label its nature honestly. Documentary/repository evidence needs a minimal immutable reviewed support capture, its hash and pinned source identity (file SHA-256 or repository object/revision). Avoid copying whole certificates or personal document numbers; a locator by itself remains an unverified reference. Record any later correction/withdrawal in source eligibility, even if the old capture remains available for history.
 
 Review each fact and its source relationship, including subject/project/period. Approve the exact payload with current revisions. Then approve exact EN wording variants; keep long and short forms only if both preserve meaning. Do not approve a model's proposed summary merely because it contains some familiar terms.
 

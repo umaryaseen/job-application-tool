@@ -16,7 +16,7 @@ Exact terms need normalization but adjacent technologies must not become equival
 
 ## Affected modules
 
-normalization/aliases.py; fixtures/aliases.json; tests/test_skill_normalization.py. Paths are intended additions unless already present; inspect before editing.
+normalization/aliases.py; tests/fixtures/aliases.json; tests/test_skill_normalization.py. Paths are intended additions unless already present; inspect before editing.
 
 ## Acceptance criteria
 

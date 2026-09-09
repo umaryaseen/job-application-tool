@@ -19,7 +19,7 @@ M1 technical fixture success may be recorded separately from personal acceptance
 | ID | Named behavior / fixture | Assertion | Task |
 |---|---|---|---|
 | A01 | schema_valid_and_invalid | Unknown keys, coercions, invalid enums, overlimits, unsupported versions fail; valid synthetic profile succeeds | 002 |
-| A02 | profile_evidence_graph | Empty/dangling/duplicate references, cycles, revoked evidence, unsupported bindings fail | 003 |
+| A02 | profile_evidence_graph | Empty/dangling/duplicate references, cycles, revoked evidence, unsupported bindings, unpinned documentary references, mutated/missing support captures fail | 003 |
 | A03 | every_visible_claim_is_bound | All visible candidate text including identity, summary, skill labels, degree and date has a claim node and approved sources | 004 |
 | A04 | unrelated_valid_evidence | A real ID cannot authorize unrelated text; replacing claim text with novel prose fails | 003, 019 |
 | A05 | date_precision_and_state | Unknown end is not Present; reversed/invalid dates fail; incomplete precision is explicit | 002, 004 |
@@ -46,7 +46,7 @@ M1 technical fixture success may be recorded separately from personal acceptance
 | A26 | bounded_page_budget | Remove optional low-value content only; protected sections survive; at most 20 iterations; no font shrink or PDF clipping | 018 |
 | A27 | generated_claim_adversaries | Correct ID/wrong employer, leadership inflation, exposure→expertise, negation flip, invented technology/degree/dates/years fail | 019 |
 | A28 | immutable_application_snapshot | Atomic completion, no overwrite, interrupted build leaves no ready snapshot; exact bytes and manifest recoverable | 008 |
-| A29 | approval_and_tamper | Approval binds exact hashes; PDF/plan/template/profile modification, stale wording, source revocation block new export | 008, 019 |
+| A29 | approval_and_tamper | Exact hashes; PDF/plan/template/profile modification, stale wording, source correction/supersession/revocation/deletion, missing capture/eligibility and elapsed expiry block new export; external original removal alone does not invalidate intact active capture | 008, 019 |
 | A30 | full_pipeline_baseline | Real CLI builds a fixture profile into PDF/TXT/QA without LLM/network; nonzero exits on unsupported input | 009, 020 |
 | A31 | full_pipeline_tailoring | Pasted JD→review→matrix→tailor→QA→approve→export, plus an unsupported injected claim that fails | 020 |
 | A32 | cover_letter_provenance | Company claims from JD/company evidence; applicant claims from profile; motivations/availability approved; unreviewed prose rejected | 021 |

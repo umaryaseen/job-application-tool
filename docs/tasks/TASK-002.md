@@ -20,7 +20,7 @@ domain/profile.py; domain/fact.py; domain/evidence.py; domain/variant.py; schema
 
 ## Acceptance criteria
 
-Implement versioned strict bounded models with stable IDs/revisions and typed contacts, employment, education, skills, languages, authorization, metrics and date states. Evidence is mandatory for facts; include support-binding and approval records. Export JSON Schema from the models. Create compact/two-page clearly synthetic fixtures and invalid examples.
+Implement versioned strict bounded models with stable IDs/revisions and typed contacts, employment, education, skills, languages, authorization, metrics and date states. Time-limited facts preserve explicit expires_at or valid_through plus timezone. Evidence is mandatory for facts; include support-binding and approval records, immutable support capture hashes and kind-specific pinned source identities. Export JSON Schema from the models. Create compact/two-page clearly synthetic fixtures and invalid examples.
 
 ## Tests required
 

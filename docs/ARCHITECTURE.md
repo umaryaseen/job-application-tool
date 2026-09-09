@@ -1,6 +1,6 @@
 # Architecture
 
-Status: reviewed planning target; runtime behavior remains unimplemented until its task passes. ADRs distinguish established foundation decisions from options requiring experiments. See [ADR index](adr/README.md).
+Status: planning target awaiting independent approval; runtime behavior remains unimplemented until its task passes. ADRs distinguish established foundation decisions from options requiring experiments. See [ADR index](adr/README.md).
 
 ## System boundary
 
@@ -62,7 +62,7 @@ Pydantic models use strict fields, bounded strings/collections and forbidden unk
 | ProfileRevision | `schema_version`, `profile_id`, `revision`, `created_at`, entity indexes, fact/evidence/variant collections; full canonical content digest |
 | Entity | Stable local ID for person, employer, role, project, institution or credential; factual display fields point to facts, never unbound prose |
 | Fact | Stable `fact_id` + revision; subject ID; typed kind/value; qualifiers/scope; nonempty evidence references; status `draft/approved/revoked`; approval of exact payload and evidence revisions |
-| Evidence | ID + revision; kind (`user_attestation`, `document_reference`, `repository_reference`, etc.); local opaque locator or attestation text; sensitivity; review identity/time; optional content hash for referenced files; status |
+| Evidence | ID + revision; kind (`user_attestation`, `document_reference`, `repository_reference`, etc.); immutable local support payload and its content hash; for documentary/repository kinds, document SHA-256 or pinned repository commit/object plus captured support; sensitivity; review identity/time; status. A locator alone cannot be approved evidence |
 | SupportBinding | Fact digest, evidence revision/digest and reviewed support scope. This records applicant review of support; a coincidental evidence ID is not enough |
 | ApprovedVariant | ID + revision, locale, exact text, nonempty fact references, protected slots/subject scope, support references, hash-bound human review; status `draft/approved/revoked` |
 | DocumentPlan | Ordered sections and entries, all visible claim nodes, variant/slot references, pinned profile digest, locale, template/config digest, explicit build date and exclusions |
@@ -73,6 +73,8 @@ Keep the implementation small: these are typed records and validation functions,
 Every displayed factual value participates: contact details, target professional label, employer and title, dates, education completion, skill possession, project technologies, languages, authorization, metrics and summary claims. Pure section labels, punctuation and page numbers come from a finite static template allowlist. Filenames/metadata must not introduce unsupported professional titles or expose evidence notes.
 
 **Evidence policy:** a deliberate applicant attestation is acceptable evidence, especially for personal responsibilities that have no public document. Record it as an attestation, never as independently certified. Raw certificates/identity scans are unnecessary for the MVP. Imported CV statements and report/chat examples start as draft/unverified; approval must not be supplied by the extraction/generation provider.
+
+For approved documentary/repository evidence, retain a minimal reviewed support capture locally, hash its exact bytes, and bind its origin to the source file SHA-256 or a pinned repository revision/object. An external URL or mutable local path is metadata, not the authoritative evidence payload. Unpinned references remain drafts or are explicitly recorded as applicant attestations with their own reviewed text; do not silently upgrade their evidentiary status. Mutating the captured payload behind the same locator fails validation. Missing required captures fail closed. A removed external original does not invalidate an intact approved capture by itself; a correction, withdrawal or revocation must update the local evidence eligibility record and block affected future exports. This distinction permits minimal captures without storing entire sensitive documents.
 
 ## Typed factual semantics
 
@@ -138,7 +140,20 @@ Write a staging directory, validate all files, then atomically publish a new imm
 
 State machine: `draft → validation_failed` or `draft → qa_passed → awaiting_review → approved`; rejection records a review event. Changes generate a new snapshot at `draft`; old submitted snapshots remain intact. Fact/wording revocation makes affected snapshots ineligible for **new export**, while preserving history. Final approval binds manifest digest, exact PDF/TXT hashes, approver and time; it is stored separately so it does not change the artifact digest.
 
-`export` re-hashes files, checks current source revocation and QA, and requires matching human approval. Approved bytes may be copied to a chosen submission folder; modified PDFs cannot reuse approval. No in-place editing of approved outputs. The software cannot stop the OS owner manually sending a file; its guarantees apply to its own publication/export path.
+`export` re-hashes artifacts and retained support captures, resolves current profile/fact/evidence eligibility, checks expiry and QA, and requires matching human approval. Time-limited claims use an explicit applicant-approved `expires_at` or `valid_through` with timezone; absence of an expiry does not authorize a legal-validity inference. Export evaluates the current clock, not a backdated build `--as-of` value. Tests may inject the clock; the normal CLI may not bypass the check. Crossing an explicit expiry boundary requires a new accurate plan and review, even when historical artifact bytes remain intact.
+
+| Condition at export | Eligibility and action |
+|---|---|
+| Exact approved bytes, intact support captures, current active source/profile revisions, no elapsed expiry, passing QA | Eligible for export |
+| PDF/TXT/plan/manifest/support capture changed or hash mismatch | Block; preserve historical record and investigate integrity failure |
+| Rebuilt output, changed template/config, or a newer profile/fact/wording revision | Block old approval for the new build; produce/review a new snapshot |
+| Fact/evidence corrected or superseded in current source registry | Block affected old snapshot for new export; regenerate from current approved sources |
+| Fact/evidence revoked or a required eligibility record/support capture deleted or unavailable | Block; never assume old approval still proves eligibility |
+| Time-limited authorization/credential claim expires between build and export | Block; rebuild with current, truthful status or omit the claim, then review |
+| External original moved/deleted but immutable reviewed capture and active source eligibility remain available | Capture remains the approved source; no silent refetch or reinterpretation |
+| Earlier submitted snapshot has become ineligible | Retain its bytes, historical approval and submission event; do not rewrite history |
+
+Approved eligible bytes may be copied to a chosen submission folder; modified PDFs cannot reuse approval. No in-place editing of approved outputs. The software cannot stop the OS owner manually sending a file; its guarantees apply to its own publication/export path.
 
 ## Planned CLI contract
 

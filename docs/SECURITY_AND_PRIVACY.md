@@ -28,7 +28,7 @@ Applicants control their own facts. The system can enforce consistency with appr
 | Renderer accessing local files or network | Controlled asset root, subprocess arguments without shell, constrained paths, deny egress and include behavior; tests before backend adoption |
 | Huge or malformed input | Limits, strict UTF-8, bounded recursion/collections/timeouts; no arbitrary document upload parser in MVP |
 | Path traversal/symlink escapes | Resolve outputs under configured private root, reject escaping paths/symlinks, use fresh private temp dirs; TASK-001/008 |
-| Stale approval / output substitution | Approval of exact manifest/output bytes; rehash on export; revocation check; TASK-008 |
+| Stale approval / output or source substitution | Hash-bound artifacts and immutable support captures; current source/profile eligibility and explicit expiry checked on export; missing eligibility fails closed; TASK-008 |
 | Lost/inconsistent application history | Atomic snapshots, no overwrite; SQLite transactions/FKs later; backups/restore tests |
 | Dependency or model supply-chain compromise | Lock versions, inspect licenses, isolated optional extras, model revision/checksum, no remote code execution for model loading |
 | Cloud data disclosure | Disabled by default, explicit user opt-in, minimal selected evidence, contact reinsertion locally; provider-specific policy review |

@@ -9,18 +9,19 @@ The downloadable package contains `job-application-engine.bundle` (complete plan
 From the extracted handoff directory, use a **new, nonexisting** target directory:
 
 ```bash
-git bundle verify ./job-application-engine.bundle
+jae_bundle_path="$PWD/job-application-engine.bundle"
 git clone ./job-application-engine.bundle ../job-application-engine
 cd ../job-application-engine
+git bundle verify "$jae_bundle_path"
 git status --short
 git log --oneline --decorate -6
 ```
 
-If the target already exists, inspect it rather than overwrite it. Use a new directory if unrelated. Bundle cloning initially sets origin to the local bundle. Remove that origin **only after confirming it points to this supplied bundle**, then configure GitHub in step 3. Never remove or replace an unrelated Git remote.
+Run the commands sequentially and stop on any error. `git bundle verify` requires a repository, so verification runs inside the newly created clone. The clone operation itself validates and imports the self-contained bundle. If the target already exists, inspect it rather than overwrite it. Use a new directory if unrelated. Bundle cloning initially sets origin to the local bundle. Remove that origin **only after confirming it points to this supplied bundle**, then configure GitHub in step 3. Never remove or replace an unrelated Git remote.
 
 Keep the accompanying research folder outside the checkout. Set `JAE_RESEARCH_ROOT` to its actual absolute path, or let Codex resolve it from the handoff. Verify source hashes against `docs/research-manifest.json`. Do not commit copied originals. Git code/plans and private applicant data are distinct stores.
 
-If the bundle cannot be used, copy the `repository/` directory into a new target and initialize Git there (`git init -b main`). This loses the supplied review history, so prefer bundle restoration and record any fallback honestly.
+If the bundle cannot be used, copy the `repository/` directory into a new target and initialize Git there (`git init -b main`). Inspect and commit the complete planning tree with a clearly identified local author, then obtain a separate review of that exact initial tree/commit before TASK-001. Initialization alone does not establish a reviewed main branch. This fallback loses the supplied Git review history, so prefer bundle restoration and record any fallback honestly.
 
 ## 2. Inspect local tools without modifying unrelated configuration
 

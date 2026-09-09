@@ -20,7 +20,7 @@ experiments/renderer/; docs/experiments/RENDERER_DECISION.md; ADR-004; tests/fix
 
 ## Acceptance criteria
 
-Render identical short/two-page/DE-Unicode plans in minimal RenderCV and HTML/Playwright spikes. Record versions, install friction, extraction order/fields, A4 pages, hostile-text handling, local font behavior and raster review. Validate no arbitrary includes or network requests. Recommend one backend and obtain independent review before changing ADR status. Record failures honestly.
+Render identical short/two-page/DE-Unicode plans in minimal RenderCV and HTML/Playwright spikes. Record versions, install friction, extraction order/fields, A4 pages, hostile-text handling, local font behavior and raster review. Validate no arbitrary includes or network requests. Include a minimal synthetic one-page letter feasibility fixture for the recommended backend, so TASK-022 has a supported route without a second backend; otherwise record an ADR reconsideration gate before letter implementation. Recommend one backend and obtain independent review before changing ADR status. Record failures honestly.
 
 ## Tests required
 

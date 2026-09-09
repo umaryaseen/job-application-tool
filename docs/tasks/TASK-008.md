@@ -20,11 +20,11 @@ snapshots/store.py; snapshots/manifest.py; snapshots/review.py; snapshots/export
 
 ## Acceptance criteria
 
-Atomically publish complete private snapshots with source slice, evidence/variant approvals, plan, PDF/TXT, QA and version hashes. Preserve stored bytes and reject overwrite. Record final human approval separately against manifest/PDF/TXT digests. Export rechecks hashes, source revocation and approval. Failed builds never become ready artifacts.
+Atomically publish complete private snapshots with source slice, immutable support captures, evidence/variant approvals, plan, PDF/TXT, QA and version hashes. Preserve stored bytes and reject overwrite. Record final human approval separately against manifest/PDF/TXT digests. Export follows ARCHITECTURE's eligibility matrix: recheck hashes/captures, current revisions/status, correction/supersession/revocation/deletion, explicit expiry at the current clock and approval. Unavailable eligibility fails closed. Failed builds never become ready artifacts.
 
 ## Tests required
 
-A28–A29: interruption, existing ID, temp cleanup, modified PDF/plan, changed fact/template, stale review, revoked evidence, concurrent revision conflict and unauthorized export; restore/read manifest verifies all file hashes.
+A28–A29: interruption, existing ID, temp cleanup, modified PDF/plan/support capture, missing capture/eligibility, changed fact/template, stale review, corrected/superseded/deleted/revoked source, concurrent revision conflict and unauthorized export. Advance a test clock past an explicit authorization/credential expiry after approval and verify export fails despite intact bytes; build as-of cannot bypass this. Preserve history. Test that removing only an external original leaves an intact active capture usable; restore/read manifest verifies all required hashes.
 
 Run relevant tests plus Ruff and mypy once tooling exists. Record actual results and skipped checks. Test IDs refer to [ACCEPTANCE_CRITERIA.md](../ACCEPTANCE_CRITERIA.md). Use sanitized fixtures; no personal test artifacts in Git/CI.
 

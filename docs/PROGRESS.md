@@ -1,6 +1,6 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-08. This repository initially contains planning only.
+Last updated: 2026-09-09. This repository initially contains planning only.
 
 ## Environment and completed work
 
@@ -16,7 +16,7 @@ Last updated: 2026-09-08. This repository initially contains planning only.
 | Milestone / task | State | Evidence / next action |
 |---|---|---|
 | M0 research | COMPLETE | Three complete reports and independent research audit |
-| M0 architecture/package | AWAITING INDEPENDENT REVIEW | Review report will record exact verdict and package checks |
+| M0 architecture/package | CORRECTIONS AWAITING INDEPENDENT REVIEW | Initial head 6b3969c received CHANGES REQUIRED; immutable evidence and expiry/source eligibility corrections are prepared |
 | Laptop repository | NOT CREATED HERE | Restore supplied Git bundle using LOCAL_SETUP |
 | Private GitHub repository | NOT CREATED | Native local gh setup/auth then verify private origin |
 | TASK-001 | NOT STARTED | Ready after M0 review and local restoration |
@@ -30,11 +30,11 @@ Last updated: 2026-09-08. This repository initially contains planning only.
 
 Application unit/integration/rendering/model tests: **NOT IMPLEMENTED / NOT RUN**. No fabricated pass rate. Planned tests and their introducing tasks are in ACCEPTANCE_CRITERIA.
 
-Planning-package validation results and Git commit state will be recorded in the M0 review report after inspection. The supplied archive is a planning handoff, not a working MVP or a laptop installation.
+Planning checks passed for required files, 256 internal Markdown links, 35 acyclic task dependencies, three source identities, and 14 private-path exclusions. Independent review of initial planning head 6b3969c required immutable support captures and explicit export expiry/source-eligibility rules; those document corrections are prepared for exact-head re-review. Application behavior remains unimplemented. The supplied archive is a planning handoff, not a working MVP or a laptop installation.
 
 ## Open gates
 
-1. Independent planning review and final package integrity verification.
+1. Independent review of corrected planning head and final package integrity verification.
 2. Local Codex restores repository and implements TASK-001.
 3. TASK-005 experimentally resolves renderer and exact versions; no backend is production-approved yet.
 4. TASK-009 obtains actual reviewed career data and accepts a genuine baseline CV. Chat memory/research templates are not evidence.

@@ -25,6 +25,7 @@ The user's current instructions take precedence. Established decisions may be ch
 - One local Python package. No services, queues, Docker requirement, frontend, or network ingestion in M1–M3.
 - Pydantic validation plus explicit graph/semantic checks; JSON Schema alone cannot prove provenance.
 - Values and references are revision-bound. Every fact requires reviewed evidence, every approved wording binds to the exact supporting fact/evidence digests and scope. Static renderer labels are the only non-claim text exemptions.
+- Approved documentary/repository evidence requires an immutable local support capture and pinned source identity; a mutable locator alone stays draft. Missing or mutated required captures fail. Export follows ARCHITECTURE's eligibility matrix, including current source status and explicit expiry evaluated at the current clock.
 - Existing evidence IDs, global number equality, embedding similarity and a second LLM are **not proof** of a generated sentence.
 - M1–M3 publish only verbatim approved variants and typed deterministic formatting. Unreviewed model rewrites remain review proposals; they cannot enter CV/TXT/PDF export.
 - Preserve unknown dates, proficiency and work authorization as unknown. Never infer language level from IELTS, nationality, a German CV, residence or university; never infer total/AI-specific experience by summing overlapping jobs.
