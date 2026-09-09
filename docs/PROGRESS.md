@@ -18,7 +18,7 @@ Last updated: 2026-09-09. This repository initially contains planning only.
 |---|---|---|
 | M0 research | COMPLETE | Three complete reports and independent research audit |
 | M0 architecture | APPROVED | Independent exact-head review of bea4cbc; see reviews/M0.md |
-| M0 package | PREPARED FOR FINAL DELIVERY CHECK | Bundle/archive integrity results recorded in package PACKAGE_VERIFICATION.json |
+| M0 package | VERIFIED | Clean bundle restoration, tracked-file byte comparison, archive CRC and source identities passed; export-specific hashes in PACKAGE_VERIFICATION.json |
 | Laptop repository | NOT CREATED HERE | Restore supplied Git bundle using LOCAL_SETUP |
 | Private GitHub repository | NOT CREATED | Native local gh setup/auth then verify private origin |
 | TASK-001 | READY / NOT STARTED | M0 approved; restore locally and follow CODEX_HANDOFF |
@@ -36,11 +36,10 @@ Planning checks passed for required files, 256 internal Markdown links at the re
 
 ## Open gates
 
-1. Final package integrity verification in PACKAGE_VERIFICATION.json; architecture review is complete.
-2. Local Codex restores repository and implements TASK-001.
-3. TASK-005 experimentally resolves renderer and exact versions; no backend is production-approved yet.
-4. TASK-009 obtains actual reviewed career data and accepts a genuine baseline CV. Chat memory/research templates are not evidence.
-5. Optional provider/model/data choices remain deferred and do not block deterministic implementation.
+1. Local Codex restores repository and implements TASK-001.
+2. TASK-005 experimentally resolves renderer and exact versions; no backend is production-approved yet.
+3. TASK-009 obtains actual reviewed career data and accepts a genuine baseline CV. Chat memory/research templates are not evidence.
+4. Optional provider/model/data choices remain deferred and do not block deterministic implementation.
 
 ## Per-task update format
 
