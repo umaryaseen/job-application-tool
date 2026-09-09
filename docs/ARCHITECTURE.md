@@ -1,6 +1,6 @@
 # Architecture
 
-Status: planning target awaiting independent approval; runtime behavior remains unimplemented until its task passes. ADRs distinguish established foundation decisions from options requiring experiments. See [ADR index](adr/README.md).
+Status: planning architecture independently approved at commit `bea4cbc` on 2026-09-09; see [M0 review](reviews/M0.md). Runtime behavior remains unimplemented until its task passes. ADRs distinguish established foundation decisions from options requiring experiments. See [ADR index](adr/README.md).
 
 ## System boundary
 
