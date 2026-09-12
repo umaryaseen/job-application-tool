@@ -7,12 +7,14 @@ Versions below are **not selected** unless an introducing task records its actua
 | Python 3.12 | Single runtime | TASK-001, target | Record patch/platform; avoid runtime matrix until needed |
 | uv | Environment/package locking | TASK-001 | Development tool; verify current version and upstream license |
 | argparse, json, pathlib, hashlib, decimal, datetime, sqlite3 | CLI, serialization, paths, hashes, typed numbers/dates, later tracker | Standard library | No trivial wrapper dependency |
-| Pydantic 2 | Strict domain validation / JSON Schema export | TASK-002 | MIT; pinned to 2.11.7 in `pyproject.toml`/`uv.lock`; extra=forbid and explicit validators |
+| Pydantic 2 | Strict domain validation / JSON Schema export | TASK-002, TASK-006 | MIT; pinned to 2.12.5 in `pyproject.toml`/`uv.lock`; RenderCV 2.8 requires >=2.12.5; extra=forbid and explicit validators |
 | pytest | Regression/integration tests | TASK-001 | Development only; actual feature tests required |
 | Ruff / mypy | Lint/format/type gates | TASK-001 | Development only; pin and record |
 | Gitleaks or a justified mature alternative | Staged/history secret detection | TASK-001 | Tool, no applicant uploads; record version/config and safe synthetic test |
-| RenderCV | Candidate PDF backend | TASK-005 experiment, then 006 if chosen | Upstream declares MIT; inspect exact version/transitives and theme API |
-| Typst and font assets | RenderCV engine/design dependencies | With selected backend | Pin versions/checksums and attribution; no external content includes |
+| RenderCV | Candidate PDF backend and trusted YAML-to-Typst adapter | TASK-006 | MIT; pinned `rendercv[full]==2.8` in `pyproject.toml`/`uv.lock`; runs in the isolated production worker |
+| Typst | Local PDF compiler used by RenderCV | TASK-006 | Apache-2.0; pinned `typst==0.15.0`; package path is local and network-denied |
+| rendercv-fonts | Pinned local font assets | TASK-006 | MIT; pinned `rendercv-fonts==0.5.1`; only bundled font folders are passed to Typst |
+| pypdf | Independent production PDF text regression extraction | TASK-006 dev | BSD-3-Clause; pinned `pypdf==6.18.1` in the dev group; no applicant upload or OCR |
 | Jinja2 + Playwright/Chromium | Alternative renderer experiment | TASK-005 only unless chosen | Escaping, browser install and network isolation tested; do not keep unused backend |
 | pypdf | Independent PDF text/page extraction | TASK-007 | Check pinned release license; no OCR/upload requirement |
 | Poppler pdftotext/pdftoppm | Independent text/geometry and page raster QA | TASK-005/007 system tools | Record OS package/version; check redistribution terms if bundling tools later |
@@ -54,6 +56,22 @@ locked in `experiments/renderer/uv.lock`:
 | Playwright | 1.62.0 | HTML/Chromium candidate | Apache-2.0; [Python package](https://playwright.dev/python/docs/library) | Browser download is separate and was blocked on macOS 13 |
 | pypdf | 6.18.1 | Independent PDF text extraction | BSD-3-Clause; [docs](https://pypdf.readthedocs.io/en/stable/user/extract-text.html) | Used only by the experiment venv |
 
-No baseline `pyproject.toml` dependency or lockfile was changed. Poppler
-25.08.0 (`pdftotext`, `pdftoppm`) is a host measurement tool and is not
+The experiment's Playwright dependency remains outside the baseline lockfile.
+Poppler 25.08.0 (`pdftotext`, `pdftoppm`) is a host measurement tool and is not
 bundled.
+
+## TASK-006 production adapter
+
+The selected current-laptop backend is installed by the root locked
+environment: RenderCV 2.8 (full extra), Typst 0.15.0 and rendercv-fonts 0.5.1.
+RenderCV 2.8 requires Pydantic 2.12.5, so the TASK-002 pin was raised to that
+compatible patch line and re-locked. `pypdf` is development-only extraction
+coverage; Poppler remains a separately installed host QA tool. The production
+adapter does not import or use the ignored experiment virtual environment.
+
+The adapter invokes a worker under macOS `sandbox-exec` with
+`(deny network*)`; it passes only local package/font paths, fixed template
+settings and private staging files. It fails closed when that isolation
+mechanism is unavailable. This is a current macOS 13.6.9 x86_64 support scope,
+not a cross-platform promise. No Playwright dependency is installed in the
+production environment.

@@ -1,0 +1,20 @@
+cv:
+  name: null
+  headline: null
+  sections:
+    __JAE_SECTIONS__
+design:
+  theme: engineeringclassic
+  page:
+    size: a4
+    top_margin: 20mm
+    bottom_margin: 20mm
+    left_margin: 20mm
+    right_margin: 20mm
+    show_footer: false
+    show_top_note: false
+  typography:
+    font_size:
+      body: 11pt
+      headline: 11pt
+      connections: 11pt

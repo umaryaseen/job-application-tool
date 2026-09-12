@@ -8,7 +8,10 @@ version = "0.1.0"
 description = "Local, evidence-aware job application tooling"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-  "pydantic==2.11.7",
+  "pydantic==2.12.5",
+  "rendercv[full]==2.8",
+  "rendercv-fonts==0.5.1",
+  "typst==0.15.0",
 ]
 
 [project.scripts]
@@ -17,12 +20,16 @@ jae = "job_application_engine.cli:main"
 [dependency-groups]
 dev = [
   "mypy==1.17.1",
+  "pypdf==6.18.1",
   "pytest==8.4.1",
   "ruff==0.12.11",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+job_application_engine = ["rendering/templates/*.yaml"]
 
 [tool.ruff]
 line-length = 100

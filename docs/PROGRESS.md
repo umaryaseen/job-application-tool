@@ -1,6 +1,6 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH FOLLOW-UP under amended ADR-004. TASK-006 is READY, NOT STARTED (normal branch integration still required).
+Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH FOLLOW-UP under amended ADR-004. TASK-006 is IMPLEMENTED — AWAITING REVIEW.
 
 ## Environment and completed work
 
@@ -26,7 +26,7 @@ Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH
 | TASK-003 | APPROVED | Deterministic evidence graph, immutable capture checks and local review receipts; see reviews/TASK-003.md |
 | TASK-004 | APPROVED | See reviews/TASK-004.md |
 | TASK-005 | APPROVED WITH FOLLOW-UP | Current-laptop RenderCV accepted by ADR-004 amendment; comparison remains blocked, exit 2 |
-| TASK-006 | READY — NOT STARTED | No browser-comparison prerequisite; integrate reviewed branch normally before implementation |
+| TASK-006 | IMPLEMENTED — AWAITING REVIEW | Production RenderCV/Typst adapter; independent review required before TASK-007 |
 | TASK-007–009 / M1 | NOT STARTED | Adapter QA and applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
@@ -35,7 +35,7 @@ Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH
 
 ## Tests and validation
 
-Application unit/integration/rendering/model tests: **NOT IMPLEMENTED / NOT RUN**. No fabricated pass rate. Planned tests and their introducing tasks are in ACCEPTANCE_CRITERIA.
+Application unit/integration/model tests and the TASK-006 production rendering tests are implemented incrementally; exact current results are recorded in the TASK-006 entry below. No PDF support or ATS score is claimed beyond the checked synthetic fixtures.
 
 ### TASK-001 implementation
 
@@ -144,3 +144,15 @@ TASK-005 corrective re-review approved with follow-up: corrected implementation 
 ### Current architecture decision — 2026-09-13
 
 Supersedes the earlier pre-adapter browser gate: the supervising engineer proposal is independently accepted in ADR-004 and the TASK-005 review addendum. TASK-006 is **READY**, not started, subject to normal reviewed-branch integration. TASK-005 remains APPROVED WITH FOLLOW-UP; F-002 comparison evidence is now nonblocking and owned by the supervising engineer upon environment change, RenderCV requirement failure or excessive maintenance. Historical experiment status remains blocked/exit 2; Playwright remains untested. Production process isolation, complete content/Unicode and other TASK-006/007 gates remain mandatory. This documentation-only assessment does not rerun or expand the earlier runtime evidence. Earlier implementation and review entries above are historical.
+
+### TASK-006 implementation — IMPLEMENTED — AWAITING REVIEW
+
+- Base: TASK-005 approved integration merge `75b8b1f`; branch: `task/006-pdf-adapter`. The implementation commit is recorded after staging and review of this entry.
+- Adds `rendering/pdf.py` and a packaged `rendering/templates/baseline.yaml`. The adapter validates the complete `DocumentPlan` and profile/support review receipts with the TASK-003/TASK-004 validator before creating private staging files. It emits only the fixed A4, one-column, 11pt, 20mm RenderCV template and literal escaped Typst text tokens.
+- RenderCV 2.8, Typst 0.15.0, rendercv-fonts 0.5.1 and Pydantic 2.12.5 are locked runtime dependencies. Pydantic was raised from 2.11.7 because RenderCV 2.8 declares `pydantic[email]>=2.12.5`; no Playwright dependency enters the production environment. `pypdf` 6.18.1 is development-only extraction coverage.
+- The worker and its RenderCV child run under macOS `sandbox-exec` with `(deny network*)`; proxies are removed, local font/package paths are explicit, subprocess arguments use arrays, and output is bounded to 2,000,000 bytes. Missing isolation, timeout, failed worker, stale/tampered plan, unsafe output name and existing output fail closed. Temporary files are removed on success and handled failures.
+- `jae build-cv` requires explicit profile JSON, DocumentPlan JSON and local human review receipt JSON. It publishes only to `JAE_DATA_DIR/outputs/`; no profile, plan or review data is bundled in Git. The README records the command and current-laptop limitation.
+- Synthetic production tests cover complete Poppler and pypdf extraction, German Unicode, hostile Typst/HTML/template-like text, URLs/file-like references, a two-page long plan, tampered plans, missing isolation, timeout and worker-failure cleanup. No PDF is accepted from an unisolated fallback.
+- Verification to record with the implementation commit: locked sync, Python 3.12, full pytest, Ruff check/format, mypy and production renderer tests. Poppler and raster inspection are host tools; cross-platform support, Playwright quality and ATS scoring remain unclaimed.
+
+Next action: obtain independent review of the exact TASK-006 implementation commit. Do not merge or start TASK-007 before approval.
