@@ -120,3 +120,5 @@ Independent TASK-004 review approved implementation `d8427071d7cdaf145dcd9a5dc6c
 - No applicant data, credentials, authenticated browser profile, UI, production renderer adapter, PDF export workflow, matching or TASK-006 work was added. The proposed RenderCV recommendation is conditional and is not an approval.
 
 Next action: obtain an independent review of the exact TASK-005 commit and decide ADR-004; do not start TASK-006 before approval.
+
+Independent TASK-005 review: CHANGES REQUIRED for implementation `dcc30ea05e7d51adbd384fe700c57cf459922fd1` (documentation head `4f5008f49e85f25d6215b4e00e4d0a53ee69bf2f`). Renderer reproduction exposed prefix-only extraction acceptance: long-wrapping and hostile-text lose complete claims while prefixes pass. Playwright remains correctly blocked by unavailable Chromium. See `docs/reviews/TASK-005.md`.
