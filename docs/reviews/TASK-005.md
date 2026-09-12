@@ -26,3 +26,21 @@ Playwright is correctly recorded BLOCKED because Chromium is unavailable on macO
 `/Users/apple/.local/bin/uv sync --locked` passed; Python 3.12.14; baseline pytest 28 passed; Ruff check/format and mypy passed (21 source files). Renderer experiment sync passed, cases were prepared, and the runner completed RenderCV/Typst, letter, Poppler/pypdf, raster and network-denial probes. RenderCV and final Typst compilation reported sandboxed success with A4 output (short 1 page, two-page 2 pages, letter 1 page). Every raster page was produced; generated outputs were inspected. Playwright reproduction failed with the recorded missing Chromium executable and remained BLOCKED. The standalone network probe was denied; the runner records RenderCV sandboxing, but HTML was not executed.
 
 The short and german-unicode PDFs have identical hashes because their fixture plans render identical content; this does not demonstrate distinct Unicode coverage. The inspected hostile fixture includes markup/sentinel content and the runner reports escaping/sentinel absence. The implementation tests cover token escaping and replacement mechanics, but the complete extraction failure above remains blocking. Review documentation and progress were updated without implementation changes.
+
+## Re-review of corrections and ADR-004 qualification
+
+Reviewer: Codex (independent reviewer)  
+Date: 2026-09-12  
+Corrected implementation: `62eddb346995c8ef7ade694d45775779f5017c36`  
+Documentation head inspected: `c13ecb2cbaa875795dfd8c4f0c7e0445ea7208b4`
+
+Ancestry and clean state were verified. The delta after the corrected implementation is documentation-only. F-001 is **addressed**: the oracle is generated from validated plans before rendering, and Poppler and pypdf complete-content comparisons pass. Normalization removes only extraction line-break artifacts/soft hyphens and preserves meaningful values; negative controls for suffix, qualification, duplication, order and unexpected content all return failures. RenderCV output passed all mandatory gates, including A4/pages, Unicode, hostile input, sandboxed compilation, and raster generation. The short and german-unicode hashes are identical because their plans are identical; required Unicode characters are covered by the synthetic cases.
+
+F-002 is **qualified follow-up**: ADR-004's selection of RenderCV is acceptable for this laptop because every RenderCV gate passes, while Playwright remains explicitly BLOCKED/UNTESTED due to the macOS 13 Chromium installation failure. The experiment reports overall status `blocked`, so blocked HTML cannot mask a RenderCV failure. The qualification does not claim comparative superiority or cross-platform support. The remaining gate before production adapter work is a supported Playwright rerun (or explicit future ADR update); TASK-006 must not begin from the blocked comparison.
+
+## Re-review verification
+
+- `/Users/apple/.local/bin/uv sync --locked`; Python 3.12.14; baseline pytest **31 passed**; Ruff check/format and mypy passed.
+- Renderer environment lock sync passed; real experiment completed with RenderCV/Typst and letter success, Poppler+pypdf complete matches, all negative controls rejected, sandboxed/network-denied probe, and raster pages generated for every case. Playwright installation failure was reproduced and retained as BLOCKED (exit 2 semantics recorded by the runner/report).
+
+**Verdict: APPROVED WITH FOLLOW-UP.**

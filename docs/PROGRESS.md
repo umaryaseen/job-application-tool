@@ -135,3 +135,5 @@ Independent TASK-005 review: CHANGES REQUIRED for implementation `dcc30ea05e7d51
 - Independently specified complete-content fixtures are checked in under `tests/fixtures/rendering/expected/`; the original extractor fragments remain in `tests/fixtures/rendering/extraction_failures.json`. The runner exits nonzero for a failed or blocked mandatory gate (this laptop returned 2 for blocked Chromium).
 
 Next action: independent re-review of the focused corrective commits, then an ADR-004 decision by the supervising engineer. Do not start TASK-006.
+
+TASK-005 corrective re-review approved with follow-up: corrected implementation `62eddb346995c8ef7ade694d45775779f5017c36`, documentation head `c13ecb2cbaa875795dfd8c4f0c7e0445ea7208b4`. Full Poppler/pypdf content oracle and negative controls pass; RenderCV mandatory gates pass. Playwright remains BLOCKED/UNTESTED on macOS 13, so ADR-004 is accepted only as a laptop qualification; supported-browser comparison remains a gate before production adapter work. See appended TASK-005 review.
