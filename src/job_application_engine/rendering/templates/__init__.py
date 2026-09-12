@@ -1,0 +1,1 @@
+"""Trusted, versioned RenderCV templates."""

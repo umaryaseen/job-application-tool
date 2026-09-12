@@ -1,54 +1,89 @@
 # Handoff to an independent reviewer
 
-Use this prompt in a **separate** coding-agent session. Review the focused
-TASK-005 corrective implementation below; do not approve it as the
-implementer.
+Use this prompt in a **separate** coding-agent session. Review the exact
+TASK-006 implementation below; do not approve it as the implementer.
 
 ```text
-Independently re-review TASK-005 corrective findings F-001 and F-002.
+Independently review TASK-006 in this repository.
 
-Original TASK-005 implementation:
-dcc30ea05e7d51adbd384fe700c57cf459922fd1
-Original independent review: f91357338fcaf02ba6f5492ad598d258ad2cc121
-Corrective implementation commits: 4b2f3eae32e59e8a6059bb3ae2d18dc1d75628a7, 180917ae3e3679c8c24dda246cbddcdf1d5732e9, 62eddb346995c8ef7ade694d45775779f5017c36
-Branch: task/005-renderer-experiment
+TASK-005 approved implementation: 62eddb346995c8ef7ade694d45775779f5017c36
+TASK-005 accepted ADR-004 amendment: 1638bec9a3c334f0491625368e1a2ab208a19ce1
+TASK-005 merge/base: 75b8b1f7b37ed62f51ec833e7f7e0ce50143cc10
+TASK-006 implementation head: 452edbe21f94a844b04d080ed7549e216c13e42f
+Branch: task/006-pdf-adapter
 
-Resolve all three full corrective hashes; the latest corrective head is 62eddb346995c8ef7ade694d45775779f5017c36. Read AGENTS.md, docs/tasks/TASK-005.md,
-docs/experiments/RENDERER_DECISION.md, docs/adr/ADR-004,
-docs/adr/ADR-015, docs/PROGRESS.md and docs/reviews/TASK-005.md. Inspect the
-complete corrective diff from the original implementation to the corrective
-head and preserve the earlier review findings.
+Read AGENTS.md, docs/PROJECT_BRIEF.md, docs/ARCHITECTURE.md,
+docs/IMPLEMENTATION_PLAN.md, docs/ACCEPTANCE_CRITERIA.md,
+docs/SECURITY_AND_PRIVACY.md, docs/PROGRESS.md, docs/tasks/TASK-006.md,
+docs/DEPENDENCIES.md, ADR-004, ADR-011, ADR-013, ADR-015,
+docs/REVIEW_PROTOCOL.md and the relevant SOURCE_REGISTER sections. Inspect
+the complete diff from the TASK-005 merge to the exact TASK-006 head,
+including the trusted template, CLI boundary, lockfile and tests.
 
-Reproduce the experiment using the locked baseline and experiment commands:
-`/Users/apple/.local/bin/uv sync --locked`, Python 3.12, pytest, Ruff,
-format, mypy, `uv sync --project experiments/renderer --locked`, and the
-commands in experiments/renderer/README.md. Inspect every regenerated
-RenderCV raster page. Confirm Playwright remains explicitly blocked on this
-macOS 13 host rather than being treated as a pass.
+Run independently:
+`/Users/apple/.local/bin/uv sync --locked`, Python 3.12, `uv run pytest`,
+`uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy src`,
+and the synthetic production renderer tests. Reproduce `jae build-cv` with
+synthetic profile, DocumentPlan and local review receipt JSON. Inspect the
+generated A4 PDF and raster preview and compare complete content with both
+Poppler and pypdf.
 
-For F-001, verify that the expected content is an independent ordered oracle
-including static headings and every claim, and that BOTH Poppler and pypdf
-must match the complete content. Check the narrow normalization rules for
-NFC, soft hyphens, date hyphens, split HTTP(S) schemes and whitespace. Confirm
-that punctuation, numbers, units, negation and qualifiers remain meaningful.
-Run or inspect the negative controls for suffix removal, qualification change,
-duplication, reordering and unexpected content. Confirm any complete-content
-failure makes the experiment unsuccessful even when PDF generation succeeds.
-Reproduce long-wrapping and hostile-text cases and inspect their corrected
-results, hashes and Unicode/security behavior.
+Focus on the validated-plan/provenance boundary (a model or recomputed digest
+alone must not authorize content), exact claims and typed formatting, private
+staging and root validation, output/temp bounds and cleanup, timeout and worker
+failure behavior, refusal to overwrite, literal Typst insertion, hostile
+markup/file/remote references, local package/font/template pinning and the
+macOS sandbox-exec `(deny network*)` process chain. Confirm missing isolation
+fails closed and no Playwright fallback, arbitrary template, remote font,
+DOCX, UI, matching, export workflow or TASK-007 work was added.
 
-For F-002, verify the ADR-004 qualification: the planned two-engine quality
-comparison was not completed; Playwright package setup succeeded but Chromium
-installation failed with the recorded macOS 13 error; HTML/Playwright layout,
-extraction, raster and browser security remain untested; no cross-platform or
-comparative-quality claim is made; and reconsideration triggers and the
-no-backend/TASK-006 gate are explicit. Do not accept ADR-004 or start
-TASK-006.
+Confirm RenderCV 2.8, Typst 0.15.0, rendercv-fonts 0.5.1, Pydantic 2.12.5
+and pypdf 6.18.1 are documented and locked, with the Pydantic upgrade
+explained by RenderCV's requirement. Confirm the current-laptop macOS support
+scope is explicit and no cross-platform or universal ATS claim is made.
 
-Confirm no applicant data, credentials, authenticated browser profile,
-production renderer, UI, matching, export workflow or unrelated feature was
-introduced. Record APPROVED, APPROVED WITH FOLLOW-UP, or CHANGES REQUIRED in
-a new sanitized docs/reviews/TASK-005.md report with exact reviewed commit
-IDs and update PROGRESS with the actual verdict. Do not modify implementation,
-merge, force-push or self-approve.
+Record APPROVED, APPROVED WITH FOLLOW-UP, or CHANGES REQUIRED in a new
+sanitized docs/reviews/TASK-006.md report with exact reviewed commit IDs.
+For each blocking finding provide a narrow reproduction, affected modules,
+acceptance criteria and regression tests. Update PROGRESS with the actual
+review state. Do not modify implementation, merge, force-push or self-approve.
+```
+
+## TASK-006 corrective re-review
+
+Use this prompt in a separate coding-agent session to review only the two
+corrections below. Preserve the original `docs/reviews/TASK-006.md` finding.
+
+```text
+Independently re-review the TASK-006 corrections in this repository.
+
+Original reviewed implementation: 452edbe21f94a844b04d080ed7549e216c13e42f
+Original review: 2feccf0032268ed3918310f5865e4fb63f60fa39
+Correction commit: 8f8181fd88925c1bc33e6800576c938f3f9857e1
+Branch: task/006-pdf-adapter
+
+Read AGENTS.md, docs/reviews/TASK-006.md, docs/tasks/TASK-006.md,
+docs/DEPENDENCIES.md, docs/PROGRESS.md and the complete correction diff.
+Confirm no dependency or lockfile changed and no unrelated implementation was
+introduced.
+
+F-001: verify the current dependency register names Pydantic 2.12.5, while the
+historical TASK-002 Pydantic 2.11.7 row is explicitly marked superseded. Verify
+the installed RenderCV 2.8 metadata constraint `pydantic[email]>=2.12.5` and
+the locked project graph. Confirm historical records remain intact.
+
+F-002: inspect and run
+`tests/test_rendering.py::test_production_pdf_handles_long_two_page_plan_without_pruning`.
+Confirm the same freshly generated two-page PDF is independently extracted by
+Poppler and pypdf, and both are compared with the same expected plan using the
+existing narrow normalization. Confirm the page-count assertion remains and
+the existing complete-content negative controls reject suffix loss,
+qualification changes, duplication, reordering and unexpected content. Do not
+accept a prefix check, one extractor as the other's oracle, fallback behavior,
+or broadened normalization.
+
+Run `/Users/apple/.local/bin/uv sync --locked`, Python 3.12, full pytest, Ruff,
+format and mypy. Record APPROVED, APPROVED WITH FOLLOW-UP, or CHANGES REQUIRED
+in docs/reviews/TASK-006-correction.md with exact commit IDs and update
+PROGRESS. Do not modify implementation, merge, push or self-approve.
 ```
