@@ -122,3 +122,14 @@ Independent TASK-004 review approved implementation `d8427071d7cdaf145dcd9a5dc6c
 Next action: obtain an independent review of the exact TASK-005 commit and decide ADR-004; do not start TASK-006 before approval.
 
 Independent TASK-005 review: CHANGES REQUIRED for implementation `dcc30ea05e7d51adbd384fe700c57cf459922fd1` (documentation head `4f5008f49e85f25d6215b4e00e4d0a53ee69bf2f`). Renderer reproduction exposed prefix-only extraction acceptance: long-wrapping and hostile-text lose complete claims while prefixes pass. Playwright remains correctly blocked by unavailable Chromium. See `docs/reviews/TASK-005.md`.
+
+### TASK-005 corrective implementation (F-001/F-002)
+
+- Status: **IMPLEMENTED — AWAITING REVIEW**. The original review at `f91357338fcaf02ba6f5492ad598d258ad2cc121` remains preserved; these corrections do not approve TASK-005.
+- F-001 root cause: RenderCV/Typst preserved complete claim text, while Poppler and pypdf inserted extractor layout artifacts (soft hyphens in wrapped words and date separators, plus a split `https://`). The prefix-only check accepted those losses. The runner now compares an independently written ordered-content oracle containing static headings and all claims in full against both extractors.
+- Normalization is narrow: Unicode NFC; date hyphen restoration only for a soft hyphen between digits; removal of soft hyphen line-break markers; repair of an extractor-split HTTP(S) scheme; and whitespace collapse. Punctuation, numbers, units, qualifiers, negation and words are not broadened or truncated.
+- Negative controls reject suffix removal, qualification/metric changes, duplication, reordering and unexpected content. Any complete-content mismatch marks PDF generation unsuccessful. All five CV fixtures and the synthetic letter matched the complete oracle in both Poppler and pypdf; all negative controls returned rejection.
+- F-002: ADR-004 and the experiment report now explicitly qualify the outcome as a feasible current-laptop RenderCV backend only. Playwright 1.62.0 package installation succeeded, but Chromium installation failed on macOS 13.6.9 with `ERROR: Playwright does not support chromium on mac13`; HTML/Playwright quality and security remain untested. No cross-platform or comparative-quality claim is made. Reconsideration triggers are a supported target environment, any unmet RenderCV mandatory gate, or excessive adapter maintenance. If RenderCV fails, no backend is recommended and TASK-006 remains blocked.
+- Added baseline regression coverage for the content normalizer and mutation controls. The existing security, Unicode, sandbox and visual checks remain.
+
+Next action: independent re-review of the focused corrective commits, then an ADR-004 decision by the supervising engineer. Do not start TASK-006.

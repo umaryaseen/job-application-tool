@@ -9,6 +9,7 @@ import re
 import shutil
 import subprocess
 import sys
+import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +26,52 @@ FONT_ROOT = VENV / "lib" / "python3.12" / "site-packages" / "rendercv_fonts"
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def normalize_extracted_text(value: str) -> str:
+    """Normalize only Unicode/layout artifacts introduced by PDF extraction.
+
+    NFC preserves Unicode identity. A soft hyphen is a line-break marker in
+    word text; between digits it replaces a date hyphen in pypdf output. PDF
+    extractors can also split the two slashes in an HTTPS scheme across a line.
+    All other whitespace is collapsed to one space so visual line wrapping does
+    not change content. Punctuation, numbers, units, qualifiers and negation
+    remain otherwise byte-for-byte meaningful after UTF-8 normalization.
+    """
+
+    value = unicodedata.normalize("NFC", value)
+    value = re.sub(r"(https?:)/\s*/\s*", r"\1//", value)
+    value = re.sub(r"(?<=\d)\u00ad(?=\d)", "-", value)
+    value = re.sub(r"\s*\u00ad\s*", "", value)
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def complete_content_matches(expected: str, actual: str) -> bool:
+    """Compare the complete ordered visible document after narrow normalization."""
+
+    return normalize_extracted_text(actual) == normalize_extracted_text(expected)
+
+
+def complete_content_controls(expected: str) -> dict[str, bool]:
+    """Negative controls prove complete comparison rejects content changes."""
+
+    qualification = (
+        ("German (CEFR B2)", "German (CEFR B1)")
+        if "German (CEFR B2)" in expected
+        else ("Synthetic Example", "Synthetic Altered Example")
+    )
+    first_word, *remaining_words = expected.split()
+    controls = {
+        "suffix_removed": expected[:-1],
+        "qualification_changed": expected.replace(*qualification, 1),
+        "claim_duplicated": f"{expected} {first_word}",
+        "claim_moved": " ".join([*remaining_words, first_word]),
+        "unexpected_content": expected + " Unexpected synthetic marker",
+    }
+    return {
+        name: not complete_content_matches(expected, candidate)
+        for name, candidate in controls.items()
+    }
 
 
 def run_rendercv(case_dir: Path, typ_path: Path, input_name: str = "input.yaml") -> dict[str, Any]:
@@ -73,7 +120,7 @@ def compile_typst(typ_path: Path, pdf_path: Path) -> dict[str, Any]:
     return {"status": "ok", "sha256": sha256(pdf_path)}
 
 
-def measure_pdf(pdf_path: Path, expected: list[str], output_dir: Path) -> dict[str, Any]:
+def measure_pdf(pdf_path: Path, expected: str, output_dir: Path) -> dict[str, Any]:
     info = subprocess.run(["pdfinfo", str(pdf_path)], text=True, capture_output=True, check=False)
     text_path = output_dir / f"{pdf_path.stem}.txt"
     extracted = subprocess.run(
@@ -83,11 +130,6 @@ def measure_pdf(pdf_path: Path, expected: list[str], output_dir: Path) -> dict[s
         check=False,
     )
     text = text_path.read_text(encoding="utf-8", errors="replace") if text_path.exists() else ""
-    normalized = re.sub(r"\s+", " ", text).strip()
-    missing = [item for item in expected if re.sub(r"\s+", " ", item).strip() not in normalized]
-    prefixes_missing = [
-        item[:48] for item in expected if re.sub(r"\s+", " ", item[:48]).strip() not in normalized
-    ]
     page_info: dict[str, Any] = {}
     for line in info.stdout.splitlines():
         if ":" in line:
@@ -108,16 +150,17 @@ def measure_pdf(pdf_path: Path, expected: list[str], output_dir: Path) -> dict[s
         check=False,
     )
     sentinel = "SECRET_SENTINEL_NOT_CLAIM_TEXT"
-    positions = [normalized.find(re.sub(r"\s+", " ", item[:48]).strip()) for item in expected]
+    poppler_match = complete_content_matches(expected, text)
+    pypdf_match = complete_content_matches(expected, pypdf_text)
     return {
         "sha256": sha256(pdf_path),
         "pdfinfo": page_info,
         "pdftotext_returncode": extracted.returncode,
         "pypdf_text_sha256": hashlib.sha256(pypdf_text.encode("utf-8")).hexdigest(),
-        "expected_claims_missing_from_pdftotext": missing,
-        "claim_prefixes_missing_from_pdftotext": prefixes_missing,
-        "claim_prefixes_in_document_order": all(position >= 0 for position in positions)
-        and positions == sorted(positions),
+        "poppler_complete_content_match": poppler_match,
+        "pypdf_complete_content_match": pypdf_match,
+        "complete_content_match": poppler_match and pypdf_match,
+        "negative_controls_rejected": complete_content_controls(expected),
         "unicode_preserved": "Größe Ä Ö Ü ß" in text,
         "sentinel_not_recovered": sentinel not in text and sentinel not in pypdf_text,
         "raster_returncode": raster.returncode,
@@ -157,12 +200,14 @@ def safe_typst_case(case_id: str) -> dict[str, Any]:
             "rendercv": render_result,
             "compile": compiled,
         }
-    plan = json.loads((case_dir / "plan.json").read_text(encoding="utf-8"))
-    expected = [str(line["text"]) for section in plan["sections"] for line in section["lines"]]
+    expected = json.loads((case_dir / "expected.json").read_text(encoding="utf-8"))[
+        "ordered_content"
+    ]
     measured = measure_pdf(pdf_path, expected, output_dir)
+    status = "ok" if measured["complete_content_match"] else "failed"
     return {
         "backend": "rendercv-typst",
-        "status": "ok",
+        "status": status,
         "rendercv": render_result,
         "compile": compiled,
         "measurements": measured,
@@ -175,12 +220,10 @@ def html_case(case_id: str) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     plan = json.loads((case_dir / "plan.json").read_text(encoding="utf-8"))
     sections = []
-    expected = []
     for section in plan["sections"]:
         rows = []
         for line in section["lines"]:
             value = str(line["text"])
-            expected.append(value)
             rows.append(f"<p>{html.escape(value, quote=True)}</p>")
         sections.append(
             f"<section><h2>{html.escape(str(section['label']))}</h2>{''.join(rows)}</section>"
@@ -210,8 +253,15 @@ def html_case(case_id: str) -> dict[str, Any]:
                 path=str(pdf_path), format="A4", print_background=True, prefer_css_page_size=True
             )
             browser.close()
+        expected = json.loads((case_dir / "expected.json").read_text(encoding="utf-8"))[
+            "ordered_content"
+        ]
         measured = measure_pdf(pdf_path, expected, output_dir)
-        return {"backend": "html-playwright", "status": "ok", "measurements": measured}
+        return {
+            "backend": "html-playwright",
+            "status": "ok" if measured["complete_content_match"] else "failed",
+            "measurements": measured,
+        }
     except Exception as error:
         return {
             "backend": "html-playwright",
@@ -315,7 +365,12 @@ def letter_case() -> dict[str, Any]:
         "rendercv": result,
         "compile": compiled,
         "measurements": measure_pdf(
-            pdf_path, ["Synthetic Example", "one-page feasibility"], output_dir
+            pdf_path,
+            "Synthetic Example Letter Synthetic Example Application for Synthetic Engineering "
+            "Dear Synthetic Hiring Team, This is a one-page feasibility letter using only "
+            "synthetic content. "
+            "Kind regards, Synthetic Example",
+            output_dir,
         ),
     }
 
@@ -335,6 +390,17 @@ def main() -> None:
         }
     results["letter"] = letter_case()
     results["security_probe"] = network_probe()
+    render_results = [item["rendercv"] for item in results["cases"].values()]
+    html_results = [item["html"] for item in results["cases"].values()]
+    if (
+        any(item["status"] == "failed" for item in render_results)
+        or results["letter"]["status"] == "failed"
+    ):
+        results["experiment_status"] = "failed"
+    elif any(item["status"] == "blocked" for item in html_results):
+        results["experiment_status"] = "blocked"
+    else:
+        results["experiment_status"] = "ok"
     (OUT / "results.json").write_text(
         json.dumps(results, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )

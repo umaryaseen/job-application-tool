@@ -101,6 +101,21 @@ def yaml_for_plan(plan: dict[str, object]) -> tuple[str, dict[str, str]]:
     return "\n".join(lines) + "\n", tokens
 
 
+def expected_content_for_plan(plan: dict[str, object]) -> str:
+    """Independent fixture oracle: trusted headings followed by all claims."""
+
+    entries: list[str] = []
+    sections = plan["sections"]
+    assert isinstance(sections, list)
+    for section in sections:
+        assert isinstance(section, dict)
+        entries.append(str(section["label"]))
+        section_lines = section["lines"]
+        assert isinstance(section_lines, list)
+        entries.extend(str(line["text"]) for line in section_lines if isinstance(line, dict))
+    return " ".join(entries)
+
+
 def write_case(case_id: str, profile: ProfileRevision, reviews: list[LocalReviewReceipt]) -> None:
     plan = compile_baseline(profile, as_of=AS_OF, reviews=reviews)
     payload = plan_payload(plan)
@@ -113,6 +128,15 @@ def write_case(case_id: str, profile: ProfileRevision, reviews: list[LocalReview
     (case_dir / "input.yaml").write_text(yaml_text, encoding="utf-8")
     (case_dir / "tokens.json").write_text(
         json.dumps(tokens, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    (case_dir / "expected.json").write_text(
+        json.dumps(
+            {"ordered_content": expected_content_for_plan(payload)},
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
     )
 
 
