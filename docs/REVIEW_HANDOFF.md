@@ -10,10 +10,10 @@ Independently re-review TASK-005 corrective findings F-001 and F-002.
 Original TASK-005 implementation:
 dcc30ea05e7d51adbd384fe700c57cf459922fd1
 Original independent review: f91357338fcaf02ba6f5492ad598d258ad2cc121
-Corrective implementation: 4b2f3eae32e59e8a6059bb3ae2d18dc1d75628a7
+Corrective implementation commits: 4b2f3eae32e59e8a6059bb3ae2d18dc1d75628a7, 180917a
 Branch: task/005-renderer-experiment
 
-Resolve the full corrective hash. Read AGENTS.md, docs/tasks/TASK-005.md,
+Resolve both full corrective hashes; the latest corrective head is 180917a. Read AGENTS.md, docs/tasks/TASK-005.md,
 docs/experiments/RENDERER_DECISION.md, docs/adr/ADR-004,
 docs/adr/ADR-015, docs/PROGRESS.md and docs/reviews/TASK-005.md. Inspect the
 complete corrective diff from the original implementation to the corrective
