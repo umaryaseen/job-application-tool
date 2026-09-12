@@ -28,3 +28,14 @@ No runtime dependencies have been installed or locked for this project yet. Vers
 Every addition must record: name, exact installed version, upstream URL, purpose, task/ADR, runtime/dev/optional group, license source, transitive or asset concerns, lockfile location, offline behavior and alternatives considered. Optional libraries cannot become mandatory imports in baseline paths.
 
 Upstream observations made on 2026-09-08: [RenderCV](https://github.com/rendercv/rendercv), [Pydantic strict validation](https://pydantic.dev/docs/validation/latest/concepts/strict_mode/), [python-docx](https://python-docx.readthedocs.io/en/latest/), [Sentence Transformers](https://sbert.net/docs/sentence_transformer/pretrained_models.html). These pages confirm capabilities, not suitability on the unseen laptop. Recheck exact APIs at implementation.
+## TASK-001 direct dependencies
+
+| Package | Locked version | Use | License source | Introduced |
+|---|---:|---|---|---|
+| pytest | 8.4.1 | Synthetic unit and security-boundary tests | PyPI metadata | TASK-001 |
+| Ruff | 0.12.11 | Lint and format checks | PyPI metadata | TASK-001 |
+| mypy | 1.17.1 | Static type checking | PyPI metadata | TASK-001 |
+
+The runtime package uses only the Python 3.12 standard library. `setuptools` is
+the build backend and is not imported at runtime. No model, renderer, network,
+database, or applicant-data dependency is installed by TASK-001.
