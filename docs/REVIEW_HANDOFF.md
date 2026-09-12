@@ -1,44 +1,54 @@
 # Handoff to an independent reviewer
 
-Use this prompt in a **separate** coding-agent session. Review the exact
-TASK-005 implementation commit below; do not approve it as the implementer.
+Use this prompt in a **separate** coding-agent session. Review the focused
+TASK-005 corrective implementation below; do not approve it as the
+implementer.
 
 ```text
-Independently review TASK-005 in this repository.
+Independently re-review TASK-005 corrective findings F-001 and F-002.
 
-TASK-004 approved merge/base: 82deb141f84c59d86da78f68f06c4e35dfc339c0
-TASK-005 implementation head: dcc30ea05e7d51adbd384fe700c57cf459922fd1
+Original TASK-005 implementation:
+dcc30ea05e7d51adbd384fe700c57cf459922fd1
+Original independent review: f91357338fcaf02ba6f5492ad598d258ad2cc121
+Corrective implementation: 4b2f3ea
 Branch: task/005-renderer-experiment
 
-Resolve the full implementation hash and inspect the complete diff from the
-TASK-004 approved merge to that exact head. Read AGENTS.md,
-docs/PROJECT_BRIEF.md, docs/ARCHITECTURE.md, docs/IMPLEMENTATION_PLAN.md,
-docs/ACCEPTANCE_CRITERIA.md, docs/SECURITY_AND_PRIVACY.md, docs/PROGRESS.md,
-docs/tasks/TASK-005.md, ADR-004, ADR-013, ADR-015, relevant research sections
-in SOURCE_REGISTER.md, and docs/REVIEW_PROTOCOL.md.
+Resolve the full corrective hash. Read AGENTS.md, docs/tasks/TASK-005.md,
+docs/experiments/RENDERER_DECISION.md, docs/adr/ADR-004,
+docs/adr/ADR-015, docs/PROGRESS.md and docs/reviews/TASK-005.md. Inspect the
+complete corrective diff from the original implementation to the corrective
+head and preserve the earlier review findings.
 
-Run the locked baseline checks and the isolated experiment independently:
+Reproduce the experiment using the locked baseline and experiment commands:
 `/Users/apple/.local/bin/uv sync --locked`, Python 3.12, pytest, Ruff,
 format, mypy, `uv sync --project experiments/renderer --locked`, and the
-reproduction commands in experiments/renderer/README.md. Inspect the
-synthetic PDFs and every raster page under the ignored artifacts path when
-reproducing. Confirm the report distinguishes the blocked Playwright Chromium
-runtime on macOS 13 from a successful browser result.
+commands in experiments/renderer/README.md. Inspect every regenerated
+RenderCV raster page. Confirm Playwright remains explicitly blocked on this
+macOS 13 host rather than being treated as a pass.
 
-Focus on identical validated DocumentPlans for RenderCV/Typst and HTML/CSS;
-A4 dimensions, page counts, extraction/order, Unicode, wrapping and visual
-inspection; exact pinned dependencies, local font/license recording; hostile
-markup and sentinel handling; sandboxed/network-denied rendering; HTML
-escaping and request aborts; and the one-page synthetic letter. Confirm no
-real applicant data, credentials, authenticated browser profile, remote
-resource, production renderer, UI, matching, export workflow, or TASK-006
-work was introduced. Confirm the candidate text boundary prevents arbitrary
-Typst/HTML markup and that limitations are recorded honestly.
+For F-001, verify that the expected content is an independent ordered oracle
+including static headings and every claim, and that BOTH Poppler and pypdf
+must match the complete content. Check the narrow normalization rules for
+NFC, soft hyphens, date hyphens, split HTTP(S) schemes and whitespace. Confirm
+that punctuation, numbers, units, negation and qualifiers remain meaningful.
+Run or inspect the negative controls for suffix removal, qualification change,
+duplication, reordering and unexpected content. Confirm any complete-content
+failure makes the experiment unsuccessful even when PDF generation succeeds.
+Reproduce long-wrapping and hostile-text cases and inspect their corrected
+results, hashes and Unicode/security behavior.
 
-Record APPROVED, APPROVED WITH FOLLOW-UP, or CHANGES REQUIRED in a new
-sanitized docs/reviews/TASK-005.md report with exact reviewed commit IDs and
-measured results. For each blocking finding provide a narrow reproduction,
-affected modules, acceptance criteria, and regression tests. Update PROGRESS
-with the actual review state. Do not modify implementation, merge,
-force-push, or self-approve.
+For F-002, verify the ADR-004 qualification: the planned two-engine quality
+comparison was not completed; Playwright package setup succeeded but Chromium
+installation failed with the recorded macOS 13 error; HTML/Playwright layout,
+extraction, raster and browser security remain untested; no cross-platform or
+comparative-quality claim is made; and reconsideration triggers and the
+no-backend/TASK-006 gate are explicit. Do not accept ADR-004 or start
+TASK-006.
+
+Confirm no applicant data, credentials, authenticated browser profile,
+production renderer, UI, matching, export workflow or unrelated feature was
+introduced. Record APPROVED, APPROVED WITH FOLLOW-UP, or CHANGES REQUIRED in
+a new sanitized docs/reviews/TASK-005.md report with exact reviewed commit
+IDs and update PROGRESS with the actual verdict. Do not modify implementation,
+merge, force-push or self-approve.
 ```

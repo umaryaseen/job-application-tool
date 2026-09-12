@@ -126,6 +126,7 @@ Independent TASK-005 review: CHANGES REQUIRED for implementation `dcc30ea05e7d51
 ### TASK-005 corrective implementation (F-001/F-002)
 
 - Status: **IMPLEMENTED — AWAITING REVIEW**. The original review at `f91357338fcaf02ba6f5492ad598d258ad2cc121` remains preserved; these corrections do not approve TASK-005.
+- Corrective implementation commit: `4b2f3ea` (full hash is pinned in the corrective review handoff); documentation-only follow-up will record its full hash.
 - F-001 root cause: RenderCV/Typst preserved complete claim text, while Poppler and pypdf inserted extractor layout artifacts (soft hyphens in wrapped words and date separators, plus a split `https://`). The prefix-only check accepted those losses. The runner now compares an independently written ordered-content oracle containing static headings and all claims in full against both extractors.
 - Normalization is narrow: Unicode NFC; date hyphen restoration only for a soft hyphen between digits; removal of soft hyphen line-break markers; repair of an extractor-split HTTP(S) scheme; and whitespace collapse. Punctuation, numbers, units, qualifiers, negation and words are not broadened or truncated.
 - Negative controls reject suffix removal, qualification/metric changes, duplication, reordering and unexpected content. Any complete-content mismatch marks PDF generation unsuccessful. All five CV fixtures and the synthetic letter matched the complete oracle in both Poppler and pypdf; all negative controls returned rejection.
