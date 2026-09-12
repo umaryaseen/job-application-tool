@@ -24,10 +24,9 @@ def _repository_root() -> Path | None:
     return Path(result.stdout.strip()).resolve()
 
 
-def private_data_root(value: str | os.PathLike[str] | None = None) -> Path:
-    """Return an existing, non-symlink private root outside the repository."""
+def _validate_private_root(raw: str | os.PathLike[str]) -> Path:
+    """Validate a candidate root using the same policy for every caller."""
 
-    raw = value if value is not None else os.environ.get("JAE_DATA_DIR")
     if not raw:
         raise ConfigurationError("JAE_DATA_DIR is required and must point outside the repository")
     path = Path(raw).expanduser()
@@ -44,10 +43,19 @@ def private_data_root(value: str | os.PathLike[str] | None = None) -> Path:
     return resolved
 
 
+def private_data_root(value: str | os.PathLike[str] | None = None) -> Path:
+    """Return an existing, non-symlink private root outside the repository."""
+
+    raw = value if value is not None else os.environ.get("JAE_DATA_DIR")
+    if raw is None:
+        raise ConfigurationError("JAE_DATA_DIR is required and must point outside the repository")
+    return _validate_private_root(raw)
+
+
 def safe_private_path(relative: str | os.PathLike[str], root: Path | None = None) -> Path:
     """Resolve a relative path under the private root, rejecting escapes and symlinks."""
 
-    base = private_data_root() if root is None else root.resolve()
+    base = private_data_root() if root is None else _validate_private_root(root)
     candidate = Path(relative)
     if candidate.is_absolute() or candidate == Path("."):
         raise ConfigurationError("private paths must be non-empty relative paths")

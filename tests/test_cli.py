@@ -61,3 +61,22 @@ def test_safe_private_path_rejects_escape_and_symlink(tmp_path: Path) -> None:
     (root / "link").symlink_to(target, target_is_directory=True)
     with pytest.raises(ConfigurationError, match="symlink"):
         safe_private_path("link/file.txt", root)
+
+
+def test_safe_private_path_validates_explicit_root(tmp_path: Path) -> None:
+    root = tmp_path / "private"
+    root.mkdir()
+    assert safe_private_path("profile.json", root) == root / "profile.json"
+
+    link = tmp_path / "root-link"
+    link.symlink_to(root, target_is_directory=True)
+    with pytest.raises(ConfigurationError, match="symlink"):
+        safe_private_path("profile.json", link)
+
+    file_root = tmp_path / "not-a-directory"
+    file_root.write_text("synthetic", encoding="utf-8")
+    with pytest.raises(ConfigurationError, match="existing directory"):
+        safe_private_path("profile.json", file_root)
+
+    with pytest.raises(ConfigurationError, match="outside"):
+        safe_private_path("profile.json", Path.cwd())

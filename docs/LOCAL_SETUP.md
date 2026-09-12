@@ -29,6 +29,17 @@ Record OS, CPU architecture, Python 3.12 availability, Git, uv, and later requir
 
 TASK-001 creates the executable project, real lockfile and quality commands. Do not run planned `jae` commands before it exists. Keep `JAE_DATA_DIR` explicitly outside the repository for real applicant inputs. No personal data is needed for TASK-001.
 
+After TASK-001 is present, enable its repository-local commit safeguard:
+
+```bash
+./scripts/install_hooks.sh
+```
+
+The command is idempotent and sets only this checkout's `core.hooksPath` to
+`.githooks`; it does not change global Git configuration or overwrite an
+existing local hook. If a conflicting local hook path or `.git/hooks/pre-commit`
+already exists, it stops and reports the path so it can be integrated manually.
+
 ## 3. Private GitHub repository
 
 If `gh` is installed and authenticated, create the private repository under the authenticated personal account unless the user explicitly names an organization. Inspect whether `job-application-engine` already exists and whether an origin is already configured. A failed `gh repo view` could be a network/auth error; do not assume every failure means the name is available.

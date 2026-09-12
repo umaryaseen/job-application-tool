@@ -21,7 +21,7 @@ Last updated: 2026-09-12. TASK-001 is IMPLEMENTED — AWAITING REVIEW.
 | M0 package | VERIFIED | Clean bundle restoration, tracked-file byte comparison, archive CRC and source identities passed; export-specific hashes in PACKAGE_VERIFICATION.json |
 | Laptop repository | RESTORED | Bundle cloned and verified locally |
 | Private GitHub repository | NOT CREATED | Native `gh` authentication is invalid; no remote configured |
-| TASK-001 | CHANGES REQUIRED — INDEPENDENT REVIEW | Review exact commit and run checks independently |
+| TASK-001 | IMPLEMENTED — AWAITING REVIEW | Corrective commits address independent review findings; re-review exact corrective head |
 | TASK-002–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
@@ -57,4 +57,11 @@ Record task ID/state; branch; base/head or containing commit reference; actual m
 Do not change historical submitted snapshots when facts improve. Correct canonical data and generate a new version. Keep implementation and review status synchronized with Git, not aspirations.
 
 
-Independent TASK-001 review: CHANGES REQUIRED. Implementation head `8eca02b481a6a1f11b153cc4620d5fd85a7fd4d4` matched; review finding F-001 records that the commit hook is not installed. uv and test tooling were unavailable in the review environment. See [TASK-001 review](reviews/TASK-001.md).
+Independent TASK-001 review: CHANGES REQUIRED at `cfaeaf1eb9eb609f89f4cbc74297066572c56a95` for F-001 (hook not enabled) and F-002 (explicit root bypass). The review is preserved in [TASK-001 review](reviews/TASK-001.md).
+
+### TASK-001 corrective implementation
+
+- F-001: `scripts/install_hooks.sh` provides an idempotent repository-local setup step. It sets only local `core.hooksPath`, preserves and reports conflicting hook configuration, and was applied locally; `git config --local --get core.hooksPath` returns `.githooks` and `.githooks/pre-commit` is executable.
+- F-001 regression coverage now creates a fresh temporary Git repository, installs the hook, makes a safe real commit, and verifies real Git commits reject both staged synthetic secrets and prohibited private paths. The secret case changes the working-tree copy after staging, proving the hook scans the index.
+- F-002: explicit roots passed to `safe_private_path` use the same absolute, existing-directory, non-symlink, repository-boundary validator as `JAE_DATA_DIR`. Tests cover valid roots, symlink roots, file roots, repository roots, traversal and symlink escapes.
+- Corrective verification: `uv sync --locked` passed; `uv run python --version` reported Python 3.12.14; `uv run pytest` reported 9 passed; Ruff check and format check passed; mypy reported no issues in 3 source files. No lockfile regeneration was needed.
