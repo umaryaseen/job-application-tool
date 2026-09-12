@@ -166,6 +166,11 @@ class FactBase(StrictModel):
         return self
 
 
+class FactRef(StrictModel):
+    fact_id: StableId
+    revision: int = Field(strict=True, ge=1)
+
+
 class ContactFact(FactBase):
     kind: Literal["contact"]
     value: ContactValue

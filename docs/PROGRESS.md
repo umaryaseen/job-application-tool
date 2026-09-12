@@ -1,6 +1,6 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-12. TASK-001 is APPROVED; TASK-002 is IMPLEMENTED — AWAITING REVIEW.
+Last updated: 2026-09-12. TASK-001 and TASK-002 are APPROVED; TASK-003 is IMPLEMENTED — AWAITING REVIEW.
 
 ## Environment and completed work
 
@@ -22,8 +22,9 @@ Last updated: 2026-09-12. TASK-001 is APPROVED; TASK-002 is IMPLEMENTED — AWAI
 | Laptop repository | RESTORED | Bundle cloned and verified locally |
 | Private GitHub repository | NOT CREATED | Native `gh` authentication is invalid; no remote configured |
 | TASK-001 | APPROVED | Independent verification gate resolved (uv located locally); see reviews/TASK-001.md |
-| TASK-002 | IMPLEMENTED — AWAITING REVIEW | Strict profile/fact schemas and exported JSON Schema; independent review pending |
-| TASK-003–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
+| TASK-002 | APPROVED | Strict profile/fact schemas and exported JSON Schema; see reviews/TASK-002.md |
+| TASK-003 | IMPLEMENTED — AWAITING REVIEW | Deterministic evidence graph, immutable capture checks and local review receipts; independent review pending |
+| TASK-004–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
 | TASK-021–023 / M4 | NOT STARTED | Letters/tracker |
@@ -82,3 +83,15 @@ Diff `a1e7d43..b2fce65` (current `HEAD`) is documentation-only (`docs/PROGRESS.m
 - Verification so far: `uv sync --locked` passed; `uv run pytest` reported 17 passed; Ruff and mypy passed. Final full-suite results and commit hash will be recorded after the staged review and commit.
 
 Independent TASK-002 review approved exact head `6cb81c04c139a18f571cc0f3dcc3281ee5ecf86a`. All required uv, Python 3.12, pytest (17 passed), Ruff, format, mypy and schema-drift checks passed. See `docs/reviews/TASK-002.md`.
+
+### TASK-003 implementation
+
+- Base: approved TASK-002 merge commit `1874f1cc0e07ed45ca291969b67f759d94f5f328`; implementation head: `b4526561620f5f829fcb32477ca33d2558788f28`; branch: `task/003-evidence-validation`; status: IMPLEMENTED — AWAITING REVIEW.
+- Adds exact `(id, revision)` graph resolution, fact/evidence/variant support-scope checks, cycle/dangling/revoked/stale rejection, immutable support-capture verification, and source-file/repository pinning requirements for approved documentary and repository evidence.
+- Adds `record_human_review`, which records the exact displayed payload and revision-bound digests. Provider/import approval fields do not satisfy the local review receipt requirement; the local review operation is the trust boundary for approvals. User attestations remain an explicitly identified source kind and do not require certificates.
+- Adds synthetic adversarial coverage for unrelated IDs, wrong scopes, stale revisions, changed/missing captures, unpinned sources, generated output, and changed wording. JSON Schema was regenerated for the TASK-003 model additions.
+- No new dependency was added; Pydantic 2.11.7 remains the only runtime dependency and the lockfile is unchanged.
+- Verification: `uv sync --locked` passed; `uv run python --version` reported Python 3.12.14; `uv run pytest` reported 24 passed; `uv run ruff check .` passed; `uv run ruff format --check .` reported 22 files already formatted; `uv run mypy src` reported no issues in 16 source files. The local safeguard remains enabled at `.githooks` and the staged pre-commit check passed.
+- Deterministic checks establish internal support integrity only; they do not establish the real-world truth of arbitrary prose. Rendering, LLM entailment, matching, snapshot/export, database, import adapters and TASK-004 remain out of scope.
+
+Independent TASK-003 review approved implementation `b4526561620f5f829fcb32477ca33d2558788f28`; inspected branch head `ca252bad2987731671e3ba392a3f46c91d8739fc` contains documentation-only changes after implementation. uv/Python 3.12 checks passed: 24 tests, Ruff, format and mypy. See `docs/reviews/TASK-003.md`.

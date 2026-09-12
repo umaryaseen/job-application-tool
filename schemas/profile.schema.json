@@ -16,10 +16,7 @@
         },
         "fact_refs": {
           "items": {
-            "maxLength": 64,
-            "minLength": 2,
-            "pattern": "^[a-z][a-z0-9_-]*$",
-            "type": "string"
+            "$ref": "#/$defs/FactRef"
           },
           "maxItems": 64,
           "minItems": 1,
@@ -817,9 +814,17 @@
       "additionalProperties": false,
       "properties": {
         "document_sha256": {
-          "pattern": "^[0-9a-f]{64}$",
-          "title": "Document Sha256",
-          "type": "string"
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Document Sha256"
         },
         "kind": {
           "const": "document_reference",
@@ -842,8 +847,7 @@
         }
       },
       "required": [
-        "kind",
-        "document_sha256"
+        "kind"
       ],
       "title": "DocumentSource",
       "type": "object"
@@ -1357,6 +1361,29 @@
       "title": "FactApproval",
       "type": "object"
     },
+    "FactRef": {
+      "additionalProperties": false,
+      "properties": {
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision"
+      ],
+      "title": "FactRef",
+      "type": "object"
+    },
     "ImportSource": {
       "additionalProperties": false,
       "properties": {
@@ -1372,16 +1399,32 @@
           "title": "Kind",
           "type": "string"
         },
-        "source_sha256": {
-          "pattern": "^[0-9a-f]{64}$",
-          "title": "Source Sha256",
+        "source_role": {
+          "default": "external_source",
+          "enum": [
+            "external_source",
+            "generated_output"
+          ],
+          "title": "Source Role",
           "type": "string"
+        },
+        "source_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Sha256"
         }
       },
       "required": [
         "kind",
-        "import_id",
-        "source_sha256"
+        "import_id"
       ],
       "title": "ImportSource",
       "type": "object"
@@ -1902,15 +1945,22 @@
           "type": "string"
         },
         "revision": {
-          "pattern": "^[0-9a-f]{40,64}$",
-          "title": "Revision",
-          "type": "string"
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{40,64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revision"
         }
       },
       "required": [
         "kind",
         "repository",
-        "revision",
         "path"
       ],
       "title": "RepositorySource",
@@ -2078,6 +2128,17 @@
           "pattern": "^[a-z][a-z0-9_-]*$",
           "title": "Binding Id",
           "type": "string"
+        },
+        "depends_on_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Depends On Binding Refs",
+          "type": "array"
         },
         "evidence_id": {
           "maxLength": 64,
