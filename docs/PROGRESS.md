@@ -157,3 +157,5 @@ Supersedes the earlier pre-adapter browser gate: the supervising engineer propos
 - Inspected ignored synthetic artifacts: one-page PDF/preview at `artifacts/renderer/task-006/production-1/` (PDF SHA-256 `70f5300f28e99ec70c00a1a6df549840c8f47467345e69eae0fe26b48f2d3c6f`) and two-page PDF/previews at `artifacts/renderer/task-006/production-3/` (PDF SHA-256 `3559ae867387f4d7ddbab96ee0ffa7e79e998a98b83aca8aa1c0a1cea369f70c`). Both are A4; the two-page case has two raster pages with no visible clipping in the inspected previews.
 
 Next action: obtain independent review of the exact TASK-006 implementation commit. Do not merge or start TASK-007 before approval.
+
+Independent TASK-006 review: CHANGES REQUIRED for implementation `452edbe21f94a844b04d080ed7549e216c13e42f` (documentation head `b6c73204a052ce860eca573a8a2ca778815b9f29`). Findings: stale Pydantic 2.11.7 documentation versus locked 2.12.5, and missing pypdf complete-content assertion for the two-page production test. Required checks passed (38 tests, Python 3.12.14, Ruff, format, mypy); CLI help/invalid usage and production staging/isolation tests were exercised. See `docs/reviews/TASK-006.md`.
