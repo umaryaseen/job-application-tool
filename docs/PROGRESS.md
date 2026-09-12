@@ -168,3 +168,5 @@ Independent TASK-006 review: CHANGES REQUIRED for implementation `452edbe21f94a8
 - Verification: targeted two-page test passed; full pytest passed (38 tests); locked sync passed; Python 3.12.14; Ruff check passed; Ruff format check passed with 37 files formatted; mypy passed with no issues in 23 source files. The staged diff contains only `docs/DEPENDENCIES.md` and `tests/test_rendering.py`.
 
 Next action: independent re-review of correction commit `8f8181fd88925c1bc33e6800576c938f3f9857e1`; do not merge or start TASK-007.
+
+Scoped TASK-006 re-review approved corrected implementation `8f8181fd88925c1bc33e6800576c938f3f9857e1` with documentation head `93e61499ff4bacbbfd44ff99b4f56738a9d79b15`. F-001 dependency documentation and F-002 independent two-page Poppler/pypdf extraction are addressed. Locked Python 3.12 checks passed: targeted test 1 passed, full suite 38 passed, Ruff, format and mypy passed. See `docs/reviews/TASK-006-rereview.md`.
