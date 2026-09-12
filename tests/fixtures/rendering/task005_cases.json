@@ -1,0 +1,11 @@
+{
+  "fixture_policy": "All content is synthetic and is generated into ignored artifacts from the approved TASK-004 fixture.",
+  "cases": [
+    {"id": "short", "description": "The approved compact baseline plan."},
+    {"id": "two-page", "description": "The same approved plan with bounded synthetic approved variants to require two pages."},
+    {"id": "german-unicode", "description": "The compact plan including Größe Ä Ö Ü ß."},
+    {"id": "long-wrapping", "description": "A synthetic long approved headline for wrapping inspection."},
+    {"id": "hostile-text", "description": "Synthetic markup, Typst command, URL and traversal sentinels."},
+    {"id": "letter", "description": "A synthetic one-page letter feasibility plan."}
+  ]
+}

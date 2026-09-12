@@ -40,3 +40,20 @@ Upstream observations made on 2026-09-08: [RenderCV](https://github.com/rendercv
 TASK-002 adds Pydantic as the runtime validation dependency. `setuptools` is
 the build backend and is not imported at runtime. No renderer, network,
 database, model, import adapter, or applicant-data dependency is installed.
+
+## TASK-005 isolated renderer experiment
+
+These dependencies are intentionally outside the baseline runtime and are
+locked in `experiments/renderer/uv.lock`:
+
+| Package | Locked version | Purpose | License/source | Offline note |
+|---|---:|---|---|---|
+| RenderCV | 2.8 | YAML-to-Typst experiment | MIT; [upstream](https://github.com/rendercv/rendercv) | Runs with the local package and template |
+| typst | 0.15.0 | Local Typst compiler binding | Apache-2.0; [typst-py](https://github.com/messense/typst-py) | Compiles from local input/package paths |
+| rendercv-fonts | 0.5.1 | Pinned local fonts | MIT; [upstream](https://github.com/rendercv/rendercv-fonts) | Font directories are passed explicitly |
+| Playwright | 1.62.0 | HTML/Chromium candidate | Apache-2.0; [Python package](https://playwright.dev/python/docs/library) | Browser download is separate and was blocked on macOS 13 |
+| pypdf | 6.18.1 | Independent PDF text extraction | BSD-3-Clause; [docs](https://pypdf.readthedocs.io/en/stable/user/extract-text.html) | Used only by the experiment venv |
+
+No baseline `pyproject.toml` dependency or lockfile was changed. Poppler
+25.08.0 (`pdftotext`, `pdftoppm`) is a host measurement tool and is not
+bundled.
