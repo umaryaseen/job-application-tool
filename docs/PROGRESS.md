@@ -1,6 +1,6 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-09. This repository initially contains planning only.
+Last updated: 2026-09-12. TASK-001 is IMPLEMENTED — AWAITING REVIEW.
 
 ## Environment and completed work
 
@@ -19,9 +19,9 @@ Last updated: 2026-09-09. This repository initially contains planning only.
 | M0 research | COMPLETE | Three complete reports and independent research audit |
 | M0 architecture | APPROVED | Independent exact-head review of bea4cbc; see reviews/M0.md |
 | M0 package | VERIFIED | Clean bundle restoration, tracked-file byte comparison, archive CRC and source identities passed; export-specific hashes in PACKAGE_VERIFICATION.json |
-| Laptop repository | NOT CREATED HERE | Restore supplied Git bundle using LOCAL_SETUP |
-| Private GitHub repository | NOT CREATED | Native local gh setup/auth then verify private origin |
-| TASK-001 | READY / NOT STARTED | M0 approved; restore locally and follow CODEX_HANDOFF |
+| Laptop repository | RESTORED | Bundle cloned and verified locally |
+| Private GitHub repository | NOT CREATED | Native `gh` authentication is invalid; no remote configured |
+| TASK-001 | IMPLEMENTED — AWAITING REVIEW | Review exact commit and run checks independently |
 | TASK-002–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
@@ -31,6 +31,15 @@ Last updated: 2026-09-09. This repository initially contains planning only.
 ## Tests and validation
 
 Application unit/integration/rendering/model tests: **NOT IMPLEMENTED / NOT RUN**. No fabricated pass rate. Planned tests and their introducing tasks are in ACCEPTANCE_CRITERIA.
+
+### TASK-001 implementation
+
+- Branch: `task/001-project-bootstrap`; base: `8939d9e8ec5af2035ca6b5a86c94ae74efedbabb`.
+- Adds a Python 3.12 package and `jae` entry point, standard-library private-root/path validation, synthetic CLI and repository-policy tests, Ruff/mypy/pytest configuration, locked dev dependencies, a staged-file safeguard, and minimal read-only-permission CI.
+- The required `JAE_DATA_DIR` is absolute, existing, non-symlink, outside the repository; path traversal and symlink traversal are rejected. No personal data or application domain schema was added.
+- Environment: macOS 13.6.9 x86_64; uv 0.12.13 with managed CPython 3.12.14. `uv sync --locked --group dev` passed and installed pytest 8.4.1, Ruff 0.12.11, and mypy 1.17.1.
+- Checks: `uv run pytest` — 7 passed; `uv run ruff check .` — passed; `uv run ruff format --check .` — passed; `uv run mypy src` — no issues in 3 source files. `jae --version` printed `jae 0.1.0`; missing `JAE_DATA_DIR` makes `jae config-check` exit 2.
+- GitHub remote setup is blocked by invalid native `gh` authentication; no remote URL or privacy claim is made. Rendering, schema, model, database, scraping, UI and application-submission checks are intentionally not implemented or run.
 
 Planning checks passed for required files, 256 internal Markdown links at the reviewed head, 35 acyclic task dependencies, three source identities, and 14 private-path exclusions. Independent review required immutable support captures and explicit export expiry/source-eligibility rules; the corrections were independently re-reviewed and APPROVED at bea4cbc. Application behavior remains unimplemented. The supplied archive is a planning handoff, not a working MVP or a laptop installation. Final artifact checks are recorded separately after bundle creation to avoid circular Git/hash metadata.
 
