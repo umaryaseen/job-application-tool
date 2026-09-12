@@ -40,3 +40,15 @@ Commands run:
 - Hook installation check: failed as described in F-001.
 
 The implementation code and tests were also reviewed for explicit absolute private roots, traversal and symlink rejection, ignore rules, staged-content scanning via `git show :path`, synthetic fixtures, and CI read-only permissions. No other blocking finding was identified. Rendering, schemas, model, database and application flows are correctly out of scope for TASK-001.
+
+## Re-review (corrective head)
+
+Date: 2026-09-12  
+Reviewed implementation head: `a1e7d43c2fd387c2f5b048a42ac59b69758b4aaa` (documentation correction atop implementation `cf60afb3d650418be3eef678994961ffc0fbe92c`)  
+Ancestry verified: `8939d9e` → `8eca02b` → `cfaeaf1` → `cf60afb` → `a1e7d43`. Working tree was clean.
+
+F-001 disposition: **addressed in code**, with idempotent installer, conflict preservation, and real Git invocation tests.
+
+F-002 disposition: **addressed in code**, with shared explicit-root validation and regression tests.
+
+Required verification commands were attempted independently but remain an unresolved gate: `uv sync --locked`, `uv run python --version`, `uv run pytest`, `uv run ruff check .`, `uv run ruff format --check .`, and `uv run mypy src` all could not execute because `uv` is not installed (`zsh: command not found: uv`). Therefore the verdict remains **CHANGES REQUIRED** until these checks run successfully in Python 3.12/uv.
