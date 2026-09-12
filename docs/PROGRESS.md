@@ -159,3 +159,12 @@ Supersedes the earlier pre-adapter browser gate: the supervising engineer propos
 Next action: obtain independent review of the exact TASK-006 implementation commit. Do not merge or start TASK-007 before approval.
 
 Independent TASK-006 review: CHANGES REQUIRED for implementation `452edbe21f94a844b04d080ed7549e216c13e42f` (documentation head `b6c73204a052ce860eca573a8a2ca778815b9f29`). Findings: stale Pydantic 2.11.7 documentation versus locked 2.12.5, and missing pypdf complete-content assertion for the two-page production test. Required checks passed (38 tests, Python 3.12.14, Ruff, format, mypy); CLI help/invalid usage and production staging/isolation tests were exercised. See `docs/reviews/TASK-006.md`.
+
+### TASK-006 review corrections — IMPLEMENTED — AWAITING REVIEW
+
+- Correction commit: `8f8181fd88925c1bc33e6800576c938f3f9857e1` on `task/006-pdf-adapter`; no dependency or lockfile changes.
+- F-001: `docs/DEPENDENCIES.md` now labels Pydantic 2.11.7 as the historical TASK-002 pin and records the current Pydantic 2.12.5 runtime pin. Installed RenderCV 2.8 metadata reports `pydantic[email]>=2.12.5` and `pydantic-extra-types>=2.11.0`; the locked graph records RenderCV 2.8 and Pydantic 2.12.5.
+- F-002: the real production two-page test now extracts the generated PDF independently with Poppler and pypdf and compares both results to the same expected plan using the existing narrow normalization. The existing complete-content and negative-control tests remain unchanged.
+- Verification: targeted two-page test passed; full pytest passed (38 tests); locked sync passed; Python 3.12.14; Ruff check passed; Ruff format check passed with 37 files formatted; mypy passed with no issues in 23 source files. The staged diff contains only `docs/DEPENDENCIES.md` and `tests/test_rendering.py`.
+
+Next action: independent re-review of correction commit `8f8181fd88925c1bc33e6800576c938f3f9857e1`; do not merge or start TASK-007.

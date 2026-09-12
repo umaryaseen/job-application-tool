@@ -48,3 +48,42 @@ For each blocking finding provide a narrow reproduction, affected modules,
 acceptance criteria and regression tests. Update PROGRESS with the actual
 review state. Do not modify implementation, merge, force-push or self-approve.
 ```
+
+## TASK-006 corrective re-review
+
+Use this prompt in a separate coding-agent session to review only the two
+corrections below. Preserve the original `docs/reviews/TASK-006.md` finding.
+
+```text
+Independently re-review the TASK-006 corrections in this repository.
+
+Original reviewed implementation: 452edbe21f94a844b04d080ed7549e216c13e42f
+Original review: 2feccf0032268ed3918310f5865e4fb63f60fa39
+Correction commit: 8f8181fd88925c1bc33e6800576c938f3f9857e1
+Branch: task/006-pdf-adapter
+
+Read AGENTS.md, docs/reviews/TASK-006.md, docs/tasks/TASK-006.md,
+docs/DEPENDENCIES.md, docs/PROGRESS.md and the complete correction diff.
+Confirm no dependency or lockfile changed and no unrelated implementation was
+introduced.
+
+F-001: verify the current dependency register names Pydantic 2.12.5, while the
+historical TASK-002 Pydantic 2.11.7 row is explicitly marked superseded. Verify
+the installed RenderCV 2.8 metadata constraint `pydantic[email]>=2.12.5` and
+the locked project graph. Confirm historical records remain intact.
+
+F-002: inspect and run
+`tests/test_rendering.py::test_production_pdf_handles_long_two_page_plan_without_pruning`.
+Confirm the same freshly generated two-page PDF is independently extracted by
+Poppler and pypdf, and both are compared with the same expected plan using the
+existing narrow normalization. Confirm the page-count assertion remains and
+the existing complete-content negative controls reject suffix loss,
+qualification changes, duplication, reordering and unexpected content. Do not
+accept a prefix check, one extractor as the other's oracle, fallback behavior,
+or broadened normalization.
+
+Run `/Users/apple/.local/bin/uv sync --locked`, Python 3.12, full pytest, Ruff,
+format and mypy. Record APPROVED, APPROVED WITH FOLLOW-UP, or CHANGES REQUIRED
+in docs/reviews/TASK-006-correction.md with exact commit IDs and update
+PROGRESS. Do not modify implementation, merge, push or self-approve.
+```
