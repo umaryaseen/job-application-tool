@@ -107,3 +107,5 @@ Thumbs.db
 *.swp
 *.swo
 *~
+# TASK-005 exploratory RenderCV working files
+/experiments/renderer/work/

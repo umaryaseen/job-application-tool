@@ -35,3 +35,7 @@ Do not implement both full production adapters, add UI/browser sessions, or call
 ## Handoff and review
 
 Follow AGENTS.md, inspect dependencies and source/ADR context, work on `task/005-short-description`, and implement this task only. Update PROGRESS with actual commands/results, risks and next task; commit as IMPLEMENTED — AWAITING REVIEW. An independent reviewer inspects code/diff/tests/security/acceptance using REVIEW_PROTOCOL. The implementer cannot approve their own work. Additional corrections should be narrow commits preserving negative tests.
+
+## Reviewed acceptance amendment — 2026-09-13
+
+[ADR-004](../adr/ADR-004.md) explicitly supersedes the requirement for two successful renderer runs before adoption. The historical comparison remains blocked (exit 2). Current-laptop RenderCV selection is accepted on its own reviewed requirements; Playwright comparison becomes trigger-based reconsideration. No selected-backend content, Unicode, visual or security gate is waived.

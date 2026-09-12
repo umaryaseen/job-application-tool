@@ -1,0 +1,27 @@
+[
+  {
+    "case": "long-wrapping/poppler",
+    "expected": "deterministic",
+    "actual": "deter\u00ad\nministic"
+  },
+  {
+    "case": "long-wrapping/pypdf",
+    "expected": "deterministic",
+    "actual": "deter \u00ad\nministic"
+  },
+  {
+    "case": "long-wrapping/pypdf-date",
+    "expected": "2022-01",
+    "actual": "2022\u00ad01"
+  },
+  {
+    "case": "hostile-text/poppler",
+    "expected": "https://example.invalid",
+    "actual": "https://\nexample.invalid"
+  },
+  {
+    "case": "hostile-text/pypdf",
+    "expected": "https://example.invalid",
+    "actual": "https:/ /\nexample.invalid"
+  }
+]

@@ -1,6 +1,6 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-12. TASK-001–003 are APPROVED; TASK-004 is IMPLEMENTED — AWAITING REVIEW.
+Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH FOLLOW-UP under amended ADR-004. TASK-006 is READY, NOT STARTED (normal branch integration still required).
 
 ## Environment and completed work
 
@@ -24,8 +24,10 @@ Last updated: 2026-09-12. TASK-001–003 are APPROVED; TASK-004 is IMPLEMENTED �
 | TASK-001 | APPROVED | Independent verification gate resolved (uv located locally); see reviews/TASK-001.md |
 | TASK-002 | APPROVED | Strict profile/fact schemas and exported JSON Schema; see reviews/TASK-002.md |
 | TASK-003 | APPROVED | Deterministic evidence graph, immutable capture checks and local review receipts; see reviews/TASK-003.md |
-| TASK-004 | IMPLEMENTED — AWAITING REVIEW | Renderer-independent baseline plan and validated UTF-8 text; independent review pending |
-| TASK-005–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
+| TASK-004 | APPROVED | See reviews/TASK-004.md |
+| TASK-005 | APPROVED WITH FOLLOW-UP | Current-laptop RenderCV accepted by ADR-004 amendment; comparison remains blocked, exit 2 |
+| TASK-006 | READY — NOT STARTED | No browser-comparison prerequisite; integrate reviewed branch normally before implementation |
+| TASK-007–009 / M1 | NOT STARTED | Adapter QA and applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
 | TASK-021–023 / M4 | NOT STARTED | Letters/tracker |
@@ -48,8 +50,8 @@ Planning checks passed for required files, 256 internal Markdown links at the re
 
 ## Open gates
 
-1. TASK-001 is APPROVED; TASK-002 (strict profile and typed fact schemas) is the next unblocked task, on a fresh branch with independent review.
-2. TASK-005 experimentally resolves renderer and exact versions; no backend is production-approved yet.
+1. TASK-006 is READY after normal integration of the reviewed TASK-005 branch; no merge or implementation occurred in this clarification.
+2. ADR-004 accepts current-laptop RenderCV selection. TASK-006/007 must still validate the production adapter; Playwright comparison is reconsideration evidence, not a prerequisite.
 3. TASK-009 obtains actual reviewed career data and accepts a genuine baseline CV. Chat memory/research templates are not evidence.
 4. Optional provider/model/data choices remain deferred and do not block deterministic implementation.
 
@@ -107,3 +109,38 @@ Independent TASK-002 review approved exact head `6cb81c04c139a18f571cc0f3dcc3281
 Independent TASK-003 review approved implementation `b4526561620f5f829fcb32477ca33d2558788f28`; inspected branch head `ca252bad2987731671e3ba392a3f46c91d8739fc` contains documentation-only changes after implementation. uv/Python 3.12 checks passed: 24 tests, Ruff, format and mypy. See `docs/reviews/TASK-003.md`.
 
 Independent TASK-004 review approved implementation `d8427071d7cdaf145dcd9a5dc6c3a2fae43d5814`; inspected branch head `b04e4f271384e3b57987d3f716a0920a38299046` differed only by documentation. Python 3.12/uv checks passed: 28 tests, Ruff, format and mypy. See `docs/reviews/TASK-004.md`.
+
+### TASK-005 implementation
+
+- Base: approved TASK-004 merge `82deb141f84c59d86da78f68f06c4e35dfc339c0`; branch: `task/005-renderer-experiment`; status: **IMPLEMENTED — AWAITING REVIEW**.
+- Implementation commit: `dcc30ea` (full hash is recorded in the review handoff); documentation-only follow-up records the independent review prompt.
+- Adds an isolated `experiments/renderer` lock and runner. The runner prepares the same validated synthetic TASK-004 `DocumentPlan` claims for RenderCV/Typst and HTML/CSS + Playwright, plus short, two-page, German-Unicode, long-wrapping, hostile-text and one-page synthetic letter fixtures. It does not add experiment packages to baseline runtime dependencies.
+- RenderCV 2.8 + Typst 0.15.0 + rendercv-fonts 0.5.1 rendered every CV fixture offline under macOS `sandbox-exec` with local fonts, 11pt body text, 20mm margins and A4 media boxes. Measured pages: short 1, two-page 2, German-Unicode 1, long-wrapping 1, hostile-text 1, letter 1. Poppler 25.08.0 and pypdf 6.18.1 recovered claim prefixes in order; raster inspection covered all seven pages. The hostile scalar boundary preserved markup as literal text and did not recover the synthetic sentinel.
+- Playwright 1.62.0 installed as an experiment dependency, but Chromium setup returned `ERROR: Playwright does not support chromium on mac13` on this macOS 13.6.9 host. HTML PDFs, browser raster output and browser-side probes are recorded as blocked, not passes. The HTML adapter still escapes text and aborts requests when a browser is available.
+- A sandboxed local HTTP probe returned `Operation not permitted`; no network sentinel was exposed. RenderCV and Typst use local package/font paths only. Security findings and limitations are in `docs/experiments/RENDERER_DECISION.md`; ADR-004 remains PROPOSED / SPIKE REQUIRED pending independent review.
+- Verification: `/Users/apple/.local/bin/uv sync --locked` passed; `/Users/apple/.local/bin/uv run python --version` reported Python 3.12.14; `/Users/apple/.local/bin/uv run pytest` reported 28 passed; Ruff check passed; Ruff format check reported 30 files already formatted; `/Users/apple/.local/bin/uv run mypy src` reported no issues in 21 source files; isolated `uv sync --project experiments/renderer --locked` passed; the local `.githooks` safeguard remains enabled. The experiment runner completed with all six synthetic RenderCV cases and the letter pass, five HTML candidate runs blocked by the unavailable browser, and the network probe blocked as intended.
+- No applicant data, credentials, authenticated browser profile, UI, production renderer adapter, PDF export workflow, matching or TASK-006 work was added. The proposed RenderCV recommendation is conditional and is not an approval.
+
+Next action: obtain an independent review of the exact TASK-005 commit and decide ADR-004; do not start TASK-006 before approval.
+
+Independent TASK-005 review: CHANGES REQUIRED for implementation `dcc30ea05e7d51adbd384fe700c57cf459922fd1` (documentation head `4f5008f49e85f25d6215b4e00e4d0a53ee69bf2f`). Renderer reproduction exposed prefix-only extraction acceptance: long-wrapping and hostile-text lose complete claims while prefixes pass. Playwright remains correctly blocked by unavailable Chromium. See `docs/reviews/TASK-005.md`.
+
+### TASK-005 corrective implementation (F-001/F-002)
+
+- Status: **IMPLEMENTED — AWAITING REVIEW**. The original review at `f91357338fcaf02ba6f5492ad598d258ad2cc121` remains preserved; these corrections do not approve TASK-005.
+- Corrective implementation commits: `4b2f3ea`, `180917a` and `62eddb3` (full hashes are pinned in the corrective review handoff); documentation-only follow-up records the latest corrective head.
+- F-001 root cause: RenderCV/Typst preserved complete claim text, while Poppler and pypdf inserted extractor layout artifacts (soft hyphens in wrapped words and date separators, plus a split `https://`). The prefix-only check accepted those losses. The runner now compares an independently written ordered-content oracle containing static headings and all claims in full against both extractors.
+- Normalization is narrow: Unicode NFC; date hyphen restoration only for a soft hyphen between digits; removal of soft hyphen line-break markers; repair of an extractor-split HTTP(S) scheme; and whitespace collapse. Punctuation, numbers, units, qualifiers, negation and words are not broadened or truncated.
+- Negative controls reject suffix removal, qualification/metric changes, duplication, reordering and unexpected content. Any complete-content mismatch marks PDF generation unsuccessful. All five CV fixtures and the synthetic letter matched the complete oracle in both Poppler and pypdf; all negative controls returned rejection.
+- F-002: ADR-004 and the experiment report now explicitly qualify the outcome as a feasible current-laptop RenderCV backend only. Playwright 1.62.0 package installation succeeded, but Chromium installation failed on macOS 13.6.9 with `ERROR: Playwright does not support chromium on mac13`; HTML/Playwright quality and security remain untested. No cross-platform or comparative-quality claim is made. Reconsideration triggers are a supported target environment, any unmet RenderCV mandatory gate, or excessive adapter maintenance. If RenderCV fails, no backend is recommended and TASK-006 remains blocked.
+- Added baseline regression coverage for the content normalizer and mutation controls. The existing security, Unicode, sandbox and visual checks remain.
+- Independently specified complete-content fixtures are checked in under `tests/fixtures/rendering/expected/`; the original extractor fragments remain in `tests/fixtures/rendering/extraction_failures.json`. The runner exits nonzero for a failed or blocked mandatory gate (this laptop returned 2 for blocked Chromium).
+
+Next action: independent re-review of the focused corrective commits, then an ADR-004 decision by the supervising engineer. Do not start TASK-006.
+
+TASK-005 corrective re-review approved with follow-up: corrected implementation `62eddb346995c8ef7ade694d45775779f5017c36`, documentation head `c13ecb2cbaa875795dfd8c4f0c7e0445ea7208b4`. Full Poppler/pypdf content oracle and negative controls pass; RenderCV mandatory gates pass. Playwright remains BLOCKED/UNTESTED on macOS 13, so ADR-004 is accepted only as a laptop qualification; supported-browser comparison remains a gate before production adapter work. See appended TASK-005 review.
+
+
+### Current architecture decision — 2026-09-13
+
+Supersedes the earlier pre-adapter browser gate: the supervising engineer proposal is independently accepted in ADR-004 and the TASK-005 review addendum. TASK-006 is **READY**, not started, subject to normal reviewed-branch integration. TASK-005 remains APPROVED WITH FOLLOW-UP; F-002 comparison evidence is now nonblocking and owned by the supervising engineer upon environment change, RenderCV requirement failure or excessive maintenance. Historical experiment status remains blocked/exit 2; Playwright remains untested. Production process isolation, complete content/Unicode and other TASK-006/007 gates remain mandatory. This documentation-only assessment does not rerun or expand the earlier runtime evidence. Earlier implementation and review entries above are historical.
