@@ -21,7 +21,7 @@ Last updated: 2026-09-12. TASK-001 is IMPLEMENTED — AWAITING REVIEW.
 | M0 package | VERIFIED | Clean bundle restoration, tracked-file byte comparison, archive CRC and source identities passed; export-specific hashes in PACKAGE_VERIFICATION.json |
 | Laptop repository | RESTORED | Bundle cloned and verified locally |
 | Private GitHub repository | NOT CREATED | Native `gh` authentication is invalid; no remote configured |
-| TASK-001 | IMPLEMENTED — AWAITING REVIEW | Review exact commit and run checks independently |
+| TASK-001 | CHANGES REQUIRED — INDEPENDENT REVIEW | Review exact commit and run checks independently |
 | TASK-002–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
@@ -55,3 +55,6 @@ Planning checks passed for required files, 256 internal Markdown links at the re
 Record task ID/state; branch; base/head or containing commit reference; actual modules/behavior; dependency versions; exact commands and exit results; skipped/unrun checks; security/privacy notes; independent review verdict/report; pending applicant input; next unblocked task. Use IMPLEMENTED — AWAITING REVIEW before independent approval.
 
 Do not change historical submitted snapshots when facts improve. Correct canonical data and generate a new version. Keep implementation and review status synchronized with Git, not aspirations.
+
+
+Independent TASK-001 review: CHANGES REQUIRED. Implementation head `8eca02b481a6a1f11b153cc4620d5fd85a7fd4d4` matched; review finding F-001 records that the commit hook is not installed. uv and test tooling were unavailable in the review environment. See [TASK-001 review](reviews/TASK-001.md).
