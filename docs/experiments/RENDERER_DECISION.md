@@ -185,3 +185,8 @@ fragments are preserved in `tests/fixtures/rendering/extraction_failures.json`.
 The runner exits 1 for a measured mandatory failure and exits 2 for the
 current blocked-browser comparison; this laptop run returned 2 with all
 RenderCV/Typst and letter checks passing.
+
+
+## Subsequent architecture decision — 2026-09-13
+
+The proposal above is now accepted for the current laptop through the explicit [ADR-004 amendment](../adr/ADR-004.md) and independent review addendum. TASK-006 is READY for implementation after normal branch integration. This supersedes the prior awaiting-decision language only: the measured two-engine comparison remains incomplete/blocked (exit 2), and Playwright remains untested. Reconsider it on target-environment change, unmet RenderCV requirements or excessive maintenance. No comparative superiority or production-adapter approval is implied.

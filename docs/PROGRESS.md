@@ -1,6 +1,6 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-12. TASK-001–003 are APPROVED; TASK-004 is IMPLEMENTED — AWAITING REVIEW.
+Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH FOLLOW-UP under amended ADR-004. TASK-006 is READY, NOT STARTED (normal branch integration still required).
 
 ## Environment and completed work
 
@@ -24,8 +24,10 @@ Last updated: 2026-09-12. TASK-001–003 are APPROVED; TASK-004 is IMPLEMENTED �
 | TASK-001 | APPROVED | Independent verification gate resolved (uv located locally); see reviews/TASK-001.md |
 | TASK-002 | APPROVED | Strict profile/fact schemas and exported JSON Schema; see reviews/TASK-002.md |
 | TASK-003 | APPROVED | Deterministic evidence graph, immutable capture checks and local review receipts; see reviews/TASK-003.md |
-| TASK-004 | IMPLEMENTED — AWAITING REVIEW | Renderer-independent baseline plan and validated UTF-8 text; independent review pending |
-| TASK-005–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
+| TASK-004 | APPROVED | See reviews/TASK-004.md |
+| TASK-005 | APPROVED WITH FOLLOW-UP | Current-laptop RenderCV accepted by ADR-004 amendment; comparison remains blocked, exit 2 |
+| TASK-006 | READY — NOT STARTED | No browser-comparison prerequisite; integrate reviewed branch normally before implementation |
+| TASK-007–009 / M1 | NOT STARTED | Adapter QA and applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
 | TASK-021–023 / M4 | NOT STARTED | Letters/tracker |
@@ -48,8 +50,8 @@ Planning checks passed for required files, 256 internal Markdown links at the re
 
 ## Open gates
 
-1. TASK-001 is APPROVED; TASK-002 (strict profile and typed fact schemas) is the next unblocked task, on a fresh branch with independent review.
-2. TASK-005 experimentally resolves renderer and exact versions; no backend is production-approved yet.
+1. TASK-006 is READY after normal integration of the reviewed TASK-005 branch; no merge or implementation occurred in this clarification.
+2. ADR-004 accepts current-laptop RenderCV selection. TASK-006/007 must still validate the production adapter; Playwright comparison is reconsideration evidence, not a prerequisite.
 3. TASK-009 obtains actual reviewed career data and accepts a genuine baseline CV. Chat memory/research templates are not evidence.
 4. Optional provider/model/data choices remain deferred and do not block deterministic implementation.
 
@@ -137,3 +139,8 @@ Independent TASK-005 review: CHANGES REQUIRED for implementation `dcc30ea05e7d51
 Next action: independent re-review of the focused corrective commits, then an ADR-004 decision by the supervising engineer. Do not start TASK-006.
 
 TASK-005 corrective re-review approved with follow-up: corrected implementation `62eddb346995c8ef7ade694d45775779f5017c36`, documentation head `c13ecb2cbaa875795dfd8c4f0c7e0445ea7208b4`. Full Poppler/pypdf content oracle and negative controls pass; RenderCV mandatory gates pass. Playwright remains BLOCKED/UNTESTED on macOS 13, so ADR-004 is accepted only as a laptop qualification; supported-browser comparison remains a gate before production adapter work. See appended TASK-005 review.
+
+
+### Current architecture decision — 2026-09-13
+
+Supersedes the earlier pre-adapter browser gate: the supervising engineer proposal is independently accepted in ADR-004 and the TASK-005 review addendum. TASK-006 is **READY**, not started, subject to normal reviewed-branch integration. TASK-005 remains APPROVED WITH FOLLOW-UP; F-002 comparison evidence is now nonblocking and owned by the supervising engineer upon environment change, RenderCV requirement failure or excessive maintenance. Historical experiment status remains blocked/exit 2; Playwright remains untested. Production process isolation, complete content/Unicode and other TASK-006/007 gates remain mandatory. This documentation-only assessment does not rerun or expand the earlier runtime evidence. Earlier implementation and review entries above are historical.

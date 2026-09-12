@@ -44,3 +44,47 @@ F-002 is **qualified follow-up**: ADR-004's selection of RenderCV is acceptable 
 - Renderer environment lock sync passed; real experiment completed with RenderCV/Typst and letter success, Poppler+pypdf complete matches, all negative controls rejected, sandboxed/network-denied probe, and raster pages generated for every case. Playwright installation failure was reproduced and retained as BLOCKED (exit 2 semantics recorded by the runner/report).
 
 **Verdict: APPROVED WITH FOLLOW-UP.**
+
+
+## Architecture gate clarification — 2026-09-13
+
+Scope: independent assessment of the supervising engineer's adoption proposal,
+not a new runtime review. Starting review commit:
+`aa244a66fb75d393b2dcb1f8c215d0df40fffb86`; implementation remains
+`62eddb346995c8ef7ade694d45775779f5017c36`. Clean branch state and ancestry
+were verified; intervening changes are documentation-only.
+
+**Decision: accept the explicit ADR-004 amendment. TASK-006 is READY for
+current-laptop implementation, after normal reviewed-branch integration.**
+The earlier statement that a supported-browser comparison must precede production
+adapter work is superseded by this reasoned amendment, not silently deleted.
+The TASK-005 verdict remains **APPROVED WITH FOLLOW-UP**; F-001's recorded
+disposition is unchanged. F-002 becomes nonblocking reconsideration owned by the
+supervising engineer on target-environment change, unmet RenderCV requirements,
+or excessive maintenance.
+
+The original TASK-005/ADR-004 did require a two-engine experiment, so an amendment
+is necessary. No concrete product requirement in A08–A14 or ADR-013/015 makes a
+successful Chromium run a prerequisite to implementing RenderCV. R1 844–859 and
+R3 695–707 recommend different pipelines; R2 470–495 requires output validation
+and multiple extractors, not two rendering backends. Recorded RenderCV results
+in the prior review provide feasibility evidence for this laptop. A Chromium run
+would add comparative layout/install/maintenance evidence, but cannot validate
+RenderCV's security or compatibility. We accept that comparative uncertainty;
+we do not waive any selected-engine requirement.
+
+ADR-004 is accepted only for this environment. The historical comparison is still
+BLOCKED/UNTESTED with runner exit 2; no claim of comparative superiority, portability,
+or a completed two-engine comparison follows. TASK-006/007 must independently
+validate the production adapter, including the process policy, literal insertion,
+asset bounds, cleanup, full text and complete Unicode corpus. Changed environments
+require fresh selected-backend validation before support is claimed. Future letter
+work must validate its maintained route; the feasibility spike is not that approval.
+
+Verification for this documentation-only clarification: read TASK-005/006, ADR-004,
+ADR-013/015, acceptance matrix, source-register sections R1 844–859, R2 470–495,
+R3 695–707, experiment report and review protocol. Inspected runner exit mapping
+(0=ok, 1=failed, 2=blocked). Prior measured results are cited as historical evidence;
+no renderer, browser installation, raster review or runtime suite was rerun in
+this turn, and no new runtime acceptance claim is made. Documentation whitespace,
+scope and staged-content safeguards are checked before commit.
