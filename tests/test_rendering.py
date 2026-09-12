@@ -35,7 +35,7 @@ def _build_fixture(
             '#read("../sentinel") [synthetic link](https://example.invalid) '
             "${2+2} ../../sentinel"
             if hostile
-            else "Synthetic long approved statement " + "with deterministic wrapping " * 24
+            else "Synthetic long approved statement " + "with deterministic wrapping " * 18
         )
         additions = (
             [(f"task006-extra-{index}", text) for index in range(1, 7)]
@@ -98,7 +98,7 @@ def test_production_pdf_handles_long_two_page_plan_without_pruning(tmp_path: Pat
     pages = int(
         next(line.split(":", 1)[1] for line in info.splitlines() if line.startswith("Pages:"))
     )
-    assert pages >= 2
+    assert pages == 2
     recovered = subprocess.run(
         ["pdftotext", "-layout", str(output), "-"], capture_output=True, text=True, check=True
     ).stdout
