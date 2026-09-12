@@ -32,7 +32,8 @@ def _build_fixture(
     if long or hostile:
         text = (
             '<script>synthetic</script> #include "../sentinel" '
-            "[synthetic link](https://example.invalid) ../../sentinel"
+            '#read("../sentinel") [synthetic link](https://example.invalid) '
+            "${2+2} ../../sentinel"
             if hostile
             else "Synthetic long approved statement " + "with deterministic wrapping " * 24
         )
@@ -71,10 +72,16 @@ def test_production_pdf_preserves_complete_unicode_content_with_two_extractors(
 def test_production_pdf_keeps_hostile_text_literal_and_does_not_read_sentinel(
     tmp_path: Path,
 ) -> None:
-    output, _ = _build_fixture(tmp_path, hostile=True)
+    (tmp_path / "sentinel").write_text("SECRET_SENTINEL_NOT_CLAIM_TEXT", encoding="utf-8")
+    output, expected = _build_fixture(tmp_path, hostile=True)
     text = subprocess.run(
         ["pdftotext", "-layout", str(output), "-"], capture_output=True, text=True, check=True
     ).stdout
+    from pypdf import PdfReader
+
+    pypdf_text = "\n".join(page.extract_text() or "" for page in PdfReader(output).pages)
+    assert normalize_extracted_text(text) == normalize_extracted_text(expected)
+    assert normalize_extracted_text(pypdf_text) == normalize_extracted_text(expected)
     assert "<script>synthetic</script>" in text
     assert "SECRET_SENTINEL_NOT_CLAIM_TEXT" not in text
     assert "example.invalid" in text
