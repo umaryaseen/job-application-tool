@@ -1,6 +1,6 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-12. TASK-001 and TASK-002 are APPROVED; TASK-003 is IMPLEMENTED — AWAITING REVIEW.
+Last updated: 2026-09-12. TASK-001–003 are APPROVED; TASK-004 is IMPLEMENTED — AWAITING REVIEW.
 
 ## Environment and completed work
 
@@ -23,8 +23,9 @@ Last updated: 2026-09-12. TASK-001 and TASK-002 are APPROVED; TASK-003 is IMPLEM
 | Private GitHub repository | NOT CREATED | Native `gh` authentication is invalid; no remote configured |
 | TASK-001 | APPROVED | Independent verification gate resolved (uv located locally); see reviews/TASK-001.md |
 | TASK-002 | APPROVED | Strict profile/fact schemas and exported JSON Schema; see reviews/TASK-002.md |
-| TASK-003 | IMPLEMENTED — AWAITING REVIEW | Deterministic evidence graph, immutable capture checks and local review receipts; independent review pending |
-| TASK-004–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
+| TASK-003 | APPROVED | Deterministic evidence graph, immutable capture checks and local review receipts; see reviews/TASK-003.md |
+| TASK-004 | IMPLEMENTED — AWAITING REVIEW | Renderer-independent baseline plan and validated UTF-8 text; independent review pending |
+| TASK-005–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
 | TASK-021–023 / M4 | NOT STARTED | Letters/tracker |
@@ -94,4 +95,15 @@ Independent TASK-002 review approved exact head `6cb81c04c139a18f571cc0f3dcc3281
 - Verification: `uv sync --locked` passed; `uv run python --version` reported Python 3.12.14; `uv run pytest` reported 24 passed; `uv run ruff check .` passed; `uv run ruff format --check .` reported 22 files already formatted; `uv run mypy src` reported no issues in 16 source files. The local safeguard remains enabled at `.githooks` and the staged pre-commit check passed.
 - Deterministic checks establish internal support integrity only; they do not establish the real-world truth of arbitrary prose. Rendering, LLM entailment, matching, snapshot/export, database, import adapters and TASK-004 remain out of scope.
 
+### TASK-004 implementation
+
+- Base: approved TASK-003 merge commit `faacbc5323d44d0ca7350356347b60dfb62984d0`; branch: `task/004-baseline-document`; status: IMPLEMENTED — AWAITING REVIEW.
+- Adds a strict renderer-independent `DocumentPlan` with pinned profile digest, revision, explicit as-of date, locale, allowlisted section labels, exact fact/variant references, and required support-binding references.
+- Adds deterministic baseline compilation for contacts, approved variants, employment, education, skills and languages. Employment and education retain typed date precision, unknown end dates render as `end date unknown`, ongoing dates render as `ongoing`, ties use stable fact IDs, and empty optional sections are omitted.
+- Adds a validation boundary that reuses TASK-003 provenance checks, rejects altered plan digests, stale profiles, unsupported typed wording, arbitrary headline/skill text, wrong sections, unapproved revisions and mismatched support bindings. UTF-8 text output is produced only after validation.
+- Synthetic expected output is checked independently at `tests/fixtures/documents/baseline.txt`; no PDF API, renderer backend, automatic rewriting, matching or artifact export was added. No dependency or lockfile change was needed.
+- Implementation head: `d8427071d7cdaf145dcd9a5dc6c3a2fae43d5814`. Verification: `uv sync --locked` passed; Python 3.12.14; 28 tests passed; Ruff check and format checks passed; mypy passed with no issues in 21 source files; `.githooks` safeguard remained enabled. The generated text is a deterministic text-plan example only; it makes no PDF pagination or ATS compatibility claim.
+
 Independent TASK-003 review approved implementation `b4526561620f5f829fcb32477ca33d2558788f28`; inspected branch head `ca252bad2987731671e3ba392a3f46c91d8739fc` contains documentation-only changes after implementation. uv/Python 3.12 checks passed: 24 tests, Ruff, format and mypy. See `docs/reviews/TASK-003.md`.
+
+Independent TASK-004 review approved implementation `d8427071d7cdaf145dcd9a5dc6c3a2fae43d5814`; inspected branch head `b04e4f271384e3b57987d3f716a0920a38299046` differed only by documentation. Python 3.12/uv checks passed: 28 tests, Ruff, format and mypy. See `docs/reviews/TASK-004.md`.
