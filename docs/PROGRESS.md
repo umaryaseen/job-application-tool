@@ -147,7 +147,7 @@ Supersedes the earlier pre-adapter browser gate: the supervising engineer propos
 
 ### TASK-006 implementation — IMPLEMENTED — AWAITING REVIEW
 
-- Base: TASK-005 approved integration merge `75b8b1f`; branch: `task/006-pdf-adapter`; implementation commit: `119d27b3daab47fe0b04cc8b28f6018d18eeac36`.
+- Base: TASK-005 approved integration merge `75b8b1f`; branch: `task/006-pdf-adapter`; implementation commits: `119d27b0af0f2ad1ed4a4224778037c679fab129`, `0b2d05464142c3bde31486b7a5fd14497089035c`.
 - Adds `rendering/pdf.py` and a packaged `rendering/templates/baseline.yaml`. The adapter validates the complete `DocumentPlan` and profile/support review receipts with the TASK-003/TASK-004 validator before creating private staging files. It emits only the fixed A4, one-column, 11pt, 20mm RenderCV template and literal escaped Typst text tokens.
 - RenderCV 2.8, Typst 0.15.0, rendercv-fonts 0.5.1 and Pydantic 2.12.5 are locked runtime dependencies. Pydantic was raised from 2.11.7 because RenderCV 2.8 declares `pydantic[email]>=2.12.5`; no Playwright dependency enters the production environment. `pypdf` 6.18.1 is development-only extraction coverage.
 - The worker and its RenderCV child run under macOS `sandbox-exec` with `(deny network*)`; proxies are removed, local font/package paths are explicit, subprocess arguments use arrays, and output is bounded to 2,000,000 bytes. Missing isolation, timeout, failed worker, stale/tampered plan, unsafe output name and existing output fail closed. Temporary files are removed on success and handled failures.

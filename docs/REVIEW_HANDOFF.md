@@ -8,8 +8,8 @@ Independently review TASK-006 in this repository.
 
 TASK-005 approved implementation: 62eddb346995c8ef7ade694d45775779f5017c36
 TASK-005 accepted ADR-004 amendment: 1638bec9a3c334f0491625368e1a2ab208a19ce1
-TASK-005 merge/base: 75b8b1f (resolve the full hash)
-TASK-006 implementation: 119d27b (resolve the full hash)
+TASK-005 merge/base: 75b8b1f7b37ed62f51ec833e7f7e0ce50143cc10
+TASK-006 implementation head: 0b2d05464142c3bde31486b7a5fd14497089035c
 Branch: task/006-pdf-adapter
 
 Read AGENTS.md, docs/PROJECT_BRIEF.md, docs/ARCHITECTURE.md,
