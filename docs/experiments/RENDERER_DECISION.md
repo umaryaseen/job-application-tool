@@ -177,3 +177,11 @@ visual, security or maintenance gate, or if the literal-boundary/local-font
 adapter becomes too costly to maintain. Until an independent reviewer and the
 supervising engineer accept this qualification, ADR-004 stays PROPOSED / SPIKE
 REQUIRED; if RenderCV fails, recommend no backend and keep TASK-006 blocked.
+
+The complete-content oracle is now checked in independently at
+`tests/fixtures/rendering/expected/`. It is not generated from extracted
+output or from the runner's section traversal. The original extractor
+fragments are preserved in `tests/fixtures/rendering/extraction_failures.json`.
+The runner exits 1 for a measured mandatory failure and exits 2 for the
+current blocked-browser comparison; this laptop run returned 2 with all
+RenderCV/Typst and letter checks passing.

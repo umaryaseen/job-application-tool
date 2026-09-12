@@ -15,6 +15,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[3]
 CASE_ROOT = ROOT / "artifacts" / "renderer" / "task-005" / "cases"
+EXPECTED_ROOT = ROOT / "tests" / "fixtures" / "rendering" / "expected"
 OUT = ROOT / "artifacts" / "renderer" / "task-005" / "outputs"
 VENV = ROOT / "experiments" / "renderer" / ".venv"
 RENDERCV = VENV / "bin" / "rendercv"
@@ -40,9 +41,9 @@ def normalize_extracted_text(value: str) -> str:
     """
 
     value = unicodedata.normalize("NFC", value)
-    value = re.sub(r"(https?:)/\s*/\s*", r"\1//", value)
+    value = re.sub(r"(https?:)/[ \t]*/[ \t]*\r?\n[ \t]*", r"\1//", value)
     value = re.sub(r"(?<=\d)\u00ad(?=\d)", "-", value)
-    value = re.sub(r"\s*\u00ad\s*", "", value)
+    value = re.sub(r"[ \t]*\u00ad[ \t]*\r?\n[ \t]*", "", value)
     return re.sub(r"\s+", " ", value).strip()
 
 
@@ -55,23 +56,38 @@ def complete_content_matches(expected: str, actual: str) -> bool:
 def complete_content_controls(expected: str) -> dict[str, bool]:
     """Negative controls prove complete comparison rejects content changes."""
 
+    claim = expected.rstrip().splitlines()[-1]
     qualification = (
         ("German (CEFR B2)", "German (CEFR B1)")
         if "German (CEFR B2)" in expected
-        else ("Synthetic Example", "Synthetic Altered Example")
+        else (claim, f"{claim} (altered qualification)")
     )
-    first_word, *remaining_words = expected.split()
+    before_last_claim, separator, after_last_claim = expected.rpartition(claim)
     controls = {
-        "suffix_removed": expected[:-1],
+        "suffix_removed": expected.replace(claim, claim[: max(1, len(claim) // 2)], 1),
         "qualification_changed": expected.replace(*qualification, 1),
-        "claim_duplicated": f"{expected} {first_word}",
-        "claim_moved": " ".join([*remaining_words, first_word]),
+        "claim_duplicated": f"{expected.rstrip()}\n{claim}\n",
+        "claim_moved": f"{claim}\n{before_last_claim}{after_last_claim}" if separator else expected,
         "unexpected_content": expected + " Unexpected synthetic marker",
     }
     return {
         name: not complete_content_matches(expected, candidate)
         for name, candidate in controls.items()
     }
+
+
+def measurement_passed(measurements: dict[str, Any], expected: str) -> bool:
+    """Apply mandatory extraction/security checks after PDF generation."""
+
+    return bool(
+        measurements["complete_content_match"]
+        and all(measurements["negative_controls_rejected"].values())
+        and measurements["pdftotext_returncode"] == 0
+        and "pypdf_error" not in measurements["pdfinfo"]
+        and measurements["raster_returncode"] == 0
+        and ("Größe Ä Ö Ü ß" not in expected or measurements["unicode_preserved"])
+        and measurements["sentinel_not_recovered"]
+    )
 
 
 def run_rendercv(case_dir: Path, typ_path: Path, input_name: str = "input.yaml") -> dict[str, Any]:
@@ -200,11 +216,9 @@ def safe_typst_case(case_id: str) -> dict[str, Any]:
             "rendercv": render_result,
             "compile": compiled,
         }
-    expected = json.loads((case_dir / "expected.json").read_text(encoding="utf-8"))[
-        "ordered_content"
-    ]
+    expected = (EXPECTED_ROOT / f"{case_id}.txt").read_text(encoding="utf-8")
     measured = measure_pdf(pdf_path, expected, output_dir)
-    status = "ok" if measured["complete_content_match"] else "failed"
+    status = "ok" if measurement_passed(measured, expected) else "failed"
     return {
         "backend": "rendercv-typst",
         "status": status,
@@ -253,13 +267,11 @@ def html_case(case_id: str) -> dict[str, Any]:
                 path=str(pdf_path), format="A4", print_background=True, prefer_css_page_size=True
             )
             browser.close()
-        expected = json.loads((case_dir / "expected.json").read_text(encoding="utf-8"))[
-            "ordered_content"
-        ]
+        expected = (EXPECTED_ROOT / f"{case_id}.txt").read_text(encoding="utf-8")
         measured = measure_pdf(pdf_path, expected, output_dir)
         return {
             "backend": "html-playwright",
-            "status": "ok" if measured["complete_content_match"] else "failed",
+            "status": "ok" if measurement_passed(measured, expected) else "failed",
             "measurements": measured,
         }
     except Exception as error:
@@ -360,22 +372,17 @@ def letter_case() -> dict[str, Any]:
     compiled = compile_typst(safe_path, pdf_path)
     if compiled["status"] != "ok":
         return {"status": "failed", "rendercv": result, "compile": compiled}
+    expected = (EXPECTED_ROOT / "letter.txt").read_text(encoding="utf-8")
+    measurements = measure_pdf(pdf_path, expected, output_dir)
     return {
-        "status": "ok",
+        "status": "ok" if measurement_passed(measurements, expected) else "failed",
         "rendercv": result,
         "compile": compiled,
-        "measurements": measure_pdf(
-            pdf_path,
-            "Synthetic Example Letter Synthetic Example Application for Synthetic Engineering "
-            "Dear Synthetic Hiring Team, This is a one-page feasibility letter using only "
-            "synthetic content. "
-            "Kind regards, Synthetic Example",
-            output_dir,
-        ),
+        "measurements": measurements,
     }
 
 
-def main() -> None:
+def main() -> int:
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -392,20 +399,21 @@ def main() -> None:
     results["security_probe"] = network_probe()
     render_results = [item["rendercv"] for item in results["cases"].values()]
     html_results = [item["html"] for item in results["cases"].values()]
-    if (
-        any(item["status"] == "failed" for item in render_results)
-        or results["letter"]["status"] == "failed"
-    ):
+    all_results = [*render_results, *html_results, results["letter"]]
+    if any(item["status"] == "failed" for item in all_results):
         results["experiment_status"] = "failed"
     elif any(item["status"] == "blocked" for item in html_results):
         results["experiment_status"] = "blocked"
+    elif results["security_probe"]["status"] != "blocked":
+        results["experiment_status"] = "failed"
     else:
         results["experiment_status"] = "ok"
     (OUT / "results.json").write_text(
         json.dumps(results, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     print(json.dumps(results, ensure_ascii=False, indent=2))
+    return {"ok": 0, "blocked": 2, "failed": 1}[results["experiment_status"]]
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
