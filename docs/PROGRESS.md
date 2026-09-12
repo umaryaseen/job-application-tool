@@ -1,6 +1,6 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-12. TASK-001 is IMPLEMENTED — AWAITING REVIEW.
+Last updated: 2026-09-12. TASK-001 is APPROVED.
 
 ## Environment and completed work
 
@@ -21,7 +21,7 @@ Last updated: 2026-09-12. TASK-001 is IMPLEMENTED — AWAITING REVIEW.
 | M0 package | VERIFIED | Clean bundle restoration, tracked-file byte comparison, archive CRC and source identities passed; export-specific hashes in PACKAGE_VERIFICATION.json |
 | Laptop repository | RESTORED | Bundle cloned and verified locally |
 | Private GitHub repository | NOT CREATED | Native `gh` authentication is invalid; no remote configured |
-| TASK-001 | IMPLEMENTED — AWAITING REVIEW | Corrective commits address independent review findings; re-review exact corrective head |
+| TASK-001 | APPROVED | Independent verification gate resolved (uv located locally); see reviews/TASK-001.md |
 | TASK-002–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
@@ -45,7 +45,7 @@ Planning checks passed for required files, 256 internal Markdown links at the re
 
 ## Open gates
 
-1. Local Codex restores repository and implements TASK-001.
+1. TASK-001 is APPROVED; TASK-002 (strict profile and typed fact schemas) is the next unblocked task, on a fresh branch with independent review.
 2. TASK-005 experimentally resolves renderer and exact versions; no backend is production-approved yet.
 3. TASK-009 obtains actual reviewed career data and accepts a genuine baseline CV. Chat memory/research templates are not evidence.
 4. Optional provider/model/data choices remain deferred and do not block deterministic implementation.
@@ -67,3 +67,7 @@ Independent TASK-001 review: CHANGES REQUIRED at `cfaeaf1eb9eb609f89f4cbc7429706
 - Corrective verification: `uv sync --locked` passed; `uv run python --version` reported Python 3.12.14; `uv run pytest` reported 10 passed; Ruff check and format check passed; mypy reported no issues in 3 source files. No lockfile regeneration was needed.
 
 Re-review of corrective head `a1e7d43c2fd387c2f5b048a42ac59b69758b4aaa`: F-001 and F-002 are addressed by `cf60afb`; however required uv/Python 3.12 verification remains an unresolved gate because uv is unavailable in the review environment. Verdict: CHANGES REQUIRED. See the appended re-review in `docs/reviews/TASK-001.md`.
+
+### TASK-001 independent verification gate (resolved)
+
+Diff `a1e7d43..b2fce65` (current `HEAD`) is documentation-only (`docs/PROGRESS.md`, `docs/reviews/TASK-001.md`); no further implementation review was required. On the laptop checkout (`/Users/apple/Desktop/webapps/job-application-engine-handoff/job-application-engine`, Darwin 22.6.0 x86_64), `uv` was found at `/Users/apple/.local/bin/uv` (not on `PATH` in the review shell) and used by absolute path; no code/dependency/lockfile change was needed. Independently executed: `uv sync --locked` (resolved/checked, no changes needed), `uv run python --version` (`Python 3.12.14`), `uv run pytest` (10 passed), `uv run ruff check .` (all checks passed), `uv run ruff format --check .` (7 files already formatted), `uv run mypy src` (no issues in 3 source files). Hook activation and explicit-root regression tests were inspected and confirmed to exercise real `git commit` invocations and repository-boundary/symlink checks for both default and explicit roots. Verdict: **APPROVED**. Full detail in [TASK-001 review](reviews/TASK-001.md).
