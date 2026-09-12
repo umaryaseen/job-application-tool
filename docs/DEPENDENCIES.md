@@ -1,13 +1,13 @@
 # Dependency and component register
 
-No runtime dependencies have been installed or locked for this project yet. Versions below are **not selected** unless an introducing task records its actual resolution. Do not create a speculative lockfile. Prefer the standard library where it solves the task directly.
+Versions below are **not selected** unless an introducing task records its actual resolution. The TASK-001 lockfile contains the immediate development tools; TASK-002 adds the pinned Pydantic runtime dependency. Prefer the standard library where it solves the task directly.
 
 | Component | Purpose | Stage / status | License or review note |
 |---|---|---|---|
 | Python 3.12 | Single runtime | TASK-001, target | Record patch/platform; avoid runtime matrix until needed |
 | uv | Environment/package locking | TASK-001 | Development tool; verify current version and upstream license |
 | argparse, json, pathlib, hashlib, decimal, datetime, sqlite3 | CLI, serialization, paths, hashes, typed numbers/dates, later tracker | Standard library | No trivial wrapper dependency |
-| Pydantic 2 | Strict domain validation / JSON Schema export | TASK-002 | Verify pinned version/license; extra=forbid and explicit validators |
+| Pydantic 2 | Strict domain validation / JSON Schema export | TASK-002 | MIT; pinned to 2.11.7 in `pyproject.toml`/`uv.lock`; extra=forbid and explicit validators |
 | pytest | Regression/integration tests | TASK-001 | Development only; actual feature tests required |
 | Ruff / mypy | Lint/format/type gates | TASK-001 | Development only; pin and record |
 | Gitleaks or a justified mature alternative | Staged/history secret detection | TASK-001 | Tool, no applicant uploads; record version/config and safe synthetic test |
@@ -35,7 +35,8 @@ Upstream observations made on 2026-09-08: [RenderCV](https://github.com/rendercv
 | pytest | 8.4.1 | Synthetic unit and security-boundary tests | PyPI metadata | TASK-001 |
 | Ruff | 0.12.11 | Lint and format checks | PyPI metadata | TASK-001 |
 | mypy | 1.17.1 | Static type checking | PyPI metadata | TASK-001 |
+| pydantic | 2.11.7 | Strict profile/fact models and JSON Schema export | MIT / PyPI metadata | TASK-002 |
 
-The runtime package uses only the Python 3.12 standard library. `setuptools` is
-the build backend and is not imported at runtime. No model, renderer, network,
-database, or applicant-data dependency is installed by TASK-001.
+TASK-002 adds Pydantic as the runtime validation dependency. `setuptools` is
+the build backend and is not imported at runtime. No renderer, network,
+database, model, import adapter, or applicant-data dependency is installed.

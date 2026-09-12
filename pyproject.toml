@@ -7,7 +7,9 @@ name = "job-application-engine"
 version = "0.1.0"
 description = "Local, evidence-aware job application tooling"
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = [
+  "pydantic==2.11.7",
+]
 
 [project.scripts]
 jae = "job_application_engine.cli:main"

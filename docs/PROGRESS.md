@@ -1,6 +1,6 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-12. TASK-001 is APPROVED.
+Last updated: 2026-09-12. TASK-001 is APPROVED; TASK-002 is IMPLEMENTED — AWAITING REVIEW.
 
 ## Environment and completed work
 
@@ -22,7 +22,8 @@ Last updated: 2026-09-12. TASK-001 is APPROVED.
 | Laptop repository | RESTORED | Bundle cloned and verified locally |
 | Private GitHub repository | NOT CREATED | Native `gh` authentication is invalid; no remote configured |
 | TASK-001 | APPROVED | Independent verification gate resolved (uv located locally); see reviews/TASK-001.md |
-| TASK-002–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
+| TASK-002 | IMPLEMENTED — AWAITING REVIEW | Strict profile/fact schemas and exported JSON Schema; independent review pending |
+| TASK-003–009 / M1 | NOT STARTED | First actual CV milestone; applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
 | TASK-021–023 / M4 | NOT STARTED | Letters/tracker |
@@ -71,3 +72,11 @@ Re-review of corrective head `a1e7d43c2fd387c2f5b048a42ac59b69758b4aaa`: F-001 a
 ### TASK-001 independent verification gate (resolved)
 
 Diff `a1e7d43..b2fce65` (current `HEAD`) is documentation-only (`docs/PROGRESS.md`, `docs/reviews/TASK-001.md`); no further implementation review was required. On the laptop checkout (`/Users/apple/Desktop/webapps/job-application-engine-handoff/job-application-engine`, Darwin 22.6.0 x86_64), `uv` was found at `/Users/apple/.local/bin/uv` (not on `PATH` in the review shell) and used by absolute path; no code/dependency/lockfile change was needed. Independently executed: `uv sync --locked` (resolved/checked, no changes needed), `uv run python --version` (`Python 3.12.14`), `uv run pytest` (10 passed), `uv run ruff check .` (all checks passed), `uv run ruff format --check .` (7 files already formatted), `uv run mypy src` (no issues in 3 source files). Hook activation and explicit-root regression tests were inspected and confirmed to exercise real `git commit` invocations and repository-boundary/symlink checks for both default and explicit roots. Verdict: **APPROVED**. Full detail in [TASK-001 review](reviews/TASK-001.md).
+
+### TASK-002 implementation
+
+- Base: merge commit `6c00c9b` (`main` after approved TASK-001); branch: `task/002-profile-schemas`.
+- Adds strict Pydantic 2.11.7 models for versioned profile revisions, stable IDs/revisions, typed dates and states, contacts, employment, education, skills, languages, authorization, credentials and decimal metrics.
+- Adds mandatory evidence references, kind-specific source identities, immutable support-capture hashes, support bindings, hash-bound fact/evidence/variant approvals, duplicate-safe JSON loading, and checked-in JSON Schema export at `schemas/profile.schema.json`.
+- Schema models intentionally do not resolve dangling references or prove provenance; graph-level validation remains TASK-003. Fixtures are synthetic and use reserved example domains.
+- Verification so far: `uv sync --locked` passed; `uv run pytest` reported 17 passed; Ruff and mypy passed. Final full-suite results and commit hash will be recorded after the staged review and commit.
