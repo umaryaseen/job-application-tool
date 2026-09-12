@@ -1,0 +1,2348 @@
+{
+  "$defs": {
+    "ApprovedVariant": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VariantApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "fact_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "title": "Fact Refs",
+          "type": "array"
+        },
+        "locale": {
+          "enum": [
+            "en",
+            "de"
+          ],
+          "title": "Locale",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_scope": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Scope",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "title": "Support Binding Refs",
+          "type": "array"
+        },
+        "text": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "variant_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Variant Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "variant_id",
+        "revision",
+        "locale",
+        "text",
+        "fact_refs",
+        "support_binding_refs",
+        "subject_scope"
+      ],
+      "title": "ApprovedVariant",
+      "type": "object"
+    },
+    "AuthorizationFact": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "authorization",
+          "title": "Kind",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Support Binding Refs",
+          "type": "array"
+        },
+        "value": {
+          "$ref": "#/$defs/AuthorizationValue"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision",
+        "subject_id",
+        "evidence_refs",
+        "kind",
+        "value"
+      ],
+      "title": "AuthorizationFact",
+      "type": "object"
+    },
+    "AuthorizationValue": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "As Of"
+        },
+        "country": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Country"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "scope": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scope"
+        },
+        "status": {
+          "enum": [
+            "known",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "valid_through": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid Through"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "AuthorizationValue",
+      "type": "object"
+    },
+    "ContactEmail": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "email",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 254,
+          "minLength": 3,
+          "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "ContactEmail",
+      "type": "object"
+    },
+    "ContactFact": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "contact",
+          "title": "Kind",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Support Binding Refs",
+          "type": "array"
+        },
+        "value": {
+          "discriminator": {
+            "mapping": {
+              "email": "#/$defs/ContactEmail",
+              "location": "#/$defs/ContactLocation",
+              "phone": "#/$defs/ContactPhone",
+              "url": "#/$defs/ContactUrl"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ContactEmail"
+            },
+            {
+              "$ref": "#/$defs/ContactPhone"
+            },
+            {
+              "$ref": "#/$defs/ContactUrl"
+            },
+            {
+              "$ref": "#/$defs/ContactLocation"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision",
+        "subject_id",
+        "evidence_refs",
+        "kind",
+        "value"
+      ],
+      "title": "ContactFact",
+      "type": "object"
+    },
+    "ContactLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "location",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "ContactLocation",
+      "type": "object"
+    },
+    "ContactPhone": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "phone",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 40,
+          "minLength": 3,
+          "pattern": "^[+0-9() .-]+$",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "ContactPhone",
+      "type": "object"
+    },
+    "ContactUrl": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "url",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 2048,
+          "minLength": 8,
+          "pattern": "^https?://[^\\s]+$",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "ContactUrl",
+      "type": "object"
+    },
+    "CredentialFact": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "credential",
+          "title": "Kind",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Support Binding Refs",
+          "type": "array"
+        },
+        "value": {
+          "$ref": "#/$defs/CredentialValue"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision",
+        "subject_id",
+        "evidence_refs",
+        "kind",
+        "value"
+      ],
+      "title": "CredentialFact",
+      "type": "object"
+    },
+    "CredentialValue": {
+      "additionalProperties": false,
+      "properties": {
+        "awarded_on": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Awarded On"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "issuer": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Issuer"
+        },
+        "name": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "awarded",
+            "in_progress",
+            "expired",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "valid_through": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid Through"
+        }
+      },
+      "required": [
+        "name",
+        "status"
+      ],
+      "title": "CredentialValue",
+      "type": "object"
+    },
+    "DateRange": {
+      "additionalProperties": false,
+      "description": "A period with explicit unknown and ongoing states and no implicit Present.",
+      "properties": {
+        "end": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End"
+        },
+        "end_state": {
+          "default": "unknown",
+          "enum": [
+            "known",
+            "ongoing",
+            "unknown"
+          ],
+          "title": "End State",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start"
+        },
+        "start_state": {
+          "default": "unknown",
+          "enum": [
+            "known",
+            "unknown"
+          ],
+          "title": "Start State",
+          "type": "string"
+        }
+      },
+      "title": "DateRange",
+      "type": "object"
+    },
+    "DayDate": {
+      "additionalProperties": false,
+      "properties": {
+        "day": {
+          "maximum": 31,
+          "minimum": 1,
+          "title": "Day",
+          "type": "integer"
+        },
+        "month": {
+          "maximum": 12,
+          "minimum": 1,
+          "title": "Month",
+          "type": "integer"
+        },
+        "precision": {
+          "const": "day",
+          "title": "Precision",
+          "type": "string"
+        },
+        "year": {
+          "maximum": 9999,
+          "minimum": 1,
+          "title": "Year",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "precision",
+        "year",
+        "month",
+        "day"
+      ],
+      "title": "DayDate",
+      "type": "object"
+    },
+    "DocumentSource": {
+      "additionalProperties": false,
+      "properties": {
+        "document_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Document Sha256",
+          "type": "string"
+        },
+        "kind": {
+          "const": "document_reference",
+          "title": "Kind",
+          "type": "string"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator"
+        }
+      },
+      "required": [
+        "kind",
+        "document_sha256"
+      ],
+      "title": "DocumentSource",
+      "type": "object"
+    },
+    "EducationFact": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "completion_date": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completion Date"
+        },
+        "degree_name": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Degree Name"
+        },
+        "degree_status": {
+          "enum": [
+            "ongoing",
+            "completed",
+            "withdrawn",
+            "unknown"
+          ],
+          "title": "Degree Status",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "institution_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Institution Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "education",
+          "title": "Kind",
+          "type": "string"
+        },
+        "period": {
+          "$ref": "#/$defs/DateRange"
+        },
+        "program": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Program",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Support Binding Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision",
+        "subject_id",
+        "evidence_refs",
+        "kind",
+        "institution_id",
+        "program",
+        "degree_status",
+        "period"
+      ],
+      "title": "EducationFact",
+      "type": "object"
+    },
+    "EmploymentFact": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "description": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "employer_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Employer Id",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "employment",
+          "title": "Kind",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/Metric"
+          },
+          "maxItems": 32,
+          "title": "Metrics",
+          "type": "array"
+        },
+        "period": {
+          "$ref": "#/$defs/DateRange"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Support Binding Refs",
+          "type": "array"
+        },
+        "title": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision",
+        "subject_id",
+        "evidence_refs",
+        "kind",
+        "employer_id",
+        "title",
+        "period"
+      ],
+      "title": "EmploymentFact",
+      "type": "object"
+    },
+    "Entity": {
+      "additionalProperties": false,
+      "properties": {
+        "display_name": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Display Name",
+          "type": "string"
+        },
+        "entity_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "maxLength": 40,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Entity Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entity_id",
+        "entity_type",
+        "display_name"
+      ],
+      "title": "Entity",
+      "type": "object"
+    },
+    "EvidenceApproval": {
+      "additionalProperties": false,
+      "properties": {
+        "approved_at": {
+          "format": "date-time",
+          "title": "Approved At",
+          "type": "string"
+        },
+        "evidence_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidence Sha256",
+          "type": "string"
+        },
+        "reviewer_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Reviewer Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_sha256",
+        "approved_at",
+        "reviewer_id"
+      ],
+      "title": "EvidenceApproval",
+      "type": "object"
+    },
+    "EvidenceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "captured_at": {
+          "format": "date-time",
+          "title": "Captured At",
+          "type": "string"
+        },
+        "evidence_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "user_attestation",
+            "document_reference",
+            "repository_reference",
+            "import_reference"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "sensitivity": {
+          "default": "normal",
+          "enum": [
+            "normal",
+            "sensitive"
+          ],
+          "title": "Sensitivity",
+          "type": "string"
+        },
+        "source": {
+          "discriminator": {
+            "mapping": {
+              "document_reference": "#/$defs/DocumentSource",
+              "import_reference": "#/$defs/ImportSource",
+              "repository_reference": "#/$defs/RepositorySource",
+              "user_attestation": "#/$defs/UserAttestationSource"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/UserAttestationSource"
+            },
+            {
+              "$ref": "#/$defs/DocumentSource"
+            },
+            {
+              "$ref": "#/$defs/RepositorySource"
+            },
+            {
+              "$ref": "#/$defs/ImportSource"
+            }
+          ],
+          "title": "Source"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "support_capture_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Support Capture Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "revision",
+        "kind",
+        "source",
+        "support_capture_sha256",
+        "captured_at"
+      ],
+      "title": "EvidenceRecord",
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "revision"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "FactApproval": {
+      "additionalProperties": false,
+      "properties": {
+        "approved_at": {
+          "format": "date-time",
+          "title": "Approved At",
+          "type": "string"
+        },
+        "evidence_bundle_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidence Bundle Sha256",
+          "type": "string"
+        },
+        "fact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Fact Sha256",
+          "type": "string"
+        },
+        "reviewer_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Reviewer Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fact_sha256",
+        "evidence_bundle_sha256",
+        "approved_at",
+        "reviewer_id"
+      ],
+      "title": "FactApproval",
+      "type": "object"
+    },
+    "ImportSource": {
+      "additionalProperties": false,
+      "properties": {
+        "import_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Import Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "import_reference",
+          "title": "Kind",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "import_id",
+        "source_sha256"
+      ],
+      "title": "ImportSource",
+      "type": "object"
+    },
+    "LanguageCEFR": {
+      "additionalProperties": false,
+      "properties": {
+        "assessed_on": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assessed On"
+        },
+        "assessment": {
+          "const": "cefr",
+          "title": "Assessment",
+          "type": "string"
+        },
+        "level": {
+          "enum": [
+            "A1",
+            "A2",
+            "B1",
+            "B2",
+            "C1",
+            "C2"
+          ],
+          "title": "Level",
+          "type": "string"
+        }
+      },
+      "required": [
+        "assessment",
+        "level"
+      ],
+      "title": "LanguageCEFR",
+      "type": "object"
+    },
+    "LanguageFact": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "assessment": {
+          "discriminator": {
+            "mapping": {
+              "cefr": "#/$defs/LanguageCEFR",
+              "self_description": "#/$defs/LanguageSelfDescription",
+              "test_score": "#/$defs/LanguageTestScore"
+            },
+            "propertyName": "assessment"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/LanguageCEFR"
+            },
+            {
+              "$ref": "#/$defs/LanguageSelfDescription"
+            },
+            {
+              "$ref": "#/$defs/LanguageTestScore"
+            }
+          ],
+          "title": "Assessment"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "language",
+          "title": "Kind",
+          "type": "string"
+        },
+        "language": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Language",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Support Binding Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision",
+        "subject_id",
+        "evidence_refs",
+        "kind",
+        "language",
+        "assessment"
+      ],
+      "title": "LanguageFact",
+      "type": "object"
+    },
+    "LanguageSelfDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "assessed_on": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assessed On"
+        },
+        "assessment": {
+          "const": "self_description",
+          "title": "Assessment",
+          "type": "string"
+        },
+        "description": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "assessment",
+        "description"
+      ],
+      "title": "LanguageSelfDescription",
+      "type": "object"
+    },
+    "LanguageTestScore": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment": {
+          "const": "test_score",
+          "title": "Assessment",
+          "type": "string"
+        },
+        "scale": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scale"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Score"
+        },
+        "test_name": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Test Name",
+          "type": "string"
+        },
+        "tested_on": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tested On"
+        }
+      },
+      "required": [
+        "assessment",
+        "test_name",
+        "score"
+      ],
+      "title": "LanguageTestScore",
+      "type": "object"
+    },
+    "Metric": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Context"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "maxLength": 3,
+              "minLength": 3,
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "operator": {
+          "default": "exact",
+          "enum": [
+            "exact",
+            "approximately",
+            "at_least",
+            "at_most"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "period": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "unit": {
+          "enum": [
+            "count",
+            "percent",
+            "percentage_points",
+            "currency",
+            "months",
+            "years",
+            "other"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Metric",
+      "type": "object"
+    },
+    "MetricFact": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "metric",
+          "title": "Kind",
+          "type": "string"
+        },
+        "metric": {
+          "$ref": "#/$defs/Metric"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Support Binding Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision",
+        "subject_id",
+        "evidence_refs",
+        "kind",
+        "metric"
+      ],
+      "title": "MetricFact",
+      "type": "object"
+    },
+    "MonthDate": {
+      "additionalProperties": false,
+      "properties": {
+        "month": {
+          "maximum": 12,
+          "minimum": 1,
+          "title": "Month",
+          "type": "integer"
+        },
+        "precision": {
+          "const": "month",
+          "title": "Precision",
+          "type": "string"
+        },
+        "year": {
+          "maximum": 9999,
+          "minimum": 1,
+          "title": "Year",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "precision",
+        "year",
+        "month"
+      ],
+      "title": "MonthDate",
+      "type": "object"
+    },
+    "RepositorySource": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "repository_reference",
+          "title": "Kind",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "repository": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Repository",
+          "type": "string"
+        },
+        "revision": {
+          "pattern": "^[0-9a-f]{40,64}$",
+          "title": "Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "repository",
+        "revision",
+        "path"
+      ],
+      "title": "RepositorySource",
+      "type": "object"
+    },
+    "SkillFact": {
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "context": {
+          "enum": [
+            "used",
+            "exposure",
+            "study",
+            "unknown"
+          ],
+          "title": "Context",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "skill",
+          "title": "Kind",
+          "type": "string"
+        },
+        "last_used": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Used"
+        },
+        "name": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "proficiency": {
+          "default": "unknown",
+          "enum": [
+            "unknown",
+            "beginner",
+            "intermediate",
+            "advanced",
+            "expert"
+          ],
+          "title": "Proficiency",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Support Binding Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision",
+        "subject_id",
+        "evidence_refs",
+        "kind",
+        "name",
+        "context"
+      ],
+      "title": "SkillFact",
+      "type": "object"
+    },
+    "SupportBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "binding_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Binding Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "evidence_revision": {
+          "minimum": 1,
+          "title": "Evidence Revision",
+          "type": "integer"
+        },
+        "evidence_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidence Sha256",
+          "type": "string"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "fact_revision": {
+          "minimum": 1,
+          "title": "Fact Revision",
+          "type": "integer"
+        },
+        "fact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Fact Sha256",
+          "type": "string"
+        },
+        "reviewed_at": {
+          "format": "date-time",
+          "title": "Reviewed At",
+          "type": "string"
+        },
+        "reviewed_scope": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Reviewed Scope",
+          "type": "string"
+        },
+        "reviewer_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Reviewer Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "binding_id",
+        "fact_id",
+        "fact_revision",
+        "evidence_id",
+        "evidence_revision",
+        "fact_sha256",
+        "evidence_sha256",
+        "reviewed_scope",
+        "reviewed_at",
+        "reviewer_id"
+      ],
+      "title": "SupportBinding",
+      "type": "object"
+    },
+    "UserAttestationSource": {
+      "additionalProperties": false,
+      "properties": {
+        "attestation_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Attestation Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "user_attestation",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "attestation_id"
+      ],
+      "title": "UserAttestationSource",
+      "type": "object"
+    },
+    "VariantApproval": {
+      "additionalProperties": false,
+      "properties": {
+        "approved_at": {
+          "format": "date-time",
+          "title": "Approved At",
+          "type": "string"
+        },
+        "evidence_bundle_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidence Bundle Sha256",
+          "type": "string"
+        },
+        "reviewer_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Reviewer Id",
+          "type": "string"
+        },
+        "variant_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Variant Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "variant_sha256",
+        "evidence_bundle_sha256",
+        "approved_at",
+        "reviewer_id"
+      ],
+      "title": "VariantApproval",
+      "type": "object"
+    },
+    "YearDate": {
+      "additionalProperties": false,
+      "properties": {
+        "precision": {
+          "const": "year",
+          "title": "Precision",
+          "type": "string"
+        },
+        "year": {
+          "maximum": 9999,
+          "minimum": 1,
+          "title": "Year",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "precision",
+        "year"
+      ],
+      "title": "YearDate",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "content_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Content Sha256",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "entities": {
+      "items": {
+        "$ref": "#/$defs/Entity"
+      },
+      "maxItems": 500,
+      "title": "Entities",
+      "type": "array"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/EvidenceRecord"
+      },
+      "maxItems": 1000,
+      "title": "Evidence",
+      "type": "array"
+    },
+    "facts": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "authorization": "#/$defs/AuthorizationFact",
+            "contact": "#/$defs/ContactFact",
+            "credential": "#/$defs/CredentialFact",
+            "education": "#/$defs/EducationFact",
+            "employment": "#/$defs/EmploymentFact",
+            "language": "#/$defs/LanguageFact",
+            "metric": "#/$defs/MetricFact",
+            "skill": "#/$defs/SkillFact"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/ContactFact"
+          },
+          {
+            "$ref": "#/$defs/EmploymentFact"
+          },
+          {
+            "$ref": "#/$defs/EducationFact"
+          },
+          {
+            "$ref": "#/$defs/SkillFact"
+          },
+          {
+            "$ref": "#/$defs/LanguageFact"
+          },
+          {
+            "$ref": "#/$defs/AuthorizationFact"
+          },
+          {
+            "$ref": "#/$defs/CredentialFact"
+          },
+          {
+            "$ref": "#/$defs/MetricFact"
+          }
+        ]
+      },
+      "maxItems": 1000,
+      "title": "Facts",
+      "type": "array"
+    },
+    "profile_id": {
+      "maxLength": 64,
+      "minLength": 2,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "revision": {
+      "minimum": 1,
+      "title": "Revision",
+      "type": "integer"
+    },
+    "schema_version": {
+      "pattern": "^1\\.0$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "support_bindings": {
+      "items": {
+        "$ref": "#/$defs/SupportBinding"
+      },
+      "maxItems": 1000,
+      "title": "Support Bindings",
+      "type": "array"
+    },
+    "variants": {
+      "items": {
+        "$ref": "#/$defs/ApprovedVariant"
+      },
+      "maxItems": 1000,
+      "title": "Variants",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "profile_id",
+    "revision",
+    "created_at",
+    "content_sha256"
+  ],
+  "title": "ProfileRevision",
+  "type": "object"
+}

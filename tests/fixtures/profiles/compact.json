@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "profile_id": "synthetic-profile",
+  "revision": 1,
+  "created_at": "2026-09-12T12:00:00Z",
+  "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "entities": [
+    {"entity_id": "synthetic-person", "entity_type": "person", "display_name": "Synthetic Example"},
+    {"entity_id": "synthetic-employer", "entity_type": "employer", "display_name": "Example Labs"},
+    {"entity_id": "synthetic-school", "entity_type": "institution", "display_name": "Example University"}
+  ],
+  "evidence": [
+    {
+      "evidence_id": "attestation-one",
+      "revision": 1,
+      "kind": "user_attestation",
+      "source": {"kind": "user_attestation", "attestation_id": "attestation-one"},
+      "support_capture_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "captured_at": "2026-09-12T12:00:00Z",
+      "status": "draft"
+    }
+  ],
+  "facts": [
+    {
+      "fact_id": "contact-email",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "contact",
+      "evidence_refs": [{"evidence_id": "attestation-one", "revision": 1}],
+      "value": {"kind": "email", "value": "synthetic@example.com"}
+    },
+    {
+      "fact_id": "employment-one",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "employment",
+      "evidence_refs": [{"evidence_id": "attestation-one", "revision": 1}],
+      "employer_id": "synthetic-employer",
+      "title": "Synthetic Engineer",
+      "period": {
+        "start": {"precision": "month", "year": 2022, "month": 1},
+        "start_state": "known",
+        "end": null,
+        "end_state": "ongoing"
+      },
+      "metrics": [{"value": "12.5", "unit": "percent", "operator": "approximately"}]
+    },
+    {
+      "fact_id": "education-one",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "education",
+      "evidence_refs": [{"evidence_id": "attestation-one", "revision": 1}],
+      "institution_id": "synthetic-school",
+      "program": "Synthetic Computing",
+      "degree_name": "Synthetic MSc",
+      "degree_status": "unknown",
+      "period": {"start": null, "start_state": "unknown", "end": null, "end_state": "unknown"}
+    },
+    {
+      "fact_id": "language-one",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "language",
+      "evidence_refs": [{"evidence_id": "attestation-one", "revision": 1}],
+      "language": "German",
+      "assessment": {"assessment": "cefr", "level": "B2"}
+    },
+    {
+      "fact_id": "authorization-one",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "authorization",
+      "evidence_refs": [{"evidence_id": "attestation-one", "revision": 1}],
+      "value": {"status": "unknown"}
+    }
+  ]
+}

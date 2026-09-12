@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "profile_id": "synthetic-two-page",
+  "revision": 2,
+  "created_at": "2026-09-12T12:00:00Z",
+  "content_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "entities": [
+    {"entity_id": "synthetic-person", "entity_type": "person", "display_name": "Synthetic Example"},
+    {"entity_id": "synthetic-employer", "entity_type": "employer", "display_name": "Example Labs"},
+    {"entity_id": "synthetic-employer-two", "entity_type": "employer", "display_name": "Example Systems"},
+    {"entity_id": "synthetic-school", "entity_type": "institution", "display_name": "Example University"}
+  ],
+  "evidence": [
+    {
+      "evidence_id": "repository-one",
+      "revision": 1,
+      "kind": "repository_reference",
+      "source": {
+        "kind": "repository_reference",
+        "repository": "example.com/synthetic/project",
+        "revision": "0123456789abcdef0123456789abcdef01234567",
+        "path": "README.md"
+      },
+      "support_capture_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "captured_at": "2026-09-12T12:00:00Z",
+      "status": "draft"
+    }
+  ],
+  "facts": [
+    {
+      "fact_id": "employment-one",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "employment",
+      "evidence_refs": [{"evidence_id": "repository-one", "revision": 1}],
+      "employer_id": "synthetic-employer",
+      "title": "Synthetic Platform Engineer",
+      "period": {
+        "start": {"precision": "year", "year": 2019},
+        "start_state": "known",
+        "end": {"precision": "month", "year": 2022, "month": 6},
+        "end_state": "known"
+      },
+      "description": "Synthetic long-form project description used only for schema fixtures.",
+      "metrics": [{"value": "125000", "unit": "count", "operator": "at_least"}]
+    },
+    {
+      "fact_id": "employment-two",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "employment",
+      "evidence_refs": [{"evidence_id": "repository-one", "revision": 1}],
+      "employer_id": "synthetic-employer-two",
+      "title": "Synthetic Data Engineer",
+      "period": {
+        "start": {"precision": "month", "year": 2022, "month": 7},
+        "start_state": "known",
+        "end": null,
+        "end_state": "ongoing"
+      },
+      "metrics": [{"value": "7.25", "unit": "years", "operator": "approximately"}]
+    },
+    {
+      "fact_id": "skill-one",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "skill",
+      "evidence_refs": [{"evidence_id": "repository-one", "revision": 1}],
+      "name": "Synthetic Tool",
+      "context": "used",
+      "proficiency": "unknown",
+      "last_used": {"precision": "month", "year": 2026, "month": 1}
+    },
+    {
+      "fact_id": "language-one",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "language",
+      "evidence_refs": [{"evidence_id": "repository-one", "revision": 1}],
+      "language": "English",
+      "assessment": {"assessment": "test_score", "test_name": "Synthetic Test", "score": "8.0", "scale": "9"}
+    },
+    {
+      "fact_id": "credential-one",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "credential",
+      "evidence_refs": [{"evidence_id": "repository-one", "revision": 1}],
+      "value": {
+        "name": "Synthetic Credential",
+        "issuer": "Example Institute",
+        "status": "awarded",
+        "expires_at": "2027-01-01T00:00:00Z"
+      }
+    },
+    {
+      "fact_id": "metric-one",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "metric",
+      "evidence_refs": [{"evidence_id": "repository-one", "revision": 1}],
+      "metric": {"value": "10.00", "unit": "currency", "currency": "EUR", "operator": "exact"}
+    }
+  ]
+}
