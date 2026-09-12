@@ -103,6 +103,10 @@ def test_production_pdf_handles_long_two_page_plan_without_pruning(tmp_path: Pat
         ["pdftotext", "-layout", str(output), "-"], capture_output=True, text=True, check=True
     ).stdout
     assert normalize_extracted_text(recovered) == normalize_extracted_text(expected)
+    from pypdf import PdfReader
+
+    pypdf_recovered = "\n".join(page.extract_text() or "" for page in PdfReader(output).pages)
+    assert normalize_extracted_text(pypdf_recovered) == normalize_extracted_text(expected)
 
 
 def test_tampered_plan_is_rejected_before_private_staging(tmp_path: Path) -> None:
