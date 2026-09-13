@@ -29,3 +29,13 @@ Corrective task: execute the three commands in a fresh external synthetic `JAE_D
 - Schema/provenance/QA regressions and A28–A29 tamper/interruption/eligibility tests were included in the 80-test suite and passed.
 
 TASK-009 was not started. Review documentation and PROGRESS were the only changes committed.
+
+## Corrective CLI re-review
+
+Date: 2026-09-13. Corrected implementation `045b1e598b5e47bd73b3838442d466fa50e40286`; documentation head `bd7c8185816d8cb4af6ce881948aa1bb81d38dba`; previous review `e7f1c8d`. Ancestry and clean state were verified; the tail is documentation-only.
+
+F-001 is **resolved**. `cli._reviews` parses JSON through the duplicate-key rejecting loader, then validates receipts with Pydantic, including timezone-aware ISO datetimes; malformed and naive timestamps fail. Unknown fields, wrong types and nested duplicate keys remain rejected. Imported approval records are data only and cannot bypass local validation.
+
+Independent `uv run pytest tests/test_snapshot_cli.py -q` passed (1 test), exercising the installed `jae` entry point, external private root, real build/approve/export commands, exact bytes, failed pre-approval/escape/existing/tampered cases and unrelated-file preservation. Full `uv run pytest -q` completed with **81 passed**. Locked sync, Python 3.12.14, Ruff check/format and mypy passed. No implementation or lockfile changes were made.
+
+**Final verdict: APPROVED.** TASK-009 was not started.

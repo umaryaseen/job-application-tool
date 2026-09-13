@@ -7,10 +7,10 @@ Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH
 - Read all three supplied research reports, including examples, schema and roadmap; exact copies identified in SOURCE_REGISTER/research-manifest.
 - Compared consensus, conflicts, assumptions, questionable examples and postponements; checked relevant primary upstream documentation.
 - Independent research audit identified insufficient evidence-membership checks, optional provenance schema fields, unsafe date/metric semantics and mismatched scope estimates. Those are addressed in the architecture and ADRs.
-- Created repository-ready documents, 16 ADRs, 35 scoped task files, acceptance/test matrix, privacy/dependency guidance, review protocol and local Codex handoff.
-- Created `.gitignore` before any career data. No real applicant data, credentials, executable application code or generated personal CV exists in the repository.
+- Historical planning record: created repository-ready documents, 16 ADRs, 35 scoped task files, acceptance/test matrix, privacy/dependency guidance, review protocol and local Codex handoff. This describes the planning-era cloud package, not the current laptop implementation state.
+- Created `.gitignore` before any career data. Historical planning snapshot: no real applicant data, credentials, executable application code or generated personal CV existed in that snapshot; current implementation state is described in the task entries below.
 - Initialized a cloud-workspace planning Git repository with an exclusions commit, a planning branch and normal corrective history. Independent reviewer approved corrected planning head `bea4cbc1a0144b6d3f4190e9b29722546ed46670` on 2026-09-09; [M0 review](reviews/M0.md) records the initial findings and resolution. This is not the laptop repository.
-- Environment: cloud Linux workspace with Git 2.51.1. No laptop filesystem bridge and no `gh` executable was available. No GitHub login, repository creation or push occurred.
+- Historical planning environment note: the initial package checks ran in a cloud Linux workspace with Git 2.51.1 and no laptop bridge/`gh`. Current laptop verification is recorded in each task entry; no GitHub login, repository creation or push occurred.
 
 ## State table
 
@@ -268,3 +268,5 @@ Independent TASK-008 review: CHANGES REQUIRED for corrected implementation `c0c2
 - Targeted verification: `uv run pytest tests/test_snapshot_cli.py -vv` — 1 passed. The private-root escape case preserves an unrelated sentinel file. Full locked verification: `uv sync --locked` passed; Python 3.12.14; `uv run pytest -q --junitxml=artifacts/verification/task-008-cli/junit.xml` — 81 passed, 0 failures/errors; Ruff check and format passed; mypy passed with no issues in 35 source files.
 
 Next action: independent re-review of corrective head `045b1e598b5e47bd73b3838442d466fa50e40286`; do not merge TASK-008 or start TASK-009.
+
+TASK-008 corrective CLI re-review approved implementation `045b1e598b5e47bd73b3838442d466fa50e40286` with documentation head `bd7c8185816d8cb4af6ce881948aa1bb81d38dba`; prior CLI finding resolved. Focused CLI test passed; full suite **81 passed**, Python 3.12.14, Ruff/format/mypy passed. Planning-era cloud/no-executable-code statements were labeled historical. See appended TASK-008 review.
