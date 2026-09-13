@@ -173,7 +173,7 @@ Scoped TASK-006 re-review approved corrected implementation `8f8181fd88925c1bc33
 
 ## TASK-007 — IMPLEMENTED — AWAITING REVIEW
 
-Base: the approved TASK-006 merge `d04d4dfe247958c175e66df5ab64f228d206246a`.
+Base: the approved TASK-006 merge `d04d4dfe247958c175e66df5ab64f228d206246a`. Implementation commit: `72daba1beb691e81f068825ae032c36a43da367e`.
 This implementation adds `job_application_engine.ats_qa`, which measures the
 actual PDF bytes with independent Poppler and pypdf extraction, complete NFC /
 layout normalization, exact ordered section and entry expectations, scoped
