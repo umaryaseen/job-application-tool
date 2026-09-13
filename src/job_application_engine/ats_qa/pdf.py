@@ -116,7 +116,11 @@ def _text_checks(text: str, expected: ExpectedDocument) -> dict[str, tuple[bool,
                 cursor = position + len(exact)
             field_total += len(entry.fields)
             if scoped:
-                field_found += len(entry.fields)
+                actual_entry = block[position : position + len(exact)]
+                field_found += sum(
+                    normalize_extracted_text(value) in actual_entry
+                    for value in entry.fields.values()
+                )
     result: dict[str, tuple[bool, Any, Any]] = {
         "complete_text": (
             bool(actual) and actual == wanted,
