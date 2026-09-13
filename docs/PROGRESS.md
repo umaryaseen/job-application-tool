@@ -203,3 +203,5 @@ production QA command can invoke its independent extractor. The version was
 already locked by TASK-006; the dependency register records the promotion.
 Poppler 25.08.0 and sandbox-exec are host tools. No online upload, OCR,
 commercial parser, second renderer, final approval or TASK-008 work was added.
+
+Independent TASK-007 review: CHANGES REQUIRED for corrected implementation `4437ff51c79cb93e3bd458dcfc910538dd045361`; documentation head `5bcb43fe2087fc0ee0577312689e6f850e025746` is documentation-only after implementation. Scoped-field and report/visual hash logic inspected. Locked sync, Python 3.12, collection (56 tests), Ruff and mypy passed, but full pytest did not complete within the review window, leaving the required verification gate unresolved. See `docs/reviews/TASK-007.md`.
