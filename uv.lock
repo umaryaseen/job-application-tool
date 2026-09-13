@@ -87,6 +87,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "pydantic" },
+    { name = "pypdf" },
     { name = "rendercv", extra = ["full"] },
     { name = "rendercv-fonts" },
     { name = "typst" },
@@ -95,7 +96,6 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "mypy" },
-    { name = "pypdf" },
     { name = "pytest" },
     { name = "ruff" },
 ]
@@ -103,6 +103,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "pydantic", specifier = "==2.12.5" },
+    { name = "pypdf", specifier = "==6.18.1" },
     { name = "rendercv", extras = ["full"], specifier = "==2.8" },
     { name = "rendercv-fonts", specifier = "==0.5.1" },
     { name = "typst", specifier = "==0.15.0" },
@@ -111,7 +112,6 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "mypy", specifier = "==1.17.1" },
-    { name = "pypdf", specifier = "==6.18.1" },
     { name = "pytest", specifier = "==8.4.1" },
     { name = "ruff", specifier = "==0.12.11" },
 ]

@@ -1,0 +1,153 @@
+{
+  "expected_pages": 2,
+  "unicode_tokens": [
+    "ä",
+    "ö",
+    "ü",
+    "Ä",
+    "Ö",
+    "Ü",
+    "ß",
+    "Müller",
+    "Groß",
+    "İpek",
+    "Łukasz",
+    "François"
+  ],
+  "quantitative_tokens": [
+    "30%",
+    "30 percentage points",
+    "1,5",
+    "1.5",
+    "not"
+  ],
+  "sections": [
+    {
+      "label": "Contact",
+      "entries": [
+        {
+          "entry_id": "email",
+          "text": "Email: synthetic@example.com",
+          "fields": {
+            "email": "synthetic@example.com"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Professional Summary",
+      "entries": [
+        {
+          "entry_id": "headline",
+          "text": "Synthetic Engineer",
+          "fields": {
+            "title": "Synthetic Engineer"
+          }
+        },
+        {
+          "entry_id": "long-1",
+          "text": "Synthetic statement 1: with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping qualification 1 only."
+        },
+        {
+          "entry_id": "long-2",
+          "text": "Synthetic statement 2: with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping qualification 2 only."
+        },
+        {
+          "entry_id": "long-3",
+          "text": "Synthetic statement 3: with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping qualification 3 only."
+        },
+        {
+          "entry_id": "long-4",
+          "text": "Synthetic statement 4: with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping qualification 4 only."
+        },
+        {
+          "entry_id": "long-5",
+          "text": "Synthetic statement 5: with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping qualification 5 only."
+        },
+        {
+          "entry_id": "long-6",
+          "text": "Synthetic statement 6: with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping with deterministic wrapping qualification 6 only."
+        },
+        {
+          "entry_id": "metric",
+          "text": "Synthetic result: 30% is not 30 percentage points; 1,5 ms and 1.5 s (study only).",
+          "fields": {
+            "metric": "30%",
+            "qualification": "study only"
+          }
+        },
+        {
+          "entry_id": "names",
+          "text": "Synthetic test names: Müller, Groß, İpek, Łukasz, François. ä ö ü Ä Ö Ü ß.",
+          "fields": {
+            "name": "Müller"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Professional Experience",
+      "entries": [
+        {
+          "entry_id": "analyst",
+          "text": "Synthetic Analyst — Example Labs | 2022-01 – 2023-12",
+          "fields": {
+            "employer": "Example Labs",
+            "title": "Synthetic Analyst",
+            "start": "2022-01",
+            "end": "2023-12"
+          }
+        },
+        {
+          "entry_id": "engineer",
+          "text": "Synthetic Engineer — Example Labs | 2022-01 – ongoing",
+          "fields": {
+            "employer": "Example Labs",
+            "title": "Synthetic Engineer",
+            "start": "2022-01",
+            "end": "ongoing"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Education",
+      "entries": [
+        {
+          "entry_id": "degree",
+          "text": "Synthetic MSc — Synthetic Computing, Example University (status: unknown;  – end date unknown)",
+          "fields": {
+            "degree": "Synthetic MSc",
+            "status": "unknown"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Skills",
+      "entries": [
+        {
+          "entry_id": "skill",
+          "text": "Größe Ä Ö Ü ß (context: study; proficiency: unknown)",
+          "fields": {
+            "skill": "Größe Ä Ö Ü ß",
+            "proficiency": "unknown"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Languages",
+      "entries": [
+        {
+          "entry_id": "language",
+          "text": "German (CEFR B2)",
+          "fields": {
+            "language": "German",
+            "cefr": "B2"
+          }
+        }
+      ]
+    }
+  ]
+}

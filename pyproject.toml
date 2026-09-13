@@ -12,6 +12,7 @@ dependencies = [
   "rendercv[full]==2.8",
   "rendercv-fonts==0.5.1",
   "typst==0.15.0",
+  "pypdf==6.18.1",
 ]
 
 [project.scripts]
@@ -20,7 +21,6 @@ jae = "job_application_engine.cli:main"
 [dependency-groups]
 dev = [
   "mypy==1.17.1",
-  "pypdf==6.18.1",
   "pytest==8.4.1",
   "ruff==0.12.11",
 ]
