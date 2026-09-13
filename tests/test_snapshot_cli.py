@@ -154,6 +154,8 @@ def test_snapshot_cli_workflow_and_negative_cases(tmp_path: Path) -> None:
     missing = _run_cli(tmp_path, "snapshot-build")
     _assert_failure(missing, "required")
 
+    escaped_target = tmp_path.parent / "outside-export"
+    escaped_target.write_text("unrelated sentinel", encoding="utf-8")
     escape = _run_cli(
         tmp_path,
         "snapshot-export",
@@ -169,7 +171,7 @@ def test_snapshot_cli_workflow_and_negative_cases(tmp_path: Path) -> None:
         "captures",
     )
     _assert_failure(escape, "private path")
-    assert not (ROOT / "outside-export").exists()
+    assert escaped_target.read_text(encoding="utf-8") == "unrelated sentinel"
 
     existing_before = (destination / "output.txt").read_bytes()
     existing = _run_cli(
