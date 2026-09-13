@@ -1,16 +1,16 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH FOLLOW-UP under amended ADR-004. TASK-006 is IMPLEMENTED — AWAITING REVIEW.
+Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH FOLLOW-UP under amended ADR-004; TASK-006 and TASK-007 are APPROVED. TASK-008 is IMPLEMENTED — AWAITING REVIEW.
 
 ## Environment and completed work
 
 - Read all three supplied research reports, including examples, schema and roadmap; exact copies identified in SOURCE_REGISTER/research-manifest.
 - Compared consensus, conflicts, assumptions, questionable examples and postponements; checked relevant primary upstream documentation.
 - Independent research audit identified insufficient evidence-membership checks, optional provenance schema fields, unsafe date/metric semantics and mismatched scope estimates. Those are addressed in the architecture and ADRs.
-- Created repository-ready documents, 16 ADRs, 35 scoped task files, acceptance/test matrix, privacy/dependency guidance, review protocol and local Codex handoff.
-- Created `.gitignore` before any career data. No real applicant data, credentials, executable application code or generated personal CV exists in the repository.
+- Historical planning record: created repository-ready documents, 16 ADRs, 35 scoped task files, acceptance/test matrix, privacy/dependency guidance, review protocol and local Codex handoff. This describes the planning-era cloud package, not the current laptop implementation state.
+- Created `.gitignore` before any career data. Historical planning snapshot: no real applicant data, credentials, executable application code or generated personal CV existed in that snapshot; current implementation state is described in the task entries below.
 - Initialized a cloud-workspace planning Git repository with an exclusions commit, a planning branch and normal corrective history. Independent reviewer approved corrected planning head `bea4cbc1a0144b6d3f4190e9b29722546ed46670` on 2026-09-09; [M0 review](reviews/M0.md) records the initial findings and resolution. This is not the laptop repository.
-- Environment: cloud Linux workspace with Git 2.51.1. No laptop filesystem bridge and no `gh` executable was available. No GitHub login, repository creation or push occurred.
+- Historical planning environment note: the initial package checks ran in a cloud Linux workspace with Git 2.51.1 and no laptop bridge/`gh`. Current laptop verification is recorded in each task entry; no GitHub login, repository creation or push occurred.
 
 ## State table
 
@@ -26,8 +26,10 @@ Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH
 | TASK-003 | APPROVED | Deterministic evidence graph, immutable capture checks and local review receipts; see reviews/TASK-003.md |
 | TASK-004 | APPROVED | See reviews/TASK-004.md |
 | TASK-005 | APPROVED WITH FOLLOW-UP | Current-laptop RenderCV accepted by ADR-004 amendment; comparison remains blocked, exit 2 |
-| TASK-006 | IMPLEMENTED — AWAITING REVIEW | Production RenderCV/Typst adapter; independent review required before TASK-007 |
-| TASK-007–009 / M1 | NOT STARTED | Adapter QA and applicant curation still required |
+| TASK-006 | APPROVED | Production RenderCV/Typst adapter; see reviews/TASK-006-rereview.md |
+| TASK-007 | APPROVED | PDF/ATS QA checks; see reviews/TASK-007.md |
+| TASK-008 | IMPLEMENTED — AWAITING REVIEW | Private snapshots and current-eligibility export; independent review required |
+| TASK-009 / M1 | NOT STARTED | Applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
 | TASK-021–023 / M4 | NOT STARTED | Letters/tracker |
@@ -207,3 +209,64 @@ commercial parser, second renderer, final approval or TASK-008 work was added.
 Independent TASK-007 review: CHANGES REQUIRED for corrected implementation `4437ff51c79cb93e3bd458dcfc910538dd045361`; documentation head `5bcb43fe2087fc0ee0577312689e6f850e025746` is documentation-only after implementation. Scoped-field and report/visual hash logic inspected. Locked sync, Python 3.12, collection (56 tests), Ruff and mypy passed, but full pytest did not complete within the review window, leaving the required verification gate unresolved. See `docs/reviews/TASK-007.md`.
 
 TASK-007 verification re-review completed: implementation `4437ff51c79cb93e3bd458dcfc910538dd045361`, documentation head `5bcb43fe2087fc0ee0577312689e6f850e025746`. Reconciled 56-versus-67 count: current configuration collects 67 nodes across 8 test files; 56 was an earlier incomplete/stale collection count. Persistent full run with JUnit (`uv run pytest -vv --durations=0 --junitxml=artifacts/verification/task-007/junit.xml`) exited 0 with 67 passed in 45.54s. Prior findings resolved; final independent verdict APPROVED. See appended review.
+
+## TASK-008 — IMPLEMENTED — AWAITING REVIEW
+
+TASK-007 approved merge/base: `a83324f9afcef143ef264c554c5d4e7764d1e8bd`. Initial implementation commit: `d53276b8357846774e5147bd13448af23b73cc5d`; corrective implementation head: `c0c25f81baca6bf34822aea58a56340000c15ce6`.
+
+Added `snapshots/manifest.py`, `snapshots/store.py`, `snapshots/review.py` and
+`snapshots/export.py`. A build validates the current profile, exact document
+plan, local review receipts, supplied immutable support captures, UTF-8 text,
+PDF size and a passing TASK-007 QA report with an attributed visual review. It
+writes profile/selected source slice/reviews/plan/PDF/TXT/QA/configuration/tool
+versions/capture bytes and a hash manifest into a private same-filesystem
+staging directory, fsyncs, then atomically publishes a new ID. Existing IDs
+cannot be overwritten; only staging directories carrying the implementation's
+owner marker are cleanable.
+
+Final approval is an explicit separate `final-approval.json`, bound to the
+manifest, PDF and text digests, reviewer and aware timestamp. Export rechecks
+manifest and every artifact/capture hash, current profile revision/digest,
+current plan/provenance/reviews, mandatory QA plus visual review, support
+availability/status and expiry against the injected current clock. The
+historical snapshot is retained and only exact PDF/TXT bytes are copied to a
+new destination. A profile loader detects concurrent revision changes before
+publication. Backdated plan `as_of` values do not move the export clock;
+external-original removal is harmless when the reviewed capture remains
+intact. No dependencies were added.
+
+CLI commands are `jae snapshot-build`, `jae snapshot-approve` and
+`jae snapshot-export`; all input/output paths are private-root-relative under
+`JAE_DATA_DIR`. The complete synthetic API workflow is reproducible with
+`/Users/apple/.local/bin/uv run python tests/reproduce_task008.py`; it created a
+private snapshot, matching final approval, and exact PDF/TXT export with
+manifest digest `dcba708224133f6f0128a7651b7ed461378f070f3b3b81f4e55df6d97ea10fec`.
+The persisted JUnit report is under ignored
+`artifacts/verification/task-008/junit.xml`.
+
+Verification: locked sync passed; Python 3.12.14; full suite 80 passed with
+zero failures (JUnit at `artifacts/verification/task-008/junit-corrective.xml`);
+focused snapshot suite 13 passed; Ruff check/format and mypy passed
+(35 source files). Synthetic tampering, interruption, no-overwrite, current
+revision/capture/status, stale/missing visual QA, expiry, concurrent revision,
+restore/hash and exact-byte export cases pass. The corrective test mutates the
+source PDF between copying and publication; the manifest recheck rejects the
+export and removes its staging directory. The implementation does not
+provide signing, encryption, SQLite tracking, browser submission, identity
+Document copying, history deletion or TASK-009 work.
+
+Next action: independent review of the exact corrective TASK-008 implementation commit;
+do not merge TASK-008 or start TASK-009 before approval.
+
+Independent TASK-008 review: CHANGES REQUIRED for corrected implementation `c0c25f81baca6bf34822aea58a56340000c15ce6`; documentation head `ff66a8617a9e9884efdff44023570e7c3081ba40` is documentation-only after implementation. Locked sync/Python 3.12, full pytest (80 passed), reproduction, Ruff, format and mypy passed. Blocking finding: required snapshot-build/approve/export CLI workflow was not independently exercised; reproduction is API-only and no CLI integration test was found. See `docs/reviews/TASK-008.md`.
+
+### TASK-008 CLI review correction — IMPLEMENTED — AWAITING REVIEW
+
+- Preserved the independent finding in `docs/reviews/TASK-008.md`. Corrective implementation commits: `ee3db56edf4b91892d8c17ded2741fea961d8e07` and `045b1e598b5e47bd73b3838442d466fa50e40286`; the corrective head is based on reviewed implementation `c0c25f81baca6bf34822aea58a56340000c15ce6` and adds no dependency or lockfile changes.
+- Added `tests/test_snapshot_cli.py`, which resolves the installed `jae` executable and runs `snapshot-build`, `snapshot-approve`, and `snapshot-export` as subprocesses against a temporary external `JAE_DATA_DIR`. It checks complete snapshot files, pre-approval rejection, synthetic reviewer and manifest/PDF/TXT digest binding, exact exported bytes, missing arguments, private-root traversal, existing-destination protection and post-approval PDF tampering.
+- The CLI defect found by the integration test was corrected in `cli._reviews`: JSON review receipts now use Pydantic JSON validation so ISO timestamps are parsed at the actual command boundary while duplicate-key rejection remains in place.
+- Targeted verification: `uv run pytest tests/test_snapshot_cli.py -vv` — 1 passed. The private-root escape case preserves an unrelated sentinel file. Full locked verification: `uv sync --locked` passed; Python 3.12.14; `uv run pytest -q --junitxml=artifacts/verification/task-008-cli/junit.xml` — 81 passed, 0 failures/errors; Ruff check and format passed; mypy passed with no issues in 35 source files.
+
+Next action: independent re-review of corrective head `045b1e598b5e47bd73b3838442d466fa50e40286`; do not merge TASK-008 or start TASK-009.
+
+TASK-008 corrective CLI re-review approved implementation `045b1e598b5e47bd73b3838442d466fa50e40286` with documentation head `bd7c8185816d8cb4af6ce881948aa1bb81d38dba`; prior CLI finding resolved. Focused CLI test passed; full suite **81 passed**, Python 3.12.14, Ruff/format/mypy passed. Planning-era cloud/no-executable-code statements were labeled historical. See appended TASK-008 review.

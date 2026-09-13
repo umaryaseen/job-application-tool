@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import date
 from typing import Any
 
@@ -20,6 +20,7 @@ from ..domain.profile import ProfileRevision
 from ..profile.review import LocalReviewReceipt
 from ..profile.validation import validate_profile
 from ..verification.document import document_plan_digest, profile_digest
+from ..verification.support import EvidenceKey
 
 
 def _date_text(point: Any) -> str:
@@ -112,11 +113,12 @@ def compile_baseline(
     *,
     as_of: date,
     reviews: Sequence[LocalReviewReceipt] = (),
+    support_captures: Mapping[EvidenceKey, bytes | bytearray] | None = None,
     locale: Locale = "en",
 ) -> DocumentPlan:
     """Compile only locally reviewed approved records into standard sections."""
 
-    validate_profile(profile, reviews=reviews)
+    validate_profile(profile, reviews=reviews, support_captures=support_captures)
     sections: list[DocumentSection] = []
 
     contacts = sorted(
