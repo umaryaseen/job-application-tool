@@ -14,9 +14,9 @@ Versions below are **not selected** unless an introducing task records its actua
 | RenderCV | Candidate PDF backend and trusted YAML-to-Typst adapter | TASK-006 | MIT; pinned `rendercv[full]==2.8` in `pyproject.toml`/`uv.lock`; runs in the isolated production worker |
 | Typst | Local PDF compiler used by RenderCV | TASK-006 | Apache-2.0; pinned `typst==0.15.0`; package path is local and network-denied |
 | rendercv-fonts | Pinned local font assets | TASK-006 | MIT; pinned `rendercv-fonts==0.5.1`; only bundled font folders are passed to Typst |
-| pypdf | Independent production PDF text regression extraction | TASK-006 dev | BSD-3-Clause; pinned `pypdf==6.18.1` in the dev group; no applicant upload or OCR |
+| pypdf | Independent production PDF text regression extraction | TASK-006/TASK-007 runtime QA | BSD-3-Clause; pinned `pypdf==6.18.1` in the runtime set; no applicant upload or OCR |
 | Jinja2 + Playwright/Chromium | Alternative renderer experiment | TASK-005 only unless chosen | Escaping, browser install and network isolation tested; do not keep unused backend |
-| pypdf | Independent PDF text/page extraction | TASK-007 | Check pinned release license; no OCR/upload requirement |
+| pypdf | Independent PDF text/page extraction | TASK-007 | BSD-3-Clause; pinned `pypdf==6.18.1` in the runtime set; no OCR/upload requirement |
 | Poppler pdftotext/pdftoppm | Independent text/geometry and page raster QA | TASK-005/007 system tools | Record OS package/version; check redistribution terms if bundling tools later |
 | python-docx | Direct validated-plan DOCX output | TASK-024 | Upstream library creates/updates DOCX; verify exact version/license |
 | Sentence Transformers + model runtime | Optional local semantic retrieval | TASK-029 | Separate extra; library/model licenses separate; pin model revision/checksums |
@@ -64,16 +64,15 @@ The experiment's Playwright dependency remains outside the baseline lockfile.
 Poppler 25.08.0 (`pdftotext`, `pdftoppm`) is a host measurement tool and is not
 bundled.
 
-## TASK-006 production adapter
+## TASK-006 production adapter and TASK-007 QA
 
 The selected current-laptop backend is installed by the root locked
 environment: RenderCV 2.8 (full extra), Typst 0.15.0 and rendercv-fonts 0.5.1.
 RenderCV 2.8 requires Pydantic 2.12.5, so the TASK-002 pin was raised to that
-compatible patch line and re-locked. `pypdf` is development-only extraction
-coverage; Poppler remains a separately installed host QA tool. The production
+compatible patch line and re-locked. `pypdf` is runtime QA extraction coverage; Poppler remains a separately installed host QA tool. The production
 adapter does not import or use the ignored experiment virtual environment.
 
-The current runtime pin is `pydantic==2.12.5` in `pyproject.toml` and `uv.lock`.
+The current runtime pins are `pydantic==2.12.5` and `pypdf==6.18.1` in `pyproject.toml` and `uv.lock`.
 On 2026-09-13, installed RenderCV metadata reported
 `Requires-Dist: pydantic[email]>=2.12.5` (and
 `pydantic-extra-types>=2.11.0`). The locked project graph records
@@ -85,4 +84,6 @@ The adapter invokes a worker under macOS `sandbox-exec` with
 settings and private staging files. It fails closed when that isolation
 mechanism is unavailable. This is a current macOS 13.6.9 x86_64 support scope,
 not a cross-platform promise. No Playwright dependency is installed in the
-production environment.
+production environment. TASK-007 promotes the unchanged pypdf pin from the
+TASK-006 development record to runtime because the QA command invokes it as
+an independent extractor; no dependency or lockfile regeneration was needed.

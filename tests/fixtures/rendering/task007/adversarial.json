@@ -1,0 +1,55 @@
+{
+  "expected_pages": 1,
+  "quantitative_tokens": [
+    "30%",
+    "1.5",
+    "2020-01",
+    "2022-12"
+  ],
+  "sections": [
+    {
+      "label": "Contact",
+      "entries": [
+        {
+          "entry_id": "name",
+          "text": "Synthetic Candidate",
+          "fields": {
+            "name": "Synthetic Candidate"
+          }
+        },
+        {
+          "entry_id": "email",
+          "text": "Email: synthetic@example.com",
+          "fields": {
+            "email": "synthetic@example.com"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Professional Experience",
+      "entries": [
+        {
+          "entry_id": "alpha",
+          "text": "Analyst at Alpha Example 2020-01 to 2021-12: 30% (study only).",
+          "fields": {
+            "employer": "Alpha Example",
+            "date": "2020-01",
+            "metric": "30%",
+            "qualification": "study only"
+          }
+        },
+        {
+          "entry_id": "beta",
+          "text": "Engineer at Beta Example 2022-01 to 2022-12: 1.5 s (not production).",
+          "fields": {
+            "employer": "Beta Example",
+            "date": "2022-12",
+            "metric": "1.5 s",
+            "qualification": "not production"
+          }
+        }
+      ]
+    }
+  ]
+}

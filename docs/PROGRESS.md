@@ -170,3 +170,36 @@ Independent TASK-006 review: CHANGES REQUIRED for implementation `452edbe21f94a8
 Next action: independent re-review of correction commit `8f8181fd88925c1bc33e6800576c938f3f9857e1`; do not merge or start TASK-007.
 
 Scoped TASK-006 re-review approved corrected implementation `8f8181fd88925c1bc33e6800576c938f3f9857e1` with documentation head `93e61499ff4bacbbfd44ff99b4f56738a9d79b15`. F-001 dependency documentation and F-002 independent two-page Poppler/pypdf extraction are addressed. Locked Python 3.12 checks passed: targeted test 1 passed, full suite 38 passed, Ruff, format and mypy passed. See `docs/reviews/TASK-006-rereview.md`.
+
+## TASK-007 — IMPLEMENTED — AWAITING REVIEW
+
+Base: the approved TASK-006 merge `d04d4dfe247958c175e66df5ab64f228d206246a`.
+This implementation adds `job_application_engine.ats_qa`, which measures the
+actual PDF bytes with independent Poppler and pypdf extraction, complete NFC /
+layout normalization, exact ordered section and entry expectations, scoped
+critical fields, Unicode and quantitative token multiplicity, page count/A4
+media and crop boxes, byte size, Poppler word geometry, visibility-operator
+flags, and raster-page hashes. `QAReport` records every check with status,
+measurement, expected value, tool/version, artifact hash and bounded
+diagnostics. Visual review remains `not_checked` until an identified person
+records an observation against the exact hash; raster generation never counts
+as that observation. A pypdf worker runs under the same macOS network-denied
+sandbox and rejects oversized streams.
+
+Synthetic fixtures and actual-PDF tests are in `tests/rendering/` and
+`tests/fixtures/rendering/task007/`. Reproduction is
+`/Users/apple/.local/bin/uv run python tests/rendering/reproduce_task007.py`;
+it writes PDFs, JSON reports and raster pages below ignored
+`artifacts/qa/task-007-<UTC>/`. The command reports `not_checked` overall until
+manual visual observations are recorded. The checker detects text-layer loss,
+wrong content/order/scope, duplicate/unexpected text, missing meaningful
+numbers and Unicode, invalid dimensions, out-of-page text, explicit nonpainting
+text modes, clipping operators and selected transparency/forms. It cannot
+universally detect occlusion, white-on-white paint, complex clipping, image
+meaning or an employer ATS score; those limitations remain explicit.
+
+Dependency change: pypdf `6.18.1` is now a locked runtime QA dependency so the
+production QA command can invoke its independent extractor. The version was
+already locked by TASK-006; the dependency register records the promotion.
+Poppler 25.08.0 and sandbox-exec are host tools. No online upload, OCR,
+commercial parser, second renderer, final approval or TASK-008 work was added.
