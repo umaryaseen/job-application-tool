@@ -173,7 +173,7 @@ Scoped TASK-006 re-review approved corrected implementation `8f8181fd88925c1bc33
 
 ## TASK-007 — IMPLEMENTED — AWAITING REVIEW
 
-Base: the approved TASK-006 merge `d04d4dfe247958c175e66df5ab64f228d206246a`. Implementation commit: `72daba1beb691e81f068825ae032c36a43da367e`.
+Base: the approved TASK-006 merge `d04d4dfe247958c175e66df5ab64f228d206246a`. Implementation commits: `72daba1beb691e81f068825ae032c36a43da367e` and corrective `4437ff51c79cb93e3bd458dcfc910538dd045361`.
 This implementation adds `job_application_engine.ats_qa`, which measures the
 actual PDF bytes with independent Poppler and pypdf extraction, complete NFC /
 layout normalization, exact ordered section and entry expectations, scoped
@@ -191,7 +191,7 @@ Synthetic fixtures and actual-PDF tests are in `tests/rendering/` and
 `/Users/apple/.local/bin/uv run python tests/rendering/reproduce_task007.py`;
 it writes PDFs, JSON reports and raster pages below ignored
 `artifacts/qa/task-007-<UTC>/`. The command reports `not_checked` overall until
-manual visual observations are recorded. The checker detects text-layer loss,
+manual visual observations are recorded. The corrective commit explicitly counts every mapped field value inside its recovered complete entry span. The checker detects text-layer loss,
 wrong content/order/scope, duplicate/unexpected text, missing meaningful
 numbers and Unicode, invalid dimensions, out-of-page text, explicit nonpainting
 text modes, clipping operators and selected transparency/forms. It cannot

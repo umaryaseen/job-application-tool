@@ -8,6 +8,8 @@ Independently review TASK-007 in this repository.
 
 TASK-006 approved merge/base: d04d4dfe247958c175e66df5ab64f228d206246a
 TASK-007 implementation: 72daba1beb691e81f068825ae032c36a43da367e
+TASK-007 corrective scope-count fix: 4437ff51c79cb93e3bd458dcfc910538dd045361
+Review the combined implementation through the corrective head above.
 Branch: task/007-pdf-ats-qa
 
 Read AGENTS.md, docs/PROJECT_BRIEF.md, docs/ARCHITECTURE.md,
