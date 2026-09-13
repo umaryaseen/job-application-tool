@@ -207,3 +207,48 @@ commercial parser, second renderer, final approval or TASK-008 work was added.
 Independent TASK-007 review: CHANGES REQUIRED for corrected implementation `4437ff51c79cb93e3bd458dcfc910538dd045361`; documentation head `5bcb43fe2087fc0ee0577312689e6f850e025746` is documentation-only after implementation. Scoped-field and report/visual hash logic inspected. Locked sync, Python 3.12, collection (56 tests), Ruff and mypy passed, but full pytest did not complete within the review window, leaving the required verification gate unresolved. See `docs/reviews/TASK-007.md`.
 
 TASK-007 verification re-review completed: implementation `4437ff51c79cb93e3bd458dcfc910538dd045361`, documentation head `5bcb43fe2087fc0ee0577312689e6f850e025746`. Reconciled 56-versus-67 count: current configuration collects 67 nodes across 8 test files; 56 was an earlier incomplete/stale collection count. Persistent full run with JUnit (`uv run pytest -vv --durations=0 --junitxml=artifacts/verification/task-007/junit.xml`) exited 0 with 67 passed in 45.54s. Prior findings resolved; final independent verdict APPROVED. See appended review.
+
+## TASK-008 — IMPLEMENTED — AWAITING REVIEW
+
+TASK-007 approved merge/base: `a83324f` (full hash is resolved in Git history). Implementation commit: `d53276b8357846774e5147bd13448af23b73cc5d`.
+
+Added `snapshots/manifest.py`, `snapshots/store.py`, `snapshots/review.py` and
+`snapshots/export.py`. A build validates the current profile, exact document
+plan, local review receipts, supplied immutable support captures, UTF-8 text,
+PDF size and a passing TASK-007 QA report with an attributed visual review. It
+writes profile/selected source slice/reviews/plan/PDF/TXT/QA/configuration/tool
+versions/capture bytes and a hash manifest into a private same-filesystem
+staging directory, fsyncs, then atomically publishes a new ID. Existing IDs
+cannot be overwritten; only staging directories carrying the implementation's
+owner marker are cleanable.
+
+Final approval is an explicit separate `final-approval.json`, bound to the
+manifest, PDF and text digests, reviewer and aware timestamp. Export rechecks
+manifest and every artifact/capture hash, current profile revision/digest,
+current plan/provenance/reviews, mandatory QA plus visual review, support
+availability/status and expiry against the injected current clock. The
+historical snapshot is retained and only exact PDF/TXT bytes are copied to a
+new destination. A profile loader detects concurrent revision changes before
+publication. Backdated plan `as_of` values do not move the export clock;
+external-original removal is harmless when the reviewed capture remains
+intact. No dependencies were added.
+
+CLI commands are `jae snapshot-build`, `jae snapshot-approve` and
+`jae snapshot-export`; all input/output paths are private-root-relative under
+`JAE_DATA_DIR`. The complete synthetic API workflow is reproducible with
+`/Users/apple/.local/bin/uv run python tests/reproduce_task008.py`; it created a
+private snapshot, matching final approval, and exact PDF/TXT export with
+manifest digest `dcba708224133f6f0128a7651b7ed461378f070f3b3b81f4e55df6d97ea10fec`.
+The persisted JUnit report is under ignored
+`artifacts/verification/task-008/junit.xml`.
+
+Verification: locked sync passed; Python 3.12.14; full suite 79 passed in
+79.32s; focused snapshot suite 12 passed; Ruff check/format and mypy passed
+(35 source files). Synthetic tampering, interruption, no-overwrite, current
+revision/capture/status, stale/missing visual QA, expiry, concurrent revision,
+restore/hash and exact-byte export cases pass. The implementation does not
+provide signing, encryption, SQLite tracking, browser submission, identity
+Document copying, history deletion or TASK-009 work.
+
+Next action: independent review of the exact TASK-008 implementation commit;
+do not merge TASK-008 or start TASK-009 before approval.
