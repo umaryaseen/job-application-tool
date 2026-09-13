@@ -210,7 +210,7 @@ TASK-007 verification re-review completed: implementation `4437ff51c79cb93e3bd45
 
 ## TASK-008 — IMPLEMENTED — AWAITING REVIEW
 
-TASK-007 approved merge/base: `a83324f` (full hash is resolved in Git history). Implementation commit: `d53276b8357846774e5147bd13448af23b73cc5d`.
+TASK-007 approved merge/base: `a83324f9afcef143ef264c554c5d4e7764d1e8bd`. Initial implementation commit: `d53276b8357846774e5147bd13448af23b73cc5d`; corrective implementation head: `c0c25f81baca6bf34822aea58a56340000c15ce6`.
 
 Added `snapshots/manifest.py`, `snapshots/store.py`, `snapshots/review.py` and
 `snapshots/export.py`. A build validates the current profile, exact document
@@ -242,13 +242,16 @@ manifest digest `dcba708224133f6f0128a7651b7ed461378f070f3b3b81f4e55df6d97ea10fe
 The persisted JUnit report is under ignored
 `artifacts/verification/task-008/junit.xml`.
 
-Verification: locked sync passed; Python 3.12.14; full suite 79 passed in
-79.32s; focused snapshot suite 12 passed; Ruff check/format and mypy passed
+Verification: locked sync passed; Python 3.12.14; full suite 80 passed with
+zero failures (JUnit at `artifacts/verification/task-008/junit-corrective.xml`);
+focused snapshot suite 13 passed; Ruff check/format and mypy passed
 (35 source files). Synthetic tampering, interruption, no-overwrite, current
 revision/capture/status, stale/missing visual QA, expiry, concurrent revision,
-restore/hash and exact-byte export cases pass. The implementation does not
+restore/hash and exact-byte export cases pass. The corrective test mutates the
+source PDF between copying and publication; the manifest recheck rejects the
+export and removes its staging directory. The implementation does not
 provide signing, encryption, SQLite tracking, browser submission, identity
 Document copying, history deletion or TASK-009 work.
 
-Next action: independent review of the exact TASK-008 implementation commit;
+Next action: independent review of the exact corrective TASK-008 implementation commit;
 do not merge TASK-008 or start TASK-009 before approval.

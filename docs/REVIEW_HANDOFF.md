@@ -7,7 +7,8 @@ TASK-008 implementation commit below; do not approve it as the implementer.
 Independently review TASK-008 in this repository.
 
 TASK-007 approved merge/base: a83324f9afcef143ef264c554c5d4e7764d1e8bd
-TASK-008 implementation: d53276b8357846774e5147bd13448af23b73cc5d
+TASK-008 implementation: c0c25f81baca6bf34822aea58a56340000c15ce6
+Initial implementation: d53276b8357846774e5147bd13448af23b73cc5d
 Branch: task/008-snapshots-export
 
 Read AGENTS.md, docs/PROJECT_BRIEF.md, docs/ARCHITECTURE.md,
@@ -17,7 +18,8 @@ ADR-002, ADR-011, ADR-012, ADR-015, relevant research sections in
 SOURCE_REGISTER.md, and docs/REVIEW_PROTOCOL.md.
 
 Inspect the complete diff from the TASK-007 approved merge to the exact
-TASK-008 head. Run the locked checks independently:
+corrective TASK-008 head, including the intervening-edit recheck. Run the
+locked checks independently:
 
   /Users/apple/.local/bin/uv sync --locked
   /Users/apple/.local/bin/uv run python --version
