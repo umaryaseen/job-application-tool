@@ -262,9 +262,9 @@ Independent TASK-008 review: CHANGES REQUIRED for corrected implementation `c0c2
 
 ### TASK-008 CLI review correction — IMPLEMENTED — AWAITING REVIEW
 
-- Preserved the independent finding in `docs/reviews/TASK-008.md`. Corrective implementation commit: `ee3db56edf4b91892d8c17ded2741fea961d8e07`; this commit is based on reviewed implementation `c0c25f81baca6bf34822aea58a56340000c15ce6` and adds no dependency or lockfile changes.
+- Preserved the independent finding in `docs/reviews/TASK-008.md`. Corrective implementation commits: `ee3db56edf4b91892d8c17ded2741fea961d8e07` and `045b1e598b5e47bd73b3838442d466fa50e40286`; the corrective head is based on reviewed implementation `c0c25f81baca6bf34822aea58a56340000c15ce6` and adds no dependency or lockfile changes.
 - Added `tests/test_snapshot_cli.py`, which resolves the installed `jae` executable and runs `snapshot-build`, `snapshot-approve`, and `snapshot-export` as subprocesses against a temporary external `JAE_DATA_DIR`. It checks complete snapshot files, pre-approval rejection, synthetic reviewer and manifest/PDF/TXT digest binding, exact exported bytes, missing arguments, private-root traversal, existing-destination protection and post-approval PDF tampering.
 - The CLI defect found by the integration test was corrected in `cli._reviews`: JSON review receipts now use Pydantic JSON validation so ISO timestamps are parsed at the actual command boundary while duplicate-key rejection remains in place.
-- Targeted verification: `uv run pytest tests/test_snapshot_cli.py -vv` — 1 passed. Full locked verification: `uv sync --locked` passed; Python 3.12.14; `uv run pytest -q --junitxml=artifacts/verification/task-008-cli/junit.xml` — 81 passed, 0 failures/errors; Ruff check and format passed; mypy passed with no issues in 35 source files.
+- Targeted verification: `uv run pytest tests/test_snapshot_cli.py -vv` — 1 passed. The private-root escape case preserves an unrelated sentinel file. Full locked verification: `uv sync --locked` passed; Python 3.12.14; `uv run pytest -q --junitxml=artifacts/verification/task-008-cli/junit.xml` — 81 passed, 0 failures/errors; Ruff check and format passed; mypy passed with no issues in 35 source files.
 
-Next action: independent re-review of corrective head `ee3db56edf4b91892d8c17ded2741fea961d8e07`; do not merge TASK-008 or start TASK-009.
+Next action: independent re-review of corrective head `045b1e598b5e47bd73b3838442d466fa50e40286`; do not merge TASK-008 or start TASK-009.

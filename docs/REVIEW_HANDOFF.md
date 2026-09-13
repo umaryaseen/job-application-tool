@@ -7,7 +7,8 @@ TASK-008 implementation commit below; do not approve it as the implementer.
 Independently review TASK-008 in this repository.
 
 TASK-007 approved merge/base: a83324f9afcef143ef264c554c5d4e7764d1e8bd
-TASK-008 corrective implementation: ee3db56edf4b91892d8c17ded2741fea961d8e07
+TASK-008 corrective implementation: 045b1e598b5e47bd73b3838442d466fa50e40286
+Earlier corrective commit: ee3db56edf4b91892d8c17ded2741fea961d8e07
 Reviewed implementation before correction: c0c25f81baca6bf34822aea58a56340000c15ce6
 Initial implementation: d53276b8357846774e5147bd13448af23b73cc5d
 Branch: task/008-snapshots-export
