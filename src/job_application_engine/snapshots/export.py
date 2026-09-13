@@ -16,7 +16,7 @@ from ..profile.review import LocalReviewReceipt
 from ..profile.validation import ProvenanceValidationError, validate_profile
 from ..verification.document import validate_document_plan
 from ..verification.support import EvidenceKey, verify_support_captures
-from .manifest import digest_file
+from .manifest import digest_file, verify_manifest_files
 from .review import _verify_ready, load_final_approval
 from .store import SnapshotError, _snapshot_root
 
@@ -131,6 +131,13 @@ def export_snapshot(
     try:
         shutil.copyfile(snapshot / "pdf/output.pdf", stage / "output.pdf")
         shutil.copyfile(snapshot / "text/output.txt", stage / "output.txt")
+        manifest, _ = _verify_ready(snapshot)
+        verify_manifest_files(snapshot, manifest)
+        expected = {item.path: item.sha256 for item in manifest.files}
+        if digest_file(stage / "output.pdf") != expected["pdf/output.pdf"]:
+            raise ExportError("PDF changed during export")
+        if digest_file(stage / "output.txt") != expected["text/output.txt"]:
+            raise ExportError("text changed during export")
         # Recheck the bytes and profile immediately before publication.
         if profile_loader is not None:
             latest = profile_loader()
@@ -140,6 +147,9 @@ def export_snapshot(
     except ExportError:
         shutil.rmtree(stage, ignore_errors=True)
         raise
+    except SnapshotError as error:
+        shutil.rmtree(stage, ignore_errors=True)
+        raise ExportError(str(error)) from error
     except (OSError, ValueError) as error:
         shutil.rmtree(stage, ignore_errors=True)
         raise ExportError("export publication failed") from error

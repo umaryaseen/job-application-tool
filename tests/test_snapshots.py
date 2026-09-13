@@ -373,3 +373,31 @@ def test_concurrent_profile_loader_conflict_blocks_publication(tmp_path: Path) -
             profile_loader=lambda: next(calls),
         )
     assert not (tmp_path / "exports/race").exists()
+
+
+def test_intervening_snapshot_edit_during_copy_blocks_publication(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    request, profile, reviews, capture = approved_snapshot(tmp_path)
+    import job_application_engine.snapshots.export as export_module
+
+    original_copy = export_module.shutil.copyfile
+
+    def copy_and_edit(source: str | Path, destination: str | Path) -> str:
+        result = original_copy(source, destination)
+        if str(source).endswith("pdf/output.pdf"):
+            Path(source).write_bytes(Path(source).read_bytes() + b"changed during copy")
+        return result
+
+    monkeypatch.setattr(export_module.shutil, "copyfile", copy_and_edit)
+    with pytest.raises(ExportError, match="manifest hash mismatch"):
+        export_snapshot(
+            request.snapshot_id,
+            destination=tmp_path / "exports" / "intervening",
+            profile=profile,
+            reviews=reviews,
+            support_captures={("attestation-one", 1): capture},
+            now=NOW,
+            root=tmp_path,
+        )
+    assert not (tmp_path / "exports/intervening").exists()
