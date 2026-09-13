@@ -255,3 +255,5 @@ Document copying, history deletion or TASK-009 work.
 
 Next action: independent review of the exact corrective TASK-008 implementation commit;
 do not merge TASK-008 or start TASK-009 before approval.
+
+Independent TASK-008 review: CHANGES REQUIRED for corrected implementation `c0c25f81baca6bf34822aea58a56340000c15ce6`; documentation head `ff66a8617a9e9884efdff44023570e7c3081ba40` is documentation-only after implementation. Locked sync/Python 3.12, full pytest (80 passed), reproduction, Ruff, format and mypy passed. Blocking finding: required snapshot-build/approve/export CLI workflow was not independently exercised; reproduction is API-only and no CLI integration test was found. See `docs/reviews/TASK-008.md`.
