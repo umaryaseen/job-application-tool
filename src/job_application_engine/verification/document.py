@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import Any
 
 from ..domain.document import DocumentLine, DocumentPlan
@@ -54,6 +55,7 @@ def validate_document_plan(
     profile: ProfileRevision,
     *,
     reviews: Sequence[LocalReviewReceipt] = (),
+    support_captures: Mapping[tuple[str, int], bytes | bytearray | Path] | None = None,
 ) -> None:
     """Reject altered plans and any line not authorized by current reviewed data."""
 
@@ -64,7 +66,7 @@ def validate_document_plan(
     if plan.plan_sha256 != document_plan_digest(plan):
         raise _line_error("document plan content was altered")
     try:
-        validate_profile(profile, reviews=reviews)
+        validate_profile(profile, reviews=reviews, support_captures=support_captures)
     except ProvenanceValidationError as error:
         raise _line_error(str(error)) from error
 
