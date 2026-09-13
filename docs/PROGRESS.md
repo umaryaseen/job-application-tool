@@ -1,6 +1,6 @@
 # Progress — authoritative implementation state
 
-Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH FOLLOW-UP under amended ADR-004. TASK-006 is IMPLEMENTED — AWAITING REVIEW.
+Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH FOLLOW-UP under amended ADR-004; TASK-006 and TASK-007 are APPROVED. TASK-008 is IMPLEMENTED — AWAITING REVIEW.
 
 ## Environment and completed work
 
@@ -26,8 +26,10 @@ Last updated: 2026-09-13. TASK-001–004 are APPROVED; TASK-005 is APPROVED WITH
 | TASK-003 | APPROVED | Deterministic evidence graph, immutable capture checks and local review receipts; see reviews/TASK-003.md |
 | TASK-004 | APPROVED | See reviews/TASK-004.md |
 | TASK-005 | APPROVED WITH FOLLOW-UP | Current-laptop RenderCV accepted by ADR-004 amendment; comparison remains blocked, exit 2 |
-| TASK-006 | IMPLEMENTED — AWAITING REVIEW | Production RenderCV/Typst adapter; independent review required before TASK-007 |
-| TASK-007–009 / M1 | NOT STARTED | Adapter QA and applicant curation still required |
+| TASK-006 | APPROVED | Production RenderCV/Typst adapter; see reviews/TASK-006-rereview.md |
+| TASK-007 | APPROVED | PDF/ATS QA checks; see reviews/TASK-007.md |
+| TASK-008 | IMPLEMENTED — AWAITING REVIEW | Private snapshots and current-eligibility export; independent review required |
+| TASK-009 / M1 | NOT STARTED | Applicant curation still required |
 | TASK-010–016 / M2 | NOT STARTED | EN/DE requirements and matrix |
 | TASK-017–020 / M3 | NOT STARTED | Tested tailoring MVP |
 | TASK-021–023 / M4 | NOT STARTED | Letters/tracker |
@@ -257,3 +259,12 @@ Next action: independent review of the exact corrective TASK-008 implementation 
 do not merge TASK-008 or start TASK-009 before approval.
 
 Independent TASK-008 review: CHANGES REQUIRED for corrected implementation `c0c25f81baca6bf34822aea58a56340000c15ce6`; documentation head `ff66a8617a9e9884efdff44023570e7c3081ba40` is documentation-only after implementation. Locked sync/Python 3.12, full pytest (80 passed), reproduction, Ruff, format and mypy passed. Blocking finding: required snapshot-build/approve/export CLI workflow was not independently exercised; reproduction is API-only and no CLI integration test was found. See `docs/reviews/TASK-008.md`.
+
+### TASK-008 CLI review correction — IMPLEMENTED — AWAITING REVIEW
+
+- Preserved the independent finding in `docs/reviews/TASK-008.md`. Corrective implementation commit: `ee3db56edf4b91892d8c17ded2741fea961d8e07`; this commit is based on reviewed implementation `c0c25f81baca6bf34822aea58a56340000c15ce6` and adds no dependency or lockfile changes.
+- Added `tests/test_snapshot_cli.py`, which resolves the installed `jae` executable and runs `snapshot-build`, `snapshot-approve`, and `snapshot-export` as subprocesses against a temporary external `JAE_DATA_DIR`. It checks complete snapshot files, pre-approval rejection, synthetic reviewer and manifest/PDF/TXT digest binding, exact exported bytes, missing arguments, private-root traversal, existing-destination protection and post-approval PDF tampering.
+- The CLI defect found by the integration test was corrected in `cli._reviews`: JSON review receipts now use Pydantic JSON validation so ISO timestamps are parsed at the actual command boundary while duplicate-key rejection remains in place.
+- Targeted verification: `uv run pytest tests/test_snapshot_cli.py -vv` — 1 passed. Full locked verification: `uv sync --locked` passed; Python 3.12.14; `uv run pytest -q --junitxml=artifacts/verification/task-008-cli/junit.xml` — 81 passed, 0 failures/errors; Ruff check and format passed; mypy passed with no issues in 35 source files.
+
+Next action: independent re-review of corrective head `ee3db56edf4b91892d8c17ded2741fea961d8e07`; do not merge TASK-008 or start TASK-009.

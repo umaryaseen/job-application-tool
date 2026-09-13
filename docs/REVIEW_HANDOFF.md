@@ -7,7 +7,8 @@ TASK-008 implementation commit below; do not approve it as the implementer.
 Independently review TASK-008 in this repository.
 
 TASK-007 approved merge/base: a83324f9afcef143ef264c554c5d4e7764d1e8bd
-TASK-008 implementation: c0c25f81baca6bf34822aea58a56340000c15ce6
+TASK-008 corrective implementation: ee3db56edf4b91892d8c17ded2741fea961d8e07
+Reviewed implementation before correction: c0c25f81baca6bf34822aea58a56340000c15ce6
 Initial implementation: d53276b8357846774e5147bd13448af23b73cc5d
 Branch: task/008-snapshots-export
 
@@ -18,8 +19,8 @@ ADR-002, ADR-011, ADR-012, ADR-015, relevant research sections in
 SOURCE_REGISTER.md, and docs/REVIEW_PROTOCOL.md.
 
 Inspect the complete diff from the TASK-007 approved merge to the exact
-corrective TASK-008 head, including the intervening-edit recheck. Run the
-locked checks independently:
+corrective TASK-008 head, including the intervening-edit recheck and CLI
+integration correction. Run the locked checks independently:
 
   /Users/apple/.local/bin/uv sync --locked
   /Users/apple/.local/bin/uv run python --version
@@ -28,6 +29,7 @@ locked checks independently:
   /Users/apple/.local/bin/uv run ruff format --check .
   /Users/apple/.local/bin/uv run mypy src
   /Users/apple/.local/bin/uv run python tests/reproduce_task008.py
+  /Users/apple/.local/bin/uv run pytest tests/test_snapshot_cli.py -vv
 
 Focus on atomic same-filesystem staging and publication, owner-marked staging
 cleanup, no-overwrite IDs, complete source slice/capture/review/plan/PDF/TXT/QA
@@ -50,6 +52,14 @@ export copies only the verified approved PDF/TXT bytes, refuses an existing
 destination, does not mutate snapshots, and has no SQLite, signing, browser,
 identity-document, history-deletion or TASK-009 work. Confirm no dependency or
 lockfile change was introduced and no applicant data or credentials are present.
+
+Exercise the installed `jae` entry point in a temporary external `JAE_DATA_DIR`.
+Confirm `snapshot-build`, `snapshot-approve`, and `snapshot-export` run as real
+subprocesses; pre-approval export fails; approval records the synthetic reviewer
+and exact manifest/PDF/TXT digests; approved export preserves exact bytes; missing
+arguments, private-root traversal, existing destinations and post-approval
+artifact tampering produce nonzero exits with bounded diagnostics and no unsafe
+publication.
 
 Record APPROVED, APPROVED WITH FOLLOW-UP, or CHANGES REQUIRED in a new
 sanitized docs/reviews/TASK-008.md report with exact reviewed commit IDs and
