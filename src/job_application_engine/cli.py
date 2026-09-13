@@ -121,7 +121,12 @@ def _reviews(path: Path) -> list[LocalReviewReceipt]:
     _, data = _read_json_without_duplicate_keys(_private_input(path))
     if not isinstance(data, list):
         raise ValueError("review receipts JSON must be an array")
-    return [LocalReviewReceipt.model_validate(item) for item in data]
+    # Validate the JSON representation so Pydantic can parse its ISO timestamps
+    # while retaining the duplicate-key rejection above.
+    return [
+        LocalReviewReceipt.model_validate_json(json.dumps(item, ensure_ascii=False))
+        for item in data
+    ]
 
 
 def _capture_map(directory: Path, profile: ProfileRevision) -> dict[EvidenceKey, Path]:
