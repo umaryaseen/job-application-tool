@@ -1,7 +1,7 @@
 # CLEANUP-001 — reconcile current state and reduce overhead
 
 Base: `3c562fe1c3de0239a129fad10804abd375c1d38e`.
-State: **APPROVED** at implementation `399dc2a0da4db865f42365901762109c2e44b35b`; PR not merged. See [independent review](../reviews/CLEANUP-001.md). Complete fresh macOS CI passed all 85 tests plus lint/format/types.
+State: **APPROVED** at implementation `399dc2a0da4db865f42365901762109c2e44b35b`; subsequently integrated by merged PR #1 at `0d81aa1`. See [independent review](../reviews/CLEANUP-001.md). Complete fresh macOS CI passed all 85 tests plus lint/format/types.
 
 ## Objective
 

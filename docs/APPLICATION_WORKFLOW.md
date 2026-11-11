@@ -4,7 +4,7 @@ This roadmap describes the requested product; it is not a list of available comm
 
 | Step | Saved result | Existing path |
 | --- | --- | --- |
-| Capture a vacancy | Company/title/job ID/locations/source; exact input and faithful Markdown revision; unknown dates stay null | TASK-010 |
+| Capture a vacancy | Supplied company/title/job ID/source; exact input, faithful Markdown and revisions; missing fields remain unknown | TASK-010 draft intake implemented; see JOB_INTAKE |
 | Analyze requirements | Exact quotes, required/preferred/unspecified, language/degree/seniority/technology constraints | TASK-011–014 |
 | Compare both CV bases | Applied AI versus Full Stack; evidence map, recommendation and gaps; both base versions preserved | TASK-009 registration, TASK-015–017 selection extension |
 | Tailor documents | Separate CV and letter in PDF/DOCX; chronology and confirmed facts retained | TASK-017–022, TASK-024 |
@@ -31,9 +31,9 @@ Count distinct current postings per normalized skill, preserving required/prefer
 
 ## Delivery order
 
-1. Complete CLEANUP-001 review and supported-platform verification.
-2. Complete TASK-009 using actual private profile and both bases, preserving approvals and reconciling missing facts.
-3. Deliver JD/matching/tailoring through the existing dependencies, comparing both bases before producing a tailored CV.
+1. Complete TASK-010 implementation review and use private draft intake under ADR-018; CLEANUP-001 is integrated.
+2. Complete TASK-009 using actual private profile and both bases, preserving approvals and reconciling missing facts. Draft intake does not complete this gate.
+3. Deliver requirement extraction/matching/tailoring through the existing dependencies, comparing both bases before producing a tailored CV.
 4. Complete the application pack with letters, DOCX, tracking and interview notes, tied to existing snapshots.
 5. Aggregate skill demand and known outcomes. Optional ESCO, embeddings, UI, reminders and integrations stay deferred.
 

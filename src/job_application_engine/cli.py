@@ -11,7 +11,9 @@ from pathlib import Path
 from . import __version__
 from .config import ConfigurationError, private_data_root
 from .domain.document import DocumentPlan
+from .domain.job import JobMetadata
 from .domain.profile import ProfileRevision
+from .ingestion.text import ingest_job, load_job_revision, read_source
 from .profile.load import DuplicateJsonKeyError
 from .profile.review import LocalReviewReceipt
 from .rendering.pdf import PdfRenderError, build_pdf
@@ -30,6 +32,19 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command")
     check = subparsers.add_parser("config-check", help="validate the configured private data root")
     check.set_defaults(handler=_config_check)
+    intake = subparsers.add_parser("job-ingest", help="save a bounded pasted JD as a private draft")
+    intake.add_argument("--text", required=True, help="UTF-8 file, or - for stdin")
+    intake.add_argument("--job-id", help="reuse this local identifier when a posting changes")
+    intake.add_argument("--company")
+    intake.add_argument("--title")
+    intake.add_argument("--external-id")
+    intake.add_argument("--source-url", help="metadata only; never fetched")
+    intake.add_argument("--locale", choices=["en", "de", "unknown"])
+    intake.set_defaults(handler=_job_ingest)
+    show = subparsers.add_parser("job-show", help="verify and show saved JD source metadata")
+    show.add_argument("--job-id", required=True)
+    show.add_argument("--revision", type=int)
+    show.set_defaults(handler=_job_show)
     build = subparsers.add_parser(
         "build-cv",
         help="build a baseline PDF from an explicitly reviewed plan and profile",
@@ -74,6 +89,67 @@ def _config_check(_: argparse.Namespace) -> int:
     except ConfigurationError as error:
         print(f"jae: {error}", file=sys.stderr)
         return 2
+    return 0
+
+
+def _job_ingest(args: argparse.Namespace) -> int:
+    try:
+        # Validate the private destination before opening or waiting on an input.
+        root = private_data_root()
+        if args.text == "-":
+            data = read_source(sys.stdin.buffer)
+        else:
+            with Path(args.text).open("rb") as stream:
+                data = read_source(stream)
+        try:
+            metadata = JobMetadata.model_validate(
+                {
+                    k: v
+                    for k, v in {
+                        "company": args.company,
+                        "title": args.title,
+                        "external_id": args.external_id,
+                        "source_url": args.source_url,
+                    }.items()
+                    if v is not None
+                }
+            )
+        except ValueError:
+            raise ValueError("supplied job metadata is invalid") from None
+        result = ingest_job(
+            data, job_id=args.job_id, metadata=metadata, locale=args.locale, data_root=root
+        )
+    except ValueError as error:
+        print(f"jae: {error}", file=sys.stderr)
+        return 2
+    except OSError:
+        print("jae: job input or private storage is unavailable", file=sys.stderr)
+        return 2
+    print(
+        json.dumps(
+            {
+                "job_id": result.record.job_id,
+                "revision": result.record.revision,
+                "state": result.record.state,
+                "duplicate": result.duplicate,
+                "path": str(result.path),
+            },
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
+def _job_show(args: argparse.Namespace) -> int:
+    try:
+        result = load_job_revision(args.job_id, revision=args.revision)
+    except ValueError as error:
+        print(f"jae: {error}", file=sys.stderr)
+        return 2
+    except OSError:
+        print("jae: private job storage is unavailable", file=sys.stderr)
+        return 2
+    print(result.record.model_dump_json(indent=2))
     return 0
 
 

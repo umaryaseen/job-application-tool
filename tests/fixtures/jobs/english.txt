@@ -1,0 +1,4 @@
+# Synthetic AI Engineer
+
+Example Company seeks Python and SQL experience.
+German is preferred. This is a synthetic fixture, not a live vacancy.
