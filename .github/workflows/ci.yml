@@ -13,13 +13,13 @@ jobs:
     # The production renderer and PDF QA deliberately require sandbox-exec.
     runs-on: macos-15-intel
     timeout-minutes: 20
-    env:
-      JAE_TYPST_PACKAGE_ROOT: ${{ runner.temp }}/jae-typst-packages
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           version: "0.12.13"
+      - name: Set local public asset directory
+        run: echo "JAE_TYPST_PACKAGE_ROOT=$RUNNER_TEMP/jae-typst-packages" >> "$GITHUB_ENV"
       - name: Install PDF measurement tools
         run: brew install poppler
       - name: Verify required renderer isolation and tools
