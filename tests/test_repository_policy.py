@@ -105,3 +105,26 @@ def test_hook_setup_preserves_conflicting_local_configuration(tmp_path: Path) ->
         ).stdout.strip()
         == "custom-hooks"
     )
+
+
+def test_staged_deletion_is_allowed_but_replacement_secret_is_checked(tmp_path: Path) -> None:
+    """Cleaning up tracked files must not bypass checks on replacement content."""
+    from scripts.check_staged import check
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "-C", str(repo), "init", "-q"], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "user.name", "Synthetic Test"], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.email", "test@example.invalid"], check=True
+    )
+    (repo / "obsolete.txt").write_text("synthetic obsolete note", encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo), "add", "obsolete.txt"], check=True)
+    subprocess.run(["git", "-C", str(repo), "commit", "-qm", "synthetic base"], check=True)
+    subprocess.run(["git", "-C", str(repo), "rm", "-q", "obsolete.txt"], check=True)
+    assert check(repo) == []
+
+    secret = "github_pat_" + "12345678901234567890"
+    (repo / "renamed.txt").write_text(f"value='{secret}'", encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo), "add", "renamed.txt"], check=True)
+    assert any("credential-like content" in item for item in check(repo))

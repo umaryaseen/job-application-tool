@@ -9,12 +9,22 @@ permissions:
 
 jobs:
   checks:
-    runs-on: ubuntu-latest
+    # The production renderer and PDF QA deliberately require sandbox-exec.
+    runs-on: macos-15-intel
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           version: "0.12.13"
+      - name: Install PDF measurement tools
+        run: brew install poppler
+      - name: Verify required renderer isolation and tools
+        run: |
+          command -v sandbox-exec
+          command -v pdftotext
+          command -v pdftoppm
+          command -v pdfinfo
       - run: uv sync --locked --group dev
       - run: uv run pytest
       - run: uv run ruff check .

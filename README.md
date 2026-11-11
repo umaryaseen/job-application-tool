@@ -1,53 +1,51 @@
-# job-application-engine
+# Job application engine
 
-A local application compiler for full-time job applications in Germany: approved career facts → a readable baseline CV → job requirements → evidence matching → tailored documents → checks → human review.
+A local Python tool for preparing truthful job applications and retaining the exact documents reviewed and exported.
 
-**Status: TASK-006 implemented — awaiting independent review.** The repository
-contains a synthetic, private-staging RenderCV/Typst baseline adapter; no real
-applicant profile or approved final CV is included. See [actual progress](docs/PROGRESS.md).
+**Implemented:** profile/evidence validation, deterministic document plans, RenderCV/Typst PDF rendering, PDF/text QA, and immutable snapshot/approval/export. TASK-001–008 are integrated; see [current progress](docs/PROGRESS.md) for review evidence. A genuine applicant-approved baseline has not been accepted in the inspected repository.
+
+**Next user workflow:** paste a JD → compare Applied AI and Full Stack base CVs → tailor a CV and cover letter → save JD/interview preparation → track company, submission, interviews and outcomes → analyze recurring skills. These application features are still planned. See [workflow roadmap](docs/APPLICATION_WORKFLOW.md) and [repository audit](docs/REPOSITORY_AUDIT.md).
 
 ## Start here
 
-1. Read [the brief](docs/PROJECT_BRIEF.md) and [research synthesis](docs/RESEARCH_SYNTHESIS.md).
-2. Read [architecture](docs/ARCHITECTURE.md), [decisions](docs/adr/README.md), and [acceptance criteria](docs/ACCEPTANCE_CRITERIA.md).
-3. Follow [LOCAL_SETUP.md](docs/LOCAL_SETUP.md) to restore the supplied Git bundle on your laptop and create a **private** GitHub repository when authenticated.
-4. Give local Codex [CODEX_HANDOFF.md](docs/CODEX_HANDOFF.md), which starts exactly one task. All agents must follow [AGENTS.md](AGENTS.md).
+1. Read [PROGRESS](docs/PROGRESS.md) and [AGENTS.md](AGENTS.md).
+2. Use [local setup](docs/LOCAL_SETUP.md) for an existing checkout or fresh clone.
+3. Continue with [the agent handoff](docs/CODEX_HANDOFF.md). Do not restart completed bootstrap tasks.
 
-The original three research reports accompany the downloadable handoff **outside the Git repository**. [SOURCE_REGISTER.md](docs/SOURCE_REGISTER.md) identifies them by title, checksum, and section/line references. They are design research, not verified applicant facts.
+The user-selected source repository is currently public. Personal CVs, profiles, evidence, application outcomes and generated documents stay in an explicit private directory outside Git and CI. No real applicant data is bundled here. No project license has been selected; dependency/reference licenses remain their owners' licenses.
 
-## First delivery
+## Setup and checks
 
-M1 must take a manually reviewed career profile, validate facts and evidence, render an ATS-safe English CV suitable for an English-language German vacancy, verify extracted text and layout, and record approval of the exact output. German text handling is tested from the beginning; full German content localization is later.
+Requires Python 3.12 and `uv`. Production rendering and PDF measurement require macOS `sandbox-exec` and Poppler (`pdftotext`, `pdftoppm`, `pdfinfo`). Linux can run domain and simulated-process tests, but is not a supported production PDF environment.
 
-No LLM, database server, HTTP server, scraper, browser session, or job-board account is needed for M1. The `jae build-cv` command is available for explicitly supplied profile, plan and local review JSON; later commands remain planned contracts.
+```bash
+uv sync --locked --group dev
+./scripts/install_hooks.sh
+uv run jae --help
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy src
+uv run pytest -ra
+```
 
-## Recommended foundation
+CI targets a macOS Intel runner with isolation/tool preflight and the complete synthetic suite. Its actual result is required; a runner change alone does not establish rendering qualification. Missing isolation is never replaced with unisolated rendering.
 
-| Concern | Plan |
-|---|---|
-| Runtime | Python 3.12, one package, synchronous CLI |
-| Career source | Versioned custom JSON with typed facts, evidence and approved text variants |
-| Interchange | JSON Resume adapter later; its schema does not govern provenance |
-| First PDF | RenderCV 2.8/Typst 0.15.0 current-laptop adapter; independent review remains required |
-| Storage | Private JSON and immutable file snapshots first; SQLite for tracking later |
-| Matching | Exact and reviewed aliases first; optional local multilingual retrieval |
-| AI | Provider interface introduced only when needed; disabled by default |
-| Publication | Private source repository; personal inputs and outputs excluded |
+## Available commands
 
-## Non-negotiable behavior
+| Command | Behavior |
+| --- | --- |
+| `jae config-check` | Validate the private data root |
+| `jae build-cv` | Render an explicitly reviewed profile and document plan into a PDF |
+| `jae snapshot-build` | Create an immutable private PDF/TXT/QA/source snapshot |
+| `jae snapshot-approve` | Record explicit review of that exact snapshot |
+| `jae snapshot-export` | Revalidate current eligibility and export approved PDF/TXT bytes |
+| `python -m job_application_engine.ats_qa` | Measure a PDF against independently supplied expectations |
 
-Every candidate claim, including headings that assert a professional title, must resolve to approved facts and evidence at specific revisions. An unrelated evidence ID is insufficient. Unsupported claims fail validation. AI cannot grant its own approvals. Requirement coverage and parser checks are reported separately; the system does not advertise a universal ATS score.
+Use `--help` for actual command arguments. JD intake, base comparison, tailoring, letters, DOCX, interviews, tracking and skill analytics are not implemented commands yet. No application LLM, browser or submission integration is active.
 
-Milestones: **M0 plan → M1 usable baseline → M2 match matrix → M3 tested tailoring MVP → M4 letters/tracker → M5 optional enhancements**. The issue-sized backlog and gates are in [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
+## Baseline example
 
-The repository is private development work. No open-source license has been selected for the project's original code. Dependency and reference licenses remain their owners' licenses; see [DEPENDENCIES.md](docs/DEPENDENCIES.md).
-
-## Baseline PDF build
-
-Set `JAE_DATA_DIR` to an existing private directory outside this checkout and
-run the locked environment. The command requires an explicitly validated
-DocumentPlan, its profile revision and the local human review receipts; it does
-not infer or approve content:
+Set `JAE_DATA_DIR` to an existing absolute private directory outside the checkout. Inputs must already be curated and reviewed; this command does not invent or approve facts.
 
 ```bash
 export JAE_DATA_DIR=/private/path/to/job-application-data
@@ -58,8 +56,4 @@ uv run jae build-cv \
   --output-name baseline.pdf
 ```
 
-The PDF is published under `JAE_DATA_DIR/outputs/` after isolated RenderCV/Typst
-completion. The current production support scope requires macOS
-`sandbox-exec`; the adapter fails clearly instead of rendering without network
-isolation. Candidate strings are inserted as literal text, and arbitrary
-templates, remote fonts, links, includes and fallback backends are not accepted.
+Output goes under `JAE_DATA_DIR/outputs/`. Snapshot commands use private-root-relative inputs. [Architecture](docs/ARCHITECTURE.md) explains source/review/export rules; [DEPENDENCIES](docs/DEPENDENCIES.md) records locked tools. Research originals remain outside Git and are identified in [SOURCE_REGISTER](docs/SOURCE_REGISTER.md).
