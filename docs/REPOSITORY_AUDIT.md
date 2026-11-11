@@ -37,4 +37,4 @@ The first full macOS run exposed a cold-cache defect: **77 passed, 5 failed**. R
 
 Locked sync succeeded with Python 3.12.14; Ruff check/format and mypy passed. Full Linux `uv run pytest -ra` produced **53 passed, 25 failed, 3 skipped**. Observed failures stem from missing macOS isolation, including unmeasured PDF reports and the two simulated tests. Local ignored evidence: `artifacts/verification/cleanup-001/baseline.xml`.
 
-Post-change results, CI and review are recorded in PROGRESS. The source repository is public; private applicant data remains outside Git/CI. Visibility was not changed.
+Final corrected implementation `399dc2a0da4db865f42365901762109c2e44b35b` passed [complete fresh macOS CI](https://github.com/umaryaseen/job-application-tool/actions/runs/43048249661): **85 tests, no failures/skips**, plus Ruff/format/mypy. [Independent review](reviews/CLEANUP-001.md) approved that exact tree. PR #1 remains unmerged; TASK-009 and the planned application workflow are not completed by this cleanup. The source repository is public; private applicant data remains outside Git/CI. Visibility was not changed.
