@@ -14,7 +14,7 @@ Audit existing code, remove stale startup instructions and repeated active-state
 - Complete CI uses an explicit macOS Intel runner with isolation/Poppler preflight. No renderer tests are removed or broadly skipped. Two simulated process tests work without host isolation.
 - Staged deletion permits cleanup, while replacement/renamed content remains scanned.
 - Roadmap covers two-base comparison, CV/letter PDF/DOCX, faithful JD MD, interview knowledge, outcomes and skill-demand analysis. Planned commands are not advertised as implemented.
-- No personal data, dependencies, profile/schema changes, submissions or production renderer/export changes.
+- Repair any cold-cache renderer package prerequisite exposed by the complete CI run, with pinned public assets, explicit setup, local integrity tests and unchanged runtime network denial. No new Python dependencies, personal data, profile/schema/export-policy changes or submissions.
 
 ## Checks
 

@@ -29,6 +29,15 @@ GitHub cannot supply files deliberately kept local. Do not commit personal input
 
 Production PDF rendering/measurement require macOS `sandbox-exec` and Poppler on PATH. ADR-004 records the existing laptop qualification. Cleanup CI targets `macos-15-intel`; the complete CI result remains a separate qualification gate.
 
+Install the transitive public Typst package once with explicit network opt-in:
+
+```bash
+export JAE_TYPST_PACKAGE_ROOT="$HOME/Library/Caches/jae/typst-packages"
+uv run python scripts/setup_typst_packages.py --destination "$JAE_TYPST_PACKAGE_ROOT" --download
+```
+
+This downloads only pinned public dependency files, not applicant information. Every file is checksum-verified again before copying into a renderer stage. Keep the environment variable set for PDF builds. Without `--download`, the setup command verifies local files without network. A missing or changed asset fails the build; there is no global-cache or unisolated fallback.
+
 ```bash
 uv run ruff check .
 uv run ruff format --check .

@@ -21,6 +21,8 @@ Requires Python 3.12 and `uv`. Production rendering and PDF measurement require 
 ```bash
 uv sync --locked --group dev
 ./scripts/install_hooks.sh
+export JAE_TYPST_PACKAGE_ROOT="$HOME/Library/Caches/jae/typst-packages"
+uv run python scripts/setup_typst_packages.py --destination "$JAE_TYPST_PACKAGE_ROOT" --download
 uv run jae --help
 uv run ruff check .
 uv run ruff format --check .
@@ -29,6 +31,8 @@ uv run pytest -ra
 ```
 
 CI targets a macOS Intel runner with isolation/tool preflight and the complete synthetic suite. Its actual result is required; a runner change alone does not establish rendering qualification. Missing isolation is never replaced with unisolated rendering.
+
+The explicit setup command downloads only checksum-pinned public Typst package files. Builds use verified local copies in the correct package namespace and keep network denial enabled. They no longer depend on a warm global Typst cache. Run setup without `--download` to verify installed assets offline.
 
 ## Available commands
 

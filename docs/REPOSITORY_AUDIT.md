@@ -29,7 +29,9 @@ Inspected GitHub main `3c562fe1c3de0239a129fad10804abd375c1d38e`, full tree, sou
 | Staged-file guard reads deleted paths from index | Legitimate cleanup commits fail | Filter deleted paths while retaining content checks |
 | Large speculative backlog obscures application journey | Risk of another parallel framework | Map user workflow onto existing tasks |
 
-There is no basis to delete provenance, validation, QA or immutable export as unused overhead: current CLI/tests exercise them. The renderer experiment is not a second production backend; test helpers still import it. A later cleanup could extract those helpers before retiring experiment code. No production source module or dependency was removed here.
+There is no basis to delete provenance, validation, QA or immutable export as unused overhead: current CLI/tests exercise them. The renderer experiment is not a second production backend; test helpers still import it. A later cleanup could extract those helpers before retiring experiment code. No production source module was removed here.
+
+The first full macOS run exposed a cold-cache defect: **77 passed, 5 failed**. RenderCV's bundled Typst code was passed as a flat package directory, and its FontAwesome dependency was not explicitly installed. This explains why prior warm-laptop success did not establish clean-install rendering. The correction adds a small local package-layout/integrity helper and a separate pinned public-asset setup command; it does not relax runtime isolation or add a second renderer.
 
 ## Baseline evidence
 

@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 permissions:
@@ -12,6 +13,8 @@ jobs:
     # The production renderer and PDF QA deliberately require sandbox-exec.
     runs-on: macos-15-intel
     timeout-minutes: 20
+    env:
+      JAE_TYPST_PACKAGE_ROOT: ${{ runner.temp }}/jae-typst-packages
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -26,6 +29,8 @@ jobs:
           command -v pdftoppm
           command -v pdfinfo
       - run: uv sync --locked --group dev
+      - name: Install pinned public Typst packages
+        run: uv run python scripts/setup_typst_packages.py --destination "$JAE_TYPST_PACKAGE_ROOT" --download
       - run: uv run pytest
       - run: uv run ruff check .
       - run: uv run ruff format --check .

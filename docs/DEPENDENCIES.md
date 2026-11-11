@@ -87,3 +87,11 @@ not a cross-platform promise. No Playwright dependency is installed in the
 production environment. TASK-007 promotes the unchanged pypdf pin from the
 TASK-006 development record to runtime because the QA command invokes it as
 an independent extractor; no dependency or lockfile regeneration was needed.
+
+## CLEANUP-001 cold-cache Typst prerequisite
+
+RenderCV 2.8 bundles the Typst package `rendercv:0.3.0`; the adapter must create Typst's `preview/rendercv/0.3.0/` namespace. That library imports `fontawesome:0.6.0`, which is a separate transitive Typst dependency, even with no icons in the CV.
+
+FontAwesome's Typst wrapper is MIT-licensed at [official package source](https://github.com/typst/packages/tree/4bb5c83d64f4a62a852c817ee6d92b3f94759950/packages/preview/fontawesome/0.6.0). The setup script retrieves six explicit files, including LICENSE, from that pinned commit; per-file SHA-256 pins live in `rendering/packages.py`. No new Python package or lockfile change is required. Source bytes were checked against GitHub's pinned blob identities before recording SHA-256 values.
+
+`scripts/setup_typst_packages.py --download --destination ABSOLUTE_PATH` is an explicit setup action for public code only. At build time `JAE_TYPST_PACKAGE_ROOT` supplies verified local files, copied into the private stage alongside the wheel's bundled package. Both compiler package paths point there. Missing or changed files fail before compilation; runtime networking remains denied. This replaces accidental dependence on the developer's global warm cache. A successful new CI run is required before claiming the correction verified.
