@@ -2,9 +2,9 @@
 
 ## Authority and starting state
 
-The repository is the implementation record. Read `docs/PROGRESS.md` and inspect Git before claiming a task is complete. This checkout initially contains planning only. Do not infer applicant facts from chat memory, research examples, task descriptions, or another model's output.
+The repository is the implementation record. Read `docs/PROGRESS.md` and inspect Git before claiming a task is complete. TASK-001–008 are integrated; the genuine applicant baseline and later application features remain separate gates. Do not infer applicant facts from chat memory, research examples, task descriptions, or another model's output.
 
-Before each task, read this file, `docs/ARCHITECTURE.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/ACCEPTANCE_CRITERIA.md`, `docs/SECURITY_AND_PRIVACY.md`, the assigned task file and its ADRs, and `docs/PROGRESS.md`. Read relevant source report sections using `docs/SOURCE_REGISTER.md`; use `JAE_RESEARCH_ROOT` or the accompanying `research-inputs` directory. Missing research is a traceability gap to record, not permission to invent what it said.
+Before each task, read this file, the short current `docs/PROGRESS.md`, and the assigned task. Read the architecture, ADR, acceptance and security sections affected by that task; use `docs/IMPLEMENTATION_PLAN.md` for dependencies and `docs/APPLICATION_WORKFLOW.md` for the requested product journey. Do not reread historical execution logs or all deferred task specs by default. Relevant rules remain mandatory. Use SOURCE_REGISTER and JAE_RESEARCH_ROOT for research when a decision depends on it; record missing relevant sources rather than invent them. See ADR-017 for this operating-document amendment.
 
 The user's current instructions take precedence. Established decisions may be changed only through an explicit ADR amendment and independent review. `PROPOSED / SPIKE REQUIRED` choices may be tested but are not production choices yet.
 
@@ -34,7 +34,7 @@ The user's current instructions take precedence. Established decisions may be ch
 
 ## Privacy and execution
 
-Use an explicit private data directory outside the repository. For temporary development, `local-data/` is ignored. Personal inputs, profiles, PDFs, evidence attachments, snapshots, approvals and tracker databases never enter Git or CI. Use clearly labeled synthetic fixtures and reserved example domains.
+Use an explicit private data directory outside the repository. For temporary development, `local-data/` is ignored. The current user-selected source repository is public; no visibility change is part of routine work. Personal inputs, profiles, PDFs, evidence attachments, snapshots, approvals and tracker databases never enter Git or CI. Use clearly labeled synthetic fixtures and reserved example domains.
 
 No secret files in prompts, logs, fixtures or Git. Do not read identity documents unless a separately authorized task requires them. No telemetry. No network requests in baseline generation. Model downloads must be an explicit setup action with pinned revisions and checksums. Cloud processing requires a separate opt-in; authorization to use a coding agent is not authorization to send applicant data to an application LLM.
 

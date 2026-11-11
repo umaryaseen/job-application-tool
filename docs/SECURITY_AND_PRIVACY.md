@@ -6,7 +6,7 @@ This document specifies controls to implement. It does not assert the unimplemen
 
 | Asset/input | Classification | Handling |
 |---|---|---|
-| Code, ADRs, synthetic fixtures | Repository material | Private GitHub initially; reviewed before commit |
+| Code, ADRs, synthetic fixtures | Repository material | Current user-selected source repository is public; reviewed before commit |
 | Canonical profile, job snapshots, generated CVs, approvals | Private applicant data | Explicit local data root outside repo, no CI/telemetry |
 | Private employment/education evidence | Sensitive supporting material | Store only reference/digest where enough; no identity scans required |
 | Passwords, tokens, session cookies, private keys | Secrets | OS credential mechanisms/environment at boundary only; never model input or logs |
@@ -54,7 +54,7 @@ No credentials, browser/filesystem tools, system prompts with secrets, or model-
 
 ## GitHub and CI
 
-Create `job-application-engine` as PRIVATE. Verify actual privacy and origin after creation, not just the requested flag. Before first push inspect all tracked files, history and staged changes; `.gitignore` cannot remove previously committed material. If a secret is found, stop publication, remove it safely, rotate it through the owner's credential workflow and document the incident without reproducing the secret. Do not rewrite shared history without explicit authorization.
+The initial plan required a private source origin. The user now explicitly selected the existing public `umaryaseen/job-application-tool` source repository; ADR-017 records this amendment. Do not create another repository or change visibility as routine setup. Only code, design and synthetic fixtures belong there. Personal inputs and outputs remain outside Git and CI regardless of source visibility. Before publication inspect tracked/staged changes; `.gitignore` cannot remove committed material. If a secret is found, stop publication, remove it safely and rotate it through the owner's credential workflow without reproducing it. Do not rewrite shared history without authorization.
 
 CI runs sanitized fixtures only with minimal read permissions and pinned actions. Do not use privileged `pull_request_target` workflows for untrusted code, upload private artifacts, or print env/config dumps. Use a mature secret scanner as a development gate, documenting its install/version and false-positive exceptions. Exceptions must not permit real keys.
 

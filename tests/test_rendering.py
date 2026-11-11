@@ -142,6 +142,9 @@ def test_isolation_unavailable_fails_closed(
 
 
 def test_timeout_cleans_private_staging(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    # Simulate the subprocess failure, including on hosts without macOS isolation.
+    # No renderer is executed by this unit test.
+    monkeypatch.setattr(pdf, "_sandbox_executable", lambda: "sandbox-exec")
     profile, reviews = approved_baseline()
     plan = compile_baseline(profile, as_of=date(2026, 9, 12), reviews=reviews)
 
@@ -162,6 +165,7 @@ def test_timeout_cleans_private_staging(monkeypatch: pytest.MonkeyPatch, tmp_pat
 def test_worker_failure_cleans_staging_and_publishes_no_pdf(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
+    monkeypatch.setattr(pdf, "_sandbox_executable", lambda: "sandbox-exec")
     profile, reviews = approved_baseline()
     plan = compile_baseline(profile, as_of=date(2026, 9, 12), reviews=reviews)
     original_run = pdf.subprocess.run

@@ -19,7 +19,7 @@ SECRET_PATTERNS = (
 
 def staged_files(repo: Path) -> list[str]:
     result = subprocess.run(
-        ["git", "-C", str(repo), "diff", "--cached", "--name-only", "-z"],
+        ["git", "-C", str(repo), "diff", "--cached", "--name-only", "--diff-filter=ACMRT", "-z"],
         check=True,
         capture_output=True,
     )

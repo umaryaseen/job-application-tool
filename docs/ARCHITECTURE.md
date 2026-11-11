@@ -122,7 +122,7 @@ Tailoring selects approved evidence variants and skills, promotes relevant proje
 
 ## Rendering and ATS QA
 
-The renderer consumes only a validated plan. Recommend a narrow RenderCV adapter (ADR-004); TASK-005 compares it against a minimal HTML/Playwright fixture on the real laptop. Do not select a winner by reputation. Pin the winning version, engine, fonts, template and settings. Do not retain both production backends.
+The renderer consumes only a validated plan. The narrow RenderCV/Typst adapter is implemented under the current-laptop ADR-004 amendment; the alternative Playwright comparison remains unmeasured. Versions/fonts/template/settings are pinned. Do not retain both production backends or interpret a proposed CI platform as automatic product qualification.
 
 Baseline contract: A4; one text column; body 11 pt; margins 20 mm; ordinary bullets; body contacts; standard headings; reverse chronology; photo-free; no icons, tables, sidebars, hidden text or critical headers/footers. 1–2 pages; target <2,000,000 bytes. Full chronology and readability outrank filling a page. No silent auto-shrink.
 
@@ -157,7 +157,7 @@ Approved eligible bytes may be copied to a chosen submission folder; modified PD
 
 ## Planned CLI contract
 
-These commands do not exist until the associated tasks are implemented.
+This table is the proposed grouped CLI, not the implemented flat command names. README lists the actual build-cv and snapshot commands. Other commands below do not exist until their tasks are implemented.
 
 | Command | Behavior |
 |---|---|

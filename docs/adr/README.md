@@ -7,7 +7,7 @@ Date: 2026-09-08. These records make report disagreements explicit. Foundation d
 | [ADR-001](ADR-001.md) | Canonical schema and JSON Resume | ACCEPTED FOR PLANNING |
 | [ADR-002](ADR-002.md) | Local files and SQLite | ACCEPTED FOR PLANNING |
 | [ADR-003](ADR-003.md) | CLI before a web interface | ACCEPTED FOR PLANNING |
-| [ADR-004](ADR-004.md) | PDF renderer selection | PROPOSED / SPIKE REQUIRED |
+| [ADR-004](ADR-004.md) | PDF renderer selection | ACCEPTED — CURRENT LAPTOP ONLY |
 | [ADR-005](ADR-005.md) | Semantic matching approach | DEFERRED / BENCHMARK REQUIRED |
 | [ADR-006](ADR-006.md) | ESCO integration | ACCEPTED FOR PLANNING — IMPLEMENTATION DEFERRED |
 | [ADR-007](ADR-007.md) | Requirement extraction | ACCEPTED FOR PLANNING |
@@ -20,3 +20,4 @@ Date: 2026-09-08. These records make report disagreements explicit. Foundation d
 | [ADR-014](ADR-014.md) | Vertical slices and scope | ACCEPTED FOR PLANNING |
 | [ADR-015](ADR-015.md) | Local security and rendering isolation | ACCEPTED FOR PLANNING |
 | [ADR-016](ADR-016.md) | Application sources and submission boundary | ACCEPTED FOR PLANNING — NO MVP SUBMISSION |
+| [ADR-017](ADR-017.md) | Current workflow, task-scoped docs and CI platform | ACCEPTED — CLEANUP-001 reviewed, PR not merged |

@@ -1,10 +1,10 @@
 # Implementation plan
 
-Planning state: no application task is implemented. This backlog is a set of issue-sized handoffs, not a command to implement the whole architecture at once. Status lives in PROGRESS; initial task-file state is a planning baseline.
+TASK-001–008 are integrated; current status and gates live in PROGRESS. This historical backlog provides acceptance detail, not a command to implement every optional feature. The requested application journey is mapped in [APPLICATION_WORKFLOW](APPLICATION_WORKFLOW.md); initial task-file states are planning baselines.
 
 ## Execution rules
 
-Start with TASK-001 after restoring the planning Git history locally. Each task reads AGENTS, architecture, relevant ADRs, source context, acceptance and progress. Use a feature branch, focused tests, a commit and independent review. A dependent task starts only after prerequisites are reviewed. No major feature may approve its own architecture.
+Continue from the next unblocked task in PROGRESS; do not restart TASK-001. Read AGENTS, current progress, the assigned task and affected design/acceptance/security sections. Use a feature branch, focused tests, a commit and independent review. A dependent task starts only after prerequisites are reviewed. No major feature may approve its own architecture.
 
 Milestones progress in order: M1 genuine baseline → M2 requirement matrix → M3 tailored CV with validation → M4 letter/tracker. No later work substitutes for an incomplete first usable CV. Optional M5 tasks can be prioritized after M3/M4 according to their dependencies, without silently widening MVP scope.
 
@@ -17,7 +17,8 @@ Milestones progress in order: M1 genuine baseline → M2 requirement matrix → 
 | M2 | 010–016 | Reviewed EN/DE requirements and evidence matrix |
 | M3 | 017–020 | Tested tailoring MVP with strict claim and export gates |
 | M4 | 021–023 | Cover letter and SQLite tracker |
-| M5 | 024–034 | Separate optional decisions/features, each reviewed |
+| Requested DOCX | 024, after M3 | Application deliverable under ADR-009/017; not yet implemented |
+| M5 | 025–034 | Separate optional decisions/features, each reviewed |
 | Later | 035 | Policy/handoff design only; no implemented portal integration |
 
 ## Backlog

@@ -25,6 +25,7 @@ from ..domain.document import DocumentPlan
 from ..domain.profile import ProfileRevision
 from ..profile.review import LocalReviewReceipt
 from ..verification.document import validate_document_plan
+from .packages import PackageAssetsError, prepare_typst_packages
 
 RENDERCV_VERSION = "2.8"
 TYPST_VERSION = "0.15.0"
@@ -150,12 +151,17 @@ def _worker(stage_argument: str) -> int:
         import typst
 
         package_path = Path(rendercv.__file__).parent / "renderer" / "rendercv_typst"
+        try:
+            local_packages = prepare_typst_packages(stage, package_path)
+        except (OSError, PackageAssetsError):
+            return 29
         compiler = typst.Compiler(
             input=str(safe_typ_path),
             root=str(stage),
             font_paths=[str(path) for path in rendercv_fonts.paths_to_font_folders],
             ignore_system_fonts=True,
-            package_path=str(package_path),
+            package_path=str(local_packages),
+            package_cache_path=str(local_packages),
         )
         compiler.compile(output=str(output_path))
     except Exception:
@@ -217,6 +223,11 @@ def build_pdf(
             raise PdfRenderError("RenderCV PDF build timed out") from error
         except OSError as error:
             raise PdfRenderError("RenderCV PDF worker could not start") from error
+        if result.returncode == 29:
+            raise PdfRenderError(
+                "offline Typst packages missing or changed; run scripts/setup_typst_packages.py "
+                "and set JAE_TYPST_PACKAGE_ROOT"
+            )
         if result.returncode != 0:
             raise PdfRenderError(f"RenderCV PDF build failed (worker exit {result.returncode})")
         built = stage / "output.pdf"
