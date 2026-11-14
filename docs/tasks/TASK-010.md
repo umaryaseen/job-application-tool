@@ -3,7 +3,7 @@
 - Milestone: M2
 - State: APPROVED implementation on PR #2; not merged. [Independent review](../reviews/TASK-010.md) covers exact published implementation `ccad19062f3050fc69c799072bb0098f13123da7`; fresh macOS CI passed 112 tests plus lint/format/types. TASK-009 and overall M2 release remain pending.
 - Estimate: 2–3 h; planning range, excludes unresolved human input and review waiting
-- Dependencies: reviewed TASK-001/TASK-008 and integrated CLEANUP-001; [ADR-018](../adr/ADR-018.md) permits only draft intake before TASK-009 personal acceptance. TASK-009 and the overall M2 release gate remain pending.
+- Dependencies: reviewed TASK-001/TASK-008 and integrated CLEANUP-001; [ADR-020](../adr/ADR-020.md) permits only draft intake before TASK-009 personal acceptance. TASK-009 and the overall M2 release gate remain pending.
 - Decisions: [ADR-002](../adr/ADR-002.md), [ADR-007](../adr/ADR-007.md), [ADR-012](../adr/ADR-012.md), [ADR-015](../adr/ADR-015.md)
 
 ## Objective

@@ -23,7 +23,7 @@ Playwright is correctly recorded BLOCKED because Chromium is unavailable on macO
 
 ## Verification
 
-`/Users/apple/.local/bin/uv sync --locked` passed; Python 3.12.14; baseline pytest 28 passed; Ruff check/format and mypy passed (21 source files). Renderer experiment sync passed, cases were prepared, and the runner completed RenderCV/Typst, letter, Poppler/pypdf, raster and network-denial probes. RenderCV and final Typst compilation reported sandboxed success with A4 output (short 1 page, two-page 2 pages, letter 1 page). Every raster page was produced; generated outputs were inspected. Playwright reproduction failed with the recorded missing Chromium executable and remained BLOCKED. The standalone network probe was denied; the runner records RenderCV sandboxing, but HTML was not executed.
+`uv sync --locked` passed; Python 3.12.14; baseline pytest 28 passed; Ruff check/format and mypy passed (21 source files). Renderer experiment sync passed, cases were prepared, and the runner completed RenderCV/Typst, letter, Poppler/pypdf, raster and network-denial probes. RenderCV and final Typst compilation reported sandboxed success with A4 output (short 1 page, two-page 2 pages, letter 1 page). Every raster page was produced; generated outputs were inspected. Playwright reproduction failed with the recorded missing Chromium executable and remained BLOCKED. The standalone network probe was denied; the runner records RenderCV sandboxing, but HTML was not executed.
 
 The short and german-unicode PDFs have identical hashes because their fixture plans render identical content; this does not demonstrate distinct Unicode coverage. The inspected hostile fixture includes markup/sentinel content and the runner reports escaping/sentinel absence. The implementation tests cover token escaping and replacement mechanics, but the complete extraction failure above remains blocking. Review documentation and progress were updated without implementation changes.
 
@@ -40,7 +40,7 @@ F-002 is **qualified follow-up**: ADR-004's selection of RenderCV is acceptable 
 
 ## Re-review verification
 
-- `/Users/apple/.local/bin/uv sync --locked`; Python 3.12.14; baseline pytest **31 passed**; Ruff check/format and mypy passed.
+- `uv sync --locked`; Python 3.12.14; baseline pytest **31 passed**; Ruff check/format and mypy passed.
 - Renderer environment lock sync passed; real experiment completed with RenderCV/Typst and letter success, Poppler+pypdf complete matches, all negative controls rejected, sandboxed/network-denied probe, and raster pages generated for every case. Playwright installation failure was reproduced and retained as BLOCKED (exit 2 semantics recorded by the runner/report).
 
 **Verdict: APPROVED WITH FOLLOW-UP.**

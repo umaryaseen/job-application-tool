@@ -1,6 +1,6 @@
 # Private job-description intake
 
-TASK-010 stores an untrusted vacancy as source data. It does not need the career profile or generate an application. ADR-018 permits this independent draft step while TASK-009 personal acceptance remains pending.
+TASK-010 stores an untrusted vacancy as source data. It does not need the career profile or generate an application. ADR-020 permits this independent draft step while TASK-009 personal acceptance remains pending.
 
 ## File or paste
 

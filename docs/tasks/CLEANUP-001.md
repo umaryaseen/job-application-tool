@@ -18,4 +18,4 @@ Audit existing code, remove stale startup instructions and repeated active-state
 
 ## Checks
 
-Run focused hook/simulated-renderer tests, Ruff check/format, mypy and Markdown-link validation. Record the full-suite result on the actual host. CI must run the complete suite with real macOS isolation/Poppler. Linux missing-isolation failures are not passes. Review ADR-017 and the exact candidate independently.
+Run focused hook/simulated-renderer tests, Ruff check/format, mypy and Markdown-link validation. Record the full-suite result on the actual host. CI must run the complete suite with real macOS isolation/Poppler. Linux missing-isolation failures are not passes. Review ADR-019 and the exact candidate independently.

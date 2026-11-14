@@ -50,6 +50,12 @@ class QAReport(StrictModel):
     report_version: Literal["1.0"]
     artifact_sha256: Sha256
     artifact_path: str = Field(min_length=1, max_length=1000)
+    profile_id: str | None = None
+    profile_revision: int | None = Field(default=None, strict=True, ge=1)
+    profile_digest: Sha256 | None = None
+    identity_fact_id: str | None = None
+    identity_revision: int | None = Field(default=None, strict=True, ge=1)
+    identity_digest: Sha256 | None = None
     overall_status: QAStatus
     checks: list[QACheck] = Field(min_length=1, max_length=100)
     visual_review: VisualReview

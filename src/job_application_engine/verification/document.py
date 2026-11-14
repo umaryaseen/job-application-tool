@@ -6,11 +6,19 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from ..domain.document import DocumentLine, DocumentPlan
+from ..domain.document import DocumentLine, DocumentPlan, DocumentSection
+from ..domain.fact import (
+    ContactFact,
+    ContactName,
+    EmploymentFact,
+    FactRef,
+    ProjectFact,
+    ResponsibilityFact,
+)
 from ..domain.profile import ProfileRevision
 from ..profile.review import LocalReviewReceipt
 from ..profile.validation import ProvenanceValidationError, validate_profile
-from .support import canonical_json, sha256_text
+from .support import canonical_fact_payload, canonical_json, sha256_text
 
 
 class DocumentValidationError(ValueError):
@@ -30,6 +38,9 @@ SECTION_LABELS = {
 
 def profile_digest(profile: ProfileRevision) -> str:
     payload = profile.model_dump(mode="json", exclude={"content_sha256"})
+    payload["facts"] = [
+        canonical_fact_payload(fact, include_approval=True) for fact in profile.facts
+    ]
     return sha256_text(canonical_json(payload))
 
 
@@ -48,6 +59,27 @@ def _fact_index(profile: ProfileRevision) -> dict[tuple[str, int], Any]:
 
 def _variant_index(profile: ProfileRevision) -> dict[tuple[str, int], Any]:
     return {(variant.variant_id, variant.revision): variant for variant in profile.variants}
+
+
+def _required_identity(profile: ProfileRevision) -> ContactFact:
+    """Resolve the one approved display-name claim for the profile person."""
+
+    people = [entity for entity in profile.entities if entity.entity_type == "person"]
+    if len(people) != 1:
+        raise _line_error("baseline requires exactly one person entity for candidate identity")
+    person = people[0]
+    matches = [
+        fact
+        for fact in profile.facts
+        if isinstance(fact, ContactFact)
+        and isinstance(fact.value, ContactName)
+        and fact.status == "approved"
+        and fact.subject_id == person.entity_id
+        and fact.value.value == person.display_name
+    ]
+    if len(matches) != 1:
+        raise _line_error("baseline requires one approved candidate-name fact")
+    return matches[0]
 
 
 def validate_document_plan(
@@ -72,6 +104,9 @@ def validate_document_plan(
 
     fact_index = _fact_index(profile)
     variant_index = _variant_index(profile)
+    identity = _required_identity(profile)
+    identity_ref = (identity.fact_id, identity.revision)
+    identity_seen = False
     previous = -1
     seen: set[str] = set()
     for section in plan.sections:
@@ -86,6 +121,55 @@ def validate_document_plan(
             raise _line_error("document section label is not allowlisted")
         for line in section.lines:
             _validate_line(line, section.section_id, profile, fact_index, variant_index)
+            if (
+                section.section_id == "contact"
+                and line.source == "fact"
+                and line.fact_ref is not None
+                and (line.fact_ref.fact_id, line.fact_ref.revision) == identity_ref
+            ):
+                identity_seen = True
+        if section.section_id == "experience":
+            _validate_experience_placement(section, fact_index)
+    if not identity_seen:
+        raise _line_error("document plan omits the approved candidate-name binding")
+
+
+def _validate_experience_placement(
+    section: DocumentSection, fact_index: dict[tuple[str, int], Any]
+) -> None:
+    """Resolve flat experience order against exact trusted employment references.
+
+    Employment lines establish the active parent. Linked responsibilities and
+    projects must immediately occur within that parent's ordered run. A
+    standalone project explicitly clears the active parent and remains valid.
+    """
+
+    active: FactRef | None = None
+    seen: set[tuple[str, int]] = set()
+    for line in section.lines:
+        if line.fact_ref is None:
+            raise _line_error("experience placement requires typed fact lines")
+        fact = fact_index.get((line.fact_ref.fact_id, line.fact_ref.revision))
+        if fact is None:
+            raise _line_error("experience placement references a missing employment revision")
+        key = (fact.fact_id, fact.revision)
+        if key in seen:
+            raise _line_error("experience placement duplicates a claim")
+        seen.add(key)
+        if isinstance(fact, EmploymentFact):
+            active = line.fact_ref
+        elif isinstance(fact, ResponsibilityFact):
+            if active is None or fact.employment_ref != active:
+                raise _line_error(
+                    "responsibility placement does not match exact employment reference"
+                )
+        elif isinstance(fact, ProjectFact):
+            if fact.employment_ref is None:
+                active = None
+            elif active is None or fact.employment_ref != active:
+                raise _line_error("project placement does not match exact employment reference")
+        else:
+            raise _line_error("experience placement contains an unsupported fact kind")
 
 
 def _validate_line(
@@ -109,6 +193,8 @@ def _validate_line(
         expected_section = {
             "contact": "contact",
             "employment": "experience",
+            "responsibility": "experience",
+            "project": "experience",
             "education": "education",
             "skill": "skills",
             "language": "languages",

@@ -33,15 +33,26 @@ class ExpectedSection(StrictModel):
         "Contact",
         "Professional Summary",
         "Professional Experience",
+        "Selected Projects",
         "Education",
         "Skills",
         "Languages",
     ]
+    heading_visible: bool = True
     entries: list[ExpectedEntry] = Field(min_length=1, max_length=500)
+
+    @model_validator(mode="after")
+    def only_contact_heading_may_be_hidden(self) -> ExpectedSection:
+        if not self.heading_visible and self.label != "Contact":
+            raise ValueError("only the Contact heading may be hidden")
+        return self
 
 
 class ExpectedDocument(StrictModel):
-    sections: list[ExpectedSection] = Field(min_length=1, max_length=6)
+    # Independently curated required identity; this is checked even when a
+    # malformed plan omits its own identity claim from the expected entries.
+    required_identity: str = Field(min_length=1, max_length=300)
+    sections: list[ExpectedSection] = Field(min_length=1, max_length=7)
     unicode_tokens: list[str] = Field(default_factory=list, max_length=100)
     quantitative_tokens: list[str] = Field(default_factory=list, max_length=100)
     expected_pages: int = Field(strict=True, ge=1, le=2)
@@ -52,6 +63,7 @@ class ExpectedDocument(StrictModel):
             "Contact",
             "Professional Summary",
             "Professional Experience",
+            "Selected Projects",
             "Education",
             "Skills",
             "Languages",
@@ -74,5 +86,8 @@ class ExpectedDocument(StrictModel):
         return "\n".join(
             text
             for section in self.sections
-            for text in [section.label, *(entry.text for entry in section.entries)]
+            for text in [
+                *([section.label] if section.heading_visible else []),
+                *(entry.text for entry in section.entries),
+            ]
         )

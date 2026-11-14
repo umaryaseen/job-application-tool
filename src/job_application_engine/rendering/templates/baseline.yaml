@@ -14,7 +14,15 @@ design:
     show_footer: false
     show_top_note: false
   typography:
+    alignment: left
     font_size:
       body: 11pt
       headline: 11pt
       connections: 11pt
+  entries:
+    allow_page_break: true
+  header:
+    alignment: left
+    connections:
+      show_icons: false
+      separator: " | "

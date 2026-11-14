@@ -34,8 +34,16 @@ class ContactLocation(StrictModel):
     value: ShortText
 
 
+class ContactName(StrictModel):
+    """The approved display name of the profile's sole person entity."""
+
+    kind: Literal["name"]
+    value: ShortText
+
+
 ContactValue = Annotated[
-    ContactEmail | ContactPhone | ContactUrl | ContactLocation, Field(discriminator="kind")
+    ContactEmail | ContactPhone | ContactUrl | ContactLocation | ContactName,
+    Field(discriminator="kind"),
 ]
 
 
@@ -186,6 +194,27 @@ class EmploymentFact(FactBase):
     metrics: list[Metric] = Field(default_factory=list, max_length=32)
 
 
+class ResponsibilityFact(FactBase):
+    """An exact, employment-scoped responsibility statement."""
+
+    kind: Literal["responsibility"]
+    employment_ref: FactRef
+    text: LongText
+
+
+class ProjectFact(FactBase):
+    """A project or contribution with optional employment association."""
+
+    kind: Literal["project"]
+    project_entity_id: StableId
+    employment_ref: FactRef | None = None
+    project_name: ShortText
+    role: ShortText
+    period: DateRange
+    description: LongText | None = None
+    technologies: list[ShortText] = Field(default_factory=list, max_length=32)
+
+
 class EducationFact(FactBase):
     kind: Literal["education"]
     institution_id: StableId
@@ -194,6 +223,9 @@ class EducationFact(FactBase):
     degree_status: Literal["ongoing", "completed", "withdrawn", "unknown"]
     period: DateRange
     completion_date: DatePoint | None = None
+    thesis_title: ShortText | None = None
+    thesis_description: LongText | None = None
+    coursework: list[ShortText] = Field(default_factory=list, max_length=32)
 
 
 class SkillFact(FactBase):
@@ -203,6 +235,7 @@ class SkillFact(FactBase):
     proficiency: Literal["unknown", "beginner", "intermediate", "advanced", "expert"] = "unknown"
     last_used: DatePoint | None = None
     notes: ShortText | None = None
+    category: ShortText | None = None
 
 
 class LanguageFact(FactBase):
@@ -230,6 +263,8 @@ Fact = Annotated[
     (
         ContactFact
         | EmploymentFact
+        | ResponsibilityFact
+        | ProjectFact
         | EducationFact
         | SkillFact
         | LanguageFact

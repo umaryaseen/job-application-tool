@@ -12,9 +12,9 @@
       "entries": [
         {
           "entry_id": "name",
-          "text": "Synthetic Candidate",
+          "text": "Synthetic Example",
           "fields": {
-            "name": "Synthetic Candidate"
+            "name": "Synthetic Example"
           }
         },
         {
@@ -51,5 +51,6 @@
         }
       ]
     }
-  ]
+  ],
+  "required_identity": "Synthetic Example"
 }

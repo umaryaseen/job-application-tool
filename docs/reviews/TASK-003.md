@@ -15,11 +15,11 @@ The implementation head is exact and the delta `b452656..ca252bad` is documentat
 
 - `git status --short --branch`: clean before review documentation.
 - `git rev-parse` for implementation and branch heads: passed; identities recorded above.
-- `/Users/apple/.local/bin/uv sync --locked`: passed.
-- `/Users/apple/.local/bin/uv run python --version`: Python 3.12.14.
-- `/Users/apple/.local/bin/uv run pytest`: **24 passed**.
-- `/Users/apple/.local/bin/uv run ruff check .`: passed.
-- `/Users/apple/.local/bin/uv run ruff format --check .`: passed (22 files already formatted).
-- `/Users/apple/.local/bin/uv run mypy src`: passed, no issues in 16 source files.
+- `uv sync --locked`: passed.
+- `uv run python --version`: Python 3.12.14.
+- `uv run pytest`: **24 passed**.
+- `uv run ruff check .`: passed.
+- `uv run ruff format --check .`: passed (22 files already formatted).
+- `uv run mypy src`: passed, no issues in 16 source files.
 
 Schema and prior TASK-001 regression coverage remained included in the full suite. No limitations or unresolved findings.

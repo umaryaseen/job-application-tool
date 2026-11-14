@@ -30,9 +30,11 @@ from job_application_engine.snapshots.store import (
     build_snapshot,
     clean_owned_staging,
 )
+from job_application_engine.verification.document import profile_digest
 from job_application_engine.verification.support import (
     canonical_json,
     evidence_digest,
+    fact_digest,
 )
 from tests.test_document_plan import approved_baseline
 
@@ -126,7 +128,7 @@ def eligible_profile() -> tuple[ProfileRevision, list[object], bytes]:
     return profile, reviews, capture
 
 
-def qa_bytes(pdf: bytes, *, visual: str = "pass") -> bytes:
+def qa_bytes(pdf: bytes, *, profile: ProfileRevision, visual: str = "pass") -> bytes:
     digest = hashlib.sha256(pdf).hexdigest()
     visual_review = VisualReview(
         status=visual,
@@ -151,6 +153,14 @@ def qa_bytes(pdf: bytes, *, visual: str = "pass") -> bytes:
             report_version="1.0",
             artifact_sha256=digest,
             artifact_path="synthetic.pdf",
+            profile_id=profile.profile_id,
+            profile_revision=profile.revision,
+            profile_digest=profile_digest(profile),
+            identity_fact_id="contact-name",
+            identity_revision=1,
+            identity_digest=fact_digest(
+                next(f for f in profile.facts if f.fact_id == "contact-name")
+            ),
             overall_status=overall_status(checks, visual_review),
             checks=checks,
             visual_review=visual_review,
@@ -186,7 +196,7 @@ def build_inputs(
         source_slice=b'{"slice":"synthetic"}\n',
         pdf=pdf,
         text=text,
-        qa_report=qa_bytes(pdf),
+        qa_report=qa_bytes(pdf, profile=profile),
         configuration={"locale": "en", "template": "synthetic-template-v1"},
         tool_versions={"python": "3.12.14", "qa": "synthetic-1"},
         as_of=date(2026, 9, 13),
@@ -351,7 +361,10 @@ def test_expiry_uses_current_clock_not_backdated_as_of(tmp_path: Path) -> None:
 def test_missing_visual_or_not_checked_qa_cannot_be_snapshotted(tmp_path: Path) -> None:
     request, *_ = build_inputs(tmp_path)
     bad = request.__class__(
-        **{**request.__dict__, "qa_report": qa_bytes(request.pdf, visual="not_checked")}
+        **{
+            **request.__dict__,
+            "qa_report": qa_bytes(request.pdf, profile=request.profile, visual="not_checked"),
+        }
     )
     with pytest.raises(SnapshotError, match="QA"):
         build_snapshot(bad, root=tmp_path)

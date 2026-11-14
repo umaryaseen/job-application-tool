@@ -42,6 +42,8 @@ def approved_baseline() -> tuple[ProfileRevision, list[object]]:
             "name": "Größe Ä Ö Ü ß",
             "context": "study",
             "proficiency": "unknown",
+            "category": "Data processing & analysis",
+            "notes": "recent experience",
         }
     )
     facts.append(
@@ -62,6 +64,7 @@ def approved_baseline() -> tuple[ProfileRevision, list[object]]:
         }
     )
     selected_ids = [
+        "contact-name",
         "contact-email",
         "employment-one",
         "employment-two",

@@ -13,7 +13,7 @@ The supplied head is an unambiguous descendant of the supplied base and the work
 
 ## Independent verification
 
-Using `/Users/apple/.local/bin/uv`:
+Using `uv`:
 
 - `uv sync --locked` — passed (resolved/checked 16/15 packages).
 - `uv run python --version` — passed: Python 3.12.14.

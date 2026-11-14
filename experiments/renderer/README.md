@@ -5,7 +5,7 @@ Chromium, or pypdf to the baseline runtime. The checked-in lockfile belongs to
 this directory only.
 
 ```sh
-export PATH="/Users/apple/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 uv sync --project experiments/renderer --locked
 uv run python experiments/renderer/prepare_cases.py
 experiments/renderer/.venv/bin/python experiments/renderer/runner/render_experiment.py

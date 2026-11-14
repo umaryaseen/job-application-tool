@@ -48,7 +48,7 @@ def adversarial_pdf(path: Path, mutation: str = "none") -> Path:
     # Keep these actual content strings independent of expected JSON traversal.
     lines = [
         "Contact",
-        "Synthetic Candidate",
+        "Synthetic Example",
         "Email: synthetic@example.com",
         "Professional Experience",
         "Analyst at Alpha Example 2020-01 to 2021-12: 30% (study only).",
@@ -60,6 +60,10 @@ def adversarial_pdf(path: Path, mutation: str = "none") -> Path:
         lines.append(lines[4])
     elif mutation == "missing":
         lines.pop(4)
+    elif mutation == "identity_missing":
+        lines.pop(1)
+    elif mutation == "identity_substitution":
+        lines[1] = "Different Applicant"
     elif mutation == "suffix_loss":
         lines[4] = lines[4].replace(" (study only).", "")
     elif mutation == "qualification":

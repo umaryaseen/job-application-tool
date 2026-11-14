@@ -19,7 +19,7 @@ from ..domain.evidence import (
     RepositorySource,
     SupportBinding,
 )
-from ..domain.fact import Fact
+from ..domain.fact import EmploymentFact, Fact, ProjectFact, ResponsibilityFact
 from ..domain.profile import ProfileRevision
 from ..verification.support import (
     EvidenceKey,
@@ -156,6 +156,7 @@ def validate_profile(
     facts = _index(profile.facts, "fact", issues)
     evidence = _index(profile.evidence, "evidence", issues)
     bindings = _index(profile.support_bindings, "binding", issues)
+    entities = {entity.entity_id: entity for entity in profile.entities}
     typed_bindings: dict[str, SupportBinding] = {str(key): value for key, value in bindings.items()}
     _check_binding_cycles(typed_bindings, issues)
 
@@ -267,6 +268,79 @@ def validate_profile(
         return resolved_evidence, resolved_bindings
 
     for fact in profile.facts:
+        if isinstance(fact, ResponsibilityFact):
+            employment = facts.get((fact.employment_ref.fact_id, fact.employment_ref.revision))
+            if employment is None:
+                issues.append(
+                    ValidationIssue(
+                        "dangling_employment_ref", f"{fact.fact_id} references missing employment"
+                    )
+                )
+            elif not isinstance(employment, EmploymentFact):
+                issues.append(
+                    ValidationIssue(
+                        "wrong_employment_kind",
+                        f"{fact.fact_id} employment reference is not employment",
+                    )
+                )
+            else:
+                if employment.subject_id != fact.subject_id:
+                    issues.append(
+                        ValidationIssue(
+                            "responsibility_scope", f"{fact.fact_id} crosses employment subject"
+                        )
+                    )
+                if fact.status == "approved" and employment.status != "approved":
+                    issues.append(
+                        ValidationIssue(
+                            "unapproved_employment", f"{fact.fact_id} uses an unapproved employment"
+                        )
+                    )
+        elif isinstance(fact, ProjectFact):
+            entity = entities.get(fact.project_entity_id)
+            if entity is None:
+                issues.append(
+                    ValidationIssue(
+                        "dangling_project_entity",
+                        f"{fact.fact_id} references missing project entity",
+                    )
+                )
+            elif entity.entity_type != "project":
+                issues.append(
+                    ValidationIssue(
+                        "wrong_project_entity", f"{fact.fact_id} entity is not a project"
+                    )
+                )
+            if fact.employment_ref is not None:
+                employment = facts.get((fact.employment_ref.fact_id, fact.employment_ref.revision))
+                if employment is None:
+                    issues.append(
+                        ValidationIssue(
+                            "dangling_employment_ref",
+                            f"{fact.fact_id} references missing employment",
+                        )
+                    )
+                elif not isinstance(employment, EmploymentFact):
+                    issues.append(
+                        ValidationIssue(
+                            "wrong_employment_kind",
+                            f"{fact.fact_id} employment reference is not employment",
+                        )
+                    )
+                else:
+                    if employment.subject_id != fact.subject_id:
+                        issues.append(
+                            ValidationIssue(
+                                "project_scope", f"{fact.fact_id} crosses employment subject"
+                            )
+                        )
+                    if fact.status == "approved" and employment.status != "approved":
+                        issues.append(
+                            ValidationIssue(
+                                "unapproved_employment",
+                                f"{fact.fact_id} uses an unapproved employment",
+                            )
+                        )
         fact_evidence, fact_bindings = evidence_for_fact(fact)
         if fact.status != "approved":
             continue

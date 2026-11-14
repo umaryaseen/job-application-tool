@@ -15,7 +15,7 @@ The next product gate is TASK-009: reconcile the real private canonical profile
 and Applied AI / Full Stack bases, preserve their evidence and versions, and
 obtain actual baseline document acceptance. Existing files do not establish it.
 
-ADR-018 separately permits TASK-010 draft JD intake before that personal gate.
+ADR-020 separately permits TASK-010 draft JD intake before that personal gate.
 Check PROGRESS before choosing work: do not restart already implemented intake
 or interpret a stored posting as personal baseline acceptance.
 

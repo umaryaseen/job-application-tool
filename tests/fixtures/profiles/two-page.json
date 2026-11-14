@@ -100,6 +100,14 @@
       "kind": "metric",
       "evidence_refs": [{"evidence_id": "repository-one", "revision": 1}],
       "metric": {"value": "10.00", "unit": "currency", "currency": "EUR", "operator": "exact"}
+    },
+    {
+      "fact_id": "contact-name",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "contact",
+      "evidence_refs": [{"evidence_id": "repository-one", "revision": 1}],
+      "value": {"kind": "name", "value": "Synthetic Example"}
     }
   ]
 }

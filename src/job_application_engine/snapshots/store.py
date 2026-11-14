@@ -90,7 +90,7 @@ def _write_private(path: Path, data: bytes) -> None:
         os.fsync(stream.fileno())
 
 
-def _validate_qa(pdf: bytes, qa_report: bytes) -> None:
+def _validate_qa(pdf: bytes, qa_report: bytes, profile: ProfileRevision) -> None:
     from ..ats_qa.report import QAReport
 
     try:
@@ -102,6 +102,22 @@ def _validate_qa(pdf: bytes, qa_report: bytes) -> None:
     pdf_digest = hashlib.sha256(pdf).hexdigest()
     if report.artifact_sha256 != pdf_digest:
         raise SnapshotError("QA report is bound to another PDF")
+    from ..verification.document import _required_identity
+    from ..verification.support import fact_digest
+
+    try:
+        identity = _required_identity(profile)
+    except ValueError as error:
+        raise SnapshotError("trusted profile identity is invalid") from error
+    if (
+        report.profile_id != profile.profile_id
+        or report.profile_revision != profile.revision
+        or report.profile_digest != profile_digest(profile)
+        or report.identity_fact_id != identity.fact_id
+        or report.identity_revision != identity.revision
+        or report.identity_digest != fact_digest(identity)
+    ):
+        raise SnapshotError("QA report is not bound to the trusted profile identity")
     if report.overall_status != "pass" or report.visual_review.status != "pass":
         raise SnapshotError("mandatory QA and attributed visual review must pass")
     if report.visual_review.artifact_sha256 != pdf_digest or not report.visual_review.reviewer_id:
@@ -138,7 +154,7 @@ def _validate_inputs(request: SnapshotBuild) -> dict[str, bytes]:
         verify_support_captures(request.profile.evidence, request.support_captures)
     except (ProvenanceValidationError, ValueError) as error:
         raise SnapshotError(f"current profile or plan is not eligible: {error}") from error
-    _validate_qa(request.pdf, request.qa_report)
+    _validate_qa(request.pdf, request.qa_report, request.profile)
     approval_bytes = _json_bytes([review.model_dump(mode="json") for review in request.reviews])
     captures: dict[str, bytes] = {}
     for key, value in request.support_captures.items():

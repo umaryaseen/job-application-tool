@@ -1,18 +1,24 @@
-Contact
+Synthetic Example
 Email: synthetic@example.com
 
 Professional Summary
 Synthetic Engineer
 
 Professional Experience
-Synthetic Analyst — Example Labs | 2022-01 – 2023-12
-Synthetic Engineer — Example Labs | 2022-01 – ongoing
+Synthetic Analyst — Example Labs
+January 2022 – December 2023
+Synthetic Engineer — Example Labs
+January 2022 – ongoing
 
 Education
-Synthetic MSc — Synthetic Computing, Example University (status: unknown;  – end date unknown)
+Synthetic MSc — Synthetic Computing, Example University
+Thesis: Synthetic validation thesis
+Synthetic research on bounded optimization.
+Coursework: Synthetic Algorithms | Synthetic Systems
 
 Skills
-Größe Ä Ö Ü ß (context: study; proficiency: unknown)
+Data processing & analysis
+Größe Ä Ö Ü ß (study, recent experience)
 
 Languages
 German (CEFR B2)

@@ -16,7 +16,7 @@ from .domain.profile import ProfileRevision
 from .ingestion.text import ingest_job, load_job_revision, read_source
 from .profile.load import DuplicateJsonKeyError
 from .profile.review import LocalReviewReceipt
-from .rendering.pdf import PdfRenderError, build_pdf
+from .rendering.pdf import TEMPLATE_VERSION, PdfRenderError, build_pdf
 from .snapshots.export import ExportError, export_snapshot
 from .snapshots.review import approve_snapshot
 from .snapshots.store import SnapshotBuild, SnapshotError, build_snapshot
@@ -53,6 +53,9 @@ def build_parser() -> argparse.ArgumentParser:
     build.add_argument("--plan", required=True, type=Path, help="validated document plan JSON")
     build.add_argument(
         "--reviews", required=True, type=Path, help="local human review receipts JSON"
+    )
+    build.add_argument(
+        "--captures-dir", required=True, type=Path, help="directory of immutable support captures"
     )
     build.add_argument("--output-name", default="baseline.pdf", help="private output filename")
     build.set_defaults(handler=_build_cv)
@@ -179,7 +182,14 @@ def _build_cv(args: argparse.Namespace) -> int:
             LocalReviewReceipt.model_validate_json(json.dumps(item, ensure_ascii=False))
             for item in reviews_data
         ]
-        output = build_pdf(plan, profile, reviews=reviews, output_name=args.output_name)
+        captures = _capture_map(args.captures_dir, profile)
+        output = build_pdf(
+            plan,
+            profile,
+            reviews=reviews,
+            support_captures=captures,
+            output_name=args.output_name,
+        )
     except (OSError, ValueError, TypeError, PdfRenderError) as error:
         print(f"jae: {error}", file=sys.stderr)
         return 2
@@ -209,6 +219,8 @@ def _capture_map(directory: Path, profile: ProfileRevision) -> dict[EvidenceKey,
     base = _private_input(directory)
     result: dict[EvidenceKey, Path] = {}
     for evidence in profile.evidence:
+        if evidence.status != "approved":
+            continue
         filename = f"{evidence.evidence_id}-r{evidence.revision}.bin"
         path = base / filename
         if not path.is_file():
@@ -234,7 +246,10 @@ def _snapshot_build(args: argparse.Namespace) -> int:
                 pdf=_private_input(args.pdf).read_bytes(),
                 text=_private_input(args.text).read_bytes(),
                 qa_report=_private_input(args.qa).read_bytes(),
-                configuration={"locale": plan.locale, "template": "baseline-v1"},
+                configuration={
+                    "locale": plan.locale,
+                    "template": TEMPLATE_VERSION,
+                },
                 tool_versions={"python": sys.version.split()[0]},
                 as_of=args.as_of,
             )
