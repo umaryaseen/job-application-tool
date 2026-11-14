@@ -6,7 +6,14 @@ The TASK-012 fixture labels are already independently
 [approved](reviews/TASK-012-FIXTURES.md); do not re-derive or change them to fit
 output. Review the implementation commit supplied with this handoff.
 
-## Round 7: corrective re-review
+## Round 8: corrective re-review
+
+Round 7 on `faee434` returned CHANGES REQUIRED for F-15 (F-16 non-blocking).
+Re-review `faee434..<candidate>`: all word sets are now case-folded at
+construction, with an invariant test. Confirm F-01–F-14 stay as recorded.
+Append a "Round 8" section.
+
+## Round 7 (completed)
 
 Round 6 on `12221f7` returned CHANGES REQUIRED for F-13 (F-14 non-blocking).
 Re-review `12221f7..<candidate>`: every filler word and connective now ends a
@@ -107,7 +114,7 @@ the repository is rejected by design), `uv run ruff check .`,
 your own adversarial inputs. The full suite needs macOS `sandbox-exec`, Poppler
 and the pinned Typst assets; inspect hosted CI for the exact published head
 rather than repeating renderer tests in a sandbox that cannot nest them.
-Implementer results are in PROGRESS (411 passed locally); they are not a
+Implementer results are in PROGRESS (417 passed locally); they are not a
 substitute for your checks.
 
 Record actual commands/results, exact head/tree, findings and one verdict in

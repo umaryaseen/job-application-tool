@@ -797,3 +797,37 @@ def test_f14_language_modifiers_keep_conditions(line, expected, tmp_path: Path) 
     row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
     assert condition(row.condition) == expected
     assert row.review_reasons == []
+
+
+# Regressions for independent review round 7 (docs/reviews/TASK-012.md).
+@pytest.mark.parametrize("word", ["fließend", "fließende", "fließenden", "Fließend"])
+def test_f15_sharp_s_filler_ends_degree_fields(word, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\nA degree in Computer Science {word} QuuxDB.", tmp_path)[2]
+    assert row.candidates[0].condition is None and row.candidates[0].needs_review
+
+
+def test_f15_sharp_s_filler_is_recognized_as_filler(tmp_path: Path) -> None:
+    row = analyze("Anforderungen\nFließend Deutsch.", tmp_path)[2].candidates[0]
+    assert condition(row.condition) == "Deutsch" and row.review_reasons == []
+
+
+def test_f15_every_lexicon_is_casefold_normalized() -> None:
+    from job_application_engine.extraction import groups, priority
+
+    lexicons = {
+        "FILLER": groups.FILLER,
+        "_FIELD_STOP": groups._FIELD_STOP,
+        "EDUCATION_MODIFIERS": groups.EDUCATION_MODIFIERS,
+        "LANGUAGE_MODIFIERS": groups.LANGUAGE_MODIFIERS,
+        "LANGUAGE_SUFFIXES": groups.LANGUAGE_SUFFIXES,
+        "_ALTERNATIVES": groups._ALTERNATIVES,
+        "_WORD_TYPES": set(groups._WORD_TYPES),
+        "_WORD_NUMBERS": set(groups._WORD_NUMBERS),
+        "_VAGUE": groups._VAGUE,
+        "_MARKER_PREFERRED": priority._MARKER_PREFERRED,
+        "_MARKER_MANDATORY": priority._MARKER_MANDATORY,
+    }
+    for name, words in lexicons.items():
+        assert words, name
+        for word in words:
+            assert word == word.casefold(), (name, word)

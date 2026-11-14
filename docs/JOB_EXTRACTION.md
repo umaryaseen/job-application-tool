@@ -108,7 +108,8 @@ Each candidate row keeps its literal quote and adds:
   — the condition is `null` and the row needs review: an OR is never split or
   partially kept. Coverage rule: every word outside the interpreted spans
   (leaf terms, connectives, cues, negation, thresholds) must be on a small EN/DE filler
-  list (experience, with, strong, Kenntnisse, sehr gute, …). Content-bearing
+  list (experience, with, strong, Kenntnisse, sehr gute, …; compared
+  case-folded, so `ß` and `ss` match). Content-bearing
   descriptors (technical, formal, academic, university, language, written, …)
   are exempt only as modifiers directly before a degree, as spoken/written/
   native-style modifiers directly before a recognized language, or as

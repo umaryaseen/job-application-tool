@@ -143,10 +143,17 @@ OPERATOR_WORD = re.compile(
     re.I,
 )
 UNIT_WORD = re.compile(r"(?<!\w)(?:years?|yrs?|jahre?n?|months?|monate?n?|monat)(?!\w)", re.I)
+
+
 # Words that may surround interpreted spans without changing their meaning. Any
 # other uncovered word may be an unrecognized operand, so the condition is
 # withheld for review instead of being kept partially.
-FILLER = frozenset(
+def _lexicon(words: str) -> frozenset[str]:
+    """Case-folded word set; lookups use ``casefold()`` (``ß`` → ``ss``), so storage must too."""
+    return frozenset(word.casefold() for word in words.split())
+
+
+FILLER = _lexicon(
     """
     a an the is are be been will would should can could may you your we our us they
     have has having had with within in of on for to at as by from using use used via
@@ -160,35 +167,35 @@ FILLER = frozenset(
     fließende fließenden verhandlungssicher verhandlungssichere verhandlungssicheren
     kenntnis kenntnisse erfahrung erfahrungen berufserfahrung praxiserfahrung aber auch
     sie du ihr haben hast habt bringst bringen bringt niveau
-    """.split()
+    """
 )
 # Content-bearing descriptors are exempt only where they modify an adjacent term:
 # directly before a degree ("completed degree", "Abgeschlossenes Studium") ...
-EDUCATION_MODIFIERS = frozenset(
+EDUCATION_MODIFIERS = _lexicon(
     """
     completed relevant university academic technical formal accredited recognized
     abgeschlossen abgeschlossene abgeschlossener abgeschlossenes abgeschlossenen
     einschlägige einschlägiger einschlägiges einschlägigen universitäre universitäres
     technische technischer technisches technischen akademische akademischer
     akademisches anerkannte anerkannter anerkanntes
-    """.split()
+    """
 )
 # ... and directly after a recognized language ("German language skills").
-LANGUAGE_SUFFIXES = frozenset({"language", "languages"})
+LANGUAGE_SUFFIXES = _lexicon("language languages")
 # A degree field stops at every filler word (function words and depth
 # qualifiers) and at connectives. Content descriptors are not filler, so
 # "A degree in formal language" keeps its whole field.
-_FIELD_STOP = FILLER | frozenset(
+_FIELD_STOP = FILLER | _lexicon(
     """
     and or und oder sowie plus including inkl etc both either entweder sowohl bzw e z
-    """.split()
+    """
 )
 # Directly before a recognized language: "Written German", "verhandlungssicheres Deutsch".
-LANGUAGE_MODIFIERS = frozenset(
+LANGUAGE_MODIFIERS = _lexicon(
     """
     spoken written native conversational business mündlich schriftlich mündliche
     schriftliche verhandlungssicheres verhandlungssichere
-    """.split()
+    """
 )
 _WORDS = re.compile(r"[^\W\d_]+|\d+")
 CEFR = re.compile(
