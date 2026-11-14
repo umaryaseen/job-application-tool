@@ -597,3 +597,60 @@ The TASK-009 note in `docs/PROGRESS.md` is generic and contains no applicant-spe
 | F-18 | blocking | `src/job_application_engine/extraction/groups.py:145-151, 547-600, 762-775`; `docs/JOB_EXTRACTION.md:132-135` | Sign/comparison detection is incomplete and asymmetric. `SYMBOL_POSTFIX` does not recognize dash/minus variants; `_COMPARISON` omits them and fullwidth/small sign forms; stray-symbol clearing scans only `_COMPARISON`. Consequently, adjacent signs can remain inside a literal scope or be ignored entirely, yielding an unreviewed threshold. | `Requirements` / `3 years − Python experience.` returns `condition=Python`, an unqualified duration of `3`, scope `− Python experience`, and no review. `Requirements` / `English C2−.` returns `condition=English`, an unqualified C2 threshold, and no review. `Requirements` / `＋3 years of Python experience.` returns `condition=Python`, duration `3`, and no review. ASCII `-`, en dash, em dash, fullwidth plus, and several Unicode dash variants reproduce the same class of failure. |
 
 Required correction: reject or otherwise withhold thresholds for sign/comparison variants on either side of amounts and CEFR levels, and clear all thresholds when such symbols occur outside an accepted threshold. Preserve valid numeric/CEFR ranges and `C1-Niveau` through explicit span handling, with regression tests for prefix, postfix, Unicode, and fullwidth variants.
+
+---
+
+## Round 10 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `ad83f8d` plus a
+  dedicated temporary directory, no network, session
+  `01a1db45-4465-7fb1-be4f-4f2a491090a1`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-10 report follows verbatim.
+
+## Round 10
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex independent implementation reviewer
+- Date: 2026-11-14
+- Candidate: `ad83f8d47c727afd4de3b93dee3ee3d6b68fb383`
+- Candidate tree: `1e31d033ea80dd8857c3f6268559b82e9a260e52`
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Working tree: clean; no tracked files modified.
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git diff 1722e32..ad83f8d` | 0 | Six paths; 188 additions, 24 deletions; full 1,414-line/76,650-byte delta inspected |
+| Focused pytest command from handoff | 0 | 328 passed, no skips, 43.42s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir .../mypy` | 0 | No issues in 47 source files |
+| `git diff --check 1722e32..ad83f8d` | 0 | Clean |
+| `sha256sum tests/fixtures/requirements/classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest matched: `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| Regression probe | 0 | 59 F-01–F-18 checks; 0 failures |
+| Alternative/unknown-operand matrix | 0 | 2,400 candidates; all reviewed with no condition; 0 unsafe partial conditions |
+| FILLER audit | 0 | 142 entries across 568 cases; no non-degree hidden operands |
+| Duplicate probe | 0 | 13 scope/qualifier cases; 0 mismatches |
+| Threshold probe | 0 | 12 valid controls review-free; no malformed unreviewed thresholds |
+| Unicode sign matrix | 0 | 5,844 Unicode Sm/Pd cases; direct sign variants handled as expected |
+| Exact 200,000-byte dense probe | 0 | Six inputs failed with bounded `ExtractionError` in 0.10–0.15s; no raw exceptions |
+| CLI probe | 0 | Five cases exited 0; diagnostics sanitized |
+| PDF renderer tests | — | Not run, as instructed |
+
+### Probe outcomes
+
+F-01–F-17 remain fixed. Unsupported alternatives, unknown operands, filler-list entries, malformed thresholds, duplicate scopes and dense inputs behaved as required. The TASK-009 note in `docs/PROGRESS.md` remains generic and contains no applicant facts.
+
+The direct F-18 reproductions withheld thresholds and required review. A nearby Unicode check found that every `Pd` dash is accepted when directly joining a CEFR level to a word, including EN DASH, EM DASH, FIGURE DASH, WAVE DASH and TWO-EM DASH.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-19 | blocking | `src/job_application_engine/extraction/groups.py:164-178`; `docs/JOB_EXTRACTION.md:133-136` | The CEFR compound exception accepts every Unicode `Pd` dash, although the documented exception permits only a word-joining hyphen. Non-hyphen dashes therefore create an unreviewed threshold. | `Requirements\nEnglish C2—Niveau.` returns an unqualified `C2` threshold with `review_reasons=[]`. `C2–Niveau`, `C2‒Niveau`, `C2⸺Niveau` and `C2～Niveau` behave the same. |
+| F-20 | non-blocking | `src/job_application_engine/extraction/groups.py:157-162` | Sign-before detection creates a conservative false alarm when a preceding recognized `C++` term contributes the plus sign. | `Requirements\nC++ 3 years of experience.` keeps condition `C++`, removes the threshold and adds `unsupported_number`; meaning remains visible for review. |
