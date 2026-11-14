@@ -466,3 +466,70 @@ PDF renderer tests were not run, as instructed; they require nested `sandbox-exe
 | F-16 | non-blocking | `src/job_application_engine/extraction/groups.py:187-191, 649-655, 797-806` | Modifier coverage remains conservative for some reasonable language prose. No meaning is hidden, but common forms remain review-required because the modifier grammar is narrow. | `Native-level German.` and `Written and spoken German.` return no condition with review. This is a false alarm only; the rows do not produce partial conditions. |
 
 F-15 requires a narrow correction that normalizes filler comparisons consistently and adds regressions for all three `ß` forms. Then rerun the focused suite, static checks, fixture digest, and adversarial probes.
+
+---
+
+## Round 8 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `f5d65ee` plus a
+  dedicated temporary directory, no network, session
+  `01a1db14-6e76-7ad1-8a75-13f35f7db03e`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-8 report follows verbatim.
+
+## Round 8
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Candidate: `f5d65eea7edf397eafb4f753088dcd35f1d30056`
+- Candidate tree: `4488048e34045ecb42682bbcc1983d1a03e7a4c3`
+- Delta reviewed: `faee434c498789f964c189393ef6ceefc3595f7e..f5d65eea7edf397eafb4f753088dcd35f1d30056`
+- Working tree remained clean; all probes were outside the checkout.
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Detached candidate, clean |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate/tree matched handoff |
+| `git diff --stat/name-status faee434..f5d65ee` | 0 | 6 paths; 141 insertions, 18 deletions |
+| Full corrective diff inspection | 0 | Code, tests and documentation inspected |
+| Focused pytest command | 0 | **297 passed** in 35.84s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir …/codex-r8-tmp/mypy-final` | 0 | No issues in 47 source files |
+| `git diff --check faee434..f5d65ee` | 0 | Clean |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest matched: `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| `round8_probe.py` | 0 | 62 cases, 0 exceptions |
+| `regressions.py` | 0 | 26 F-01–F-16 regression cases, 0 exceptions |
+| `filler_outside.py` | 0 | All 142 FILLER words reviewed around `QuuxDB`; 0 unsafe, 0 exceptions |
+| `matrix.py` | 0 | 269 alternative/unknown-operand cases, 0 exceptions; no unsafe non-degree cases |
+| `dense_probe.py` | 0 | Six exact 200,000-byte inputs; 0 raw exceptions; bounded failures or completion in ~0.11–0.39s |
+| `operator_symbols.py`, `operator_postfix.py`, `negative_thresholds.py` | 0 | Symbol/sign threshold probes completed; exposed F-17 |
+
+PDF renderer tests were not run, as instructed; nested `sandbox-exec` is unavailable here.
+
+### Probe outcomes
+
+F-15 is fixed for `fließend`, `fließende`, `fließenden`, and valid uppercase/case-folded variants. Language controls such as `Fließend Deutsch`, `FLIESSEND Deutsch`, and `FLIEẞEND Deutsch` retain the language condition without review.
+
+F-01–F-14 reproductions remained consistent with prior reports: unsupported alternatives and operands require review; malformed thresholds do not produce unreviewed structured thresholds; duplicate grouping stays within heading/marker scope; valid formal-language degree fields remain represented; F-13 connective tails require review; F-14 direct written/spoken modifiers remain covered.
+
+All 142 actual FILLER entries caused review when placed between `Python` and `QuuxDB`. The remaining no-review unknown-token cases were the documented literal ≤4-word degree-field grammar; fifth-word, filler, connective and punctuation variants were reviewed.
+
+Coverage false alarms remain nonblocking and meaning-preserving: `Native-level German`, `Written and spoken German`, `Python with Docker experience`, and similar unsupported prose require review.
+
+`docs/PROGRESS.md` retains a generic TASK-009 pending state without applicant facts. The case-folding documentation matches the implementation.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-17 | blocking | `src/job_application_engine/extraction/groups.py:531-603, 666-667` | Numeric and CEFR parsers accept unsupported signs/comparison symbols as an `unqualified` threshold. Only `/`, `|`, `&`, and `+` are checked as symbols; `-`, `−`, `~`, `≈`, `≤`, `≥`, `<`, and `>` around amounts/levels are ignored. This can turn a negative value positive or discard an operator without review. | `Requirements\n−3 years of Python experience.` → `condition=Python`, `duration/unqualified/value=3`, no review. `Requirements\n~3 years of Python experience.` behaves the same. `Requirements\nEnglish ≤C2.` → `language_level/unqualified/C2`, no review. |
+| F-16 | non-blocking | `src/job_application_engine/extraction/groups.py:194-199, 804-813` | Coverage remains conservative for some reasonable modifier prose. No condition is hidden. | `Native-level German.` and `Written and spoken German.` remain review-required. |
+
+F-17 requires rejecting unsupported symbolic operators/signs or explicitly parsing them into typed operators, with regression coverage for prefix, postfix, negative and Unicode variants.
