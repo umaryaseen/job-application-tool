@@ -11,7 +11,7 @@ sentinels are under the ignored `artifacts/renderer/task-005/` directory.
 ## Reproduction and environment
 
 ```sh
-export PATH="/Users/apple/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 uv sync --project experiments/renderer --locked
 uv run python experiments/renderer/prepare_cases.py
 experiments/renderer/.venv/bin/python experiments/renderer/runner/render_experiment.py

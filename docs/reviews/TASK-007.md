@@ -24,7 +24,7 @@ Corrective task: rerun the full suite in a Python 3.12 locked environment to a c
 ## Verification
 
 - Commit identities, ancestry and clean working-tree state: passed.
-- `/Users/apple/.local/bin/uv sync --locked`: passed; Python 3.12.14.
+- `uv sync --locked`: passed; Python 3.12.14.
 - Full-suite `uv run pytest`: attempted independently but did not complete before the review window; no pass claim.
 - `uv run pytest --collect-only -q`: passed; 56 tests collected.
 - `uv run ruff check .`: passed.
@@ -40,6 +40,6 @@ Date: 2026-09-13. Reviewed implementation remains `4437ff51c79cb93e3bd458dcfc910
 
 The previous 56-node figure was a collection from the earlier review attempt before the final test set was fully collected (and its shell `wc` counted summary lines, not node IDs). The current `pyproject.toml` has `testpaths = ["tests"]`; `pytest --collect-only -q` reports 67 collected items across 8 files: `tests/rendering/test_pdf_qa.py` (29), `test_cli.py` (6), `test_document_plan.py` (4), `test_profile_schema.py` (7), `test_provenance.py` (7), `test_renderer_experiment.py` (3), `test_rendering.py` (7), and `test_repository_policy.py` (4). No ignored or untracked tests were found.
 
-Persistent command: `/Users/apple/.local/bin/uv run pytest -vv --durations=0 --junitxml=artifacts/verification/task-007/junit.xml` — exit **0**, **67 passed in 45.54s**. The JUnit file was written under the ignored verification directory. The run showed scoped wrong-field negative cases failing with the intended check IDs, missing-tool and failed-measurement cases not passing, and visual receipts hash-bound. Prior PDF reproduction and attributed raster inspection remain covered by the earlier review record; no implementation changes were made.
+Persistent command: `uv run pytest -vv --durations=0 --junitxml=artifacts/verification/task-007/junit.xml` — exit **0**, **67 passed in 45.54s**. The JUnit file was written under the ignored verification directory. The run showed scoped wrong-field negative cases failing with the intended check IDs, missing-tool and failed-measurement cases not passing, and visual receipts hash-bound. Prior PDF reproduction and attributed raster inspection remain covered by the earlier review record; no implementation changes were made.
 
 F-001 is **resolved**. F-002 is **resolved**. The prior verification blocker is **resolved** by the completed run. **Final verdict: APPROVED.** TASK-008 was not started.

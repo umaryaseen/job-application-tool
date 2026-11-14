@@ -389,6 +389,7 @@
             "mapping": {
               "email": "#/$defs/ContactEmail",
               "location": "#/$defs/ContactLocation",
+              "name": "#/$defs/ContactName",
               "phone": "#/$defs/ContactPhone",
               "url": "#/$defs/ContactUrl"
             },
@@ -406,6 +407,9 @@
             },
             {
               "$ref": "#/$defs/ContactLocation"
+            },
+            {
+              "$ref": "#/$defs/ContactName"
             }
           ],
           "title": "Value"
@@ -442,6 +446,29 @@
         "value"
       ],
       "title": "ContactLocation",
+      "type": "object"
+    },
+    "ContactName": {
+      "additionalProperties": false,
+      "description": "The approved display name of the profile's sole person entity.",
+      "properties": {
+        "kind": {
+          "const": "name",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "ContactName",
       "type": "object"
     },
     "ContactPhone": {
@@ -896,6 +923,16 @@
           "default": null,
           "title": "Completion Date"
         },
+        "coursework": {
+          "items": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Coursework",
+          "type": "array"
+        },
         "degree_name": {
           "anyOf": [
             {
@@ -989,6 +1026,34 @@
           "maxItems": 32,
           "title": "Support Binding Refs",
           "type": "array"
+        },
+        "thesis_description": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Thesis Description"
+        },
+        "thesis_title": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Thesis Title"
         }
       },
       "required": [
@@ -1926,6 +1991,147 @@
       "title": "MonthDate",
       "type": "object"
     },
+    "ProjectFact": {
+      "additionalProperties": false,
+      "description": "A project or contribution with optional employment association.",
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "description": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "employment_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "project",
+          "title": "Kind",
+          "type": "string"
+        },
+        "period": {
+          "$ref": "#/$defs/DateRange"
+        },
+        "project_entity_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Project Entity Id",
+          "type": "string"
+        },
+        "project_name": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Project Name",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "role": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Support Binding Refs",
+          "type": "array"
+        },
+        "technologies": {
+          "items": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Technologies",
+          "type": "array"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision",
+        "subject_id",
+        "evidence_refs",
+        "kind",
+        "project_entity_id",
+        "project_name",
+        "role",
+        "period"
+      ],
+      "title": "ProjectFact",
+      "type": "object"
+    },
     "RepositorySource": {
       "additionalProperties": false,
       "properties": {
@@ -1968,6 +2174,97 @@
       "title": "RepositorySource",
       "type": "object"
     },
+    "ResponsibilityFact": {
+      "additionalProperties": false,
+      "description": "An exact, employment-scoped responsibility statement.",
+      "properties": {
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactApproval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "employment_ref": {
+          "$ref": "#/$defs/FactRef"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "fact_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "responsibility",
+          "title": "Kind",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "approved",
+            "revoked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 64,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "support_binding_refs": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Support Binding Refs",
+          "type": "array"
+        },
+        "text": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fact_id",
+        "revision",
+        "subject_id",
+        "evidence_refs",
+        "kind",
+        "employment_ref",
+        "text"
+      ],
+      "title": "ResponsibilityFact",
+      "type": "object"
+    },
     "SkillFact": {
       "additionalProperties": false,
       "properties": {
@@ -1981,6 +2278,20 @@
             }
           ],
           "default": null
+        },
+        "category": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Category"
         },
         "context": {
           "enum": [
@@ -2330,6 +2641,8 @@
             "employment": "#/$defs/EmploymentFact",
             "language": "#/$defs/LanguageFact",
             "metric": "#/$defs/MetricFact",
+            "project": "#/$defs/ProjectFact",
+            "responsibility": "#/$defs/ResponsibilityFact",
             "skill": "#/$defs/SkillFact"
           },
           "propertyName": "kind"
@@ -2340,6 +2653,12 @@
           },
           {
             "$ref": "#/$defs/EmploymentFact"
+          },
+          {
+            "$ref": "#/$defs/ResponsibilityFact"
+          },
+          {
+            "$ref": "#/$defs/ProjectFact"
           },
           {
             "$ref": "#/$defs/EducationFact"

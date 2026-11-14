@@ -10,7 +10,7 @@ Date: 11 November 2026
 - Published implementation: `ccad19062f3050fc69c799072bb0098f13123da7`
 - Independently verified matching tree: `c045b103ae6d216c6b083114a8adab9a0e7d6e70`
 
-The cumulative diff, task acceptance, accepted ADR-018, affected architecture/privacy rules, implementation and tests were inspected. No blocking correctness, scope, privacy or factuality findings remain.
+The cumulative diff, task acceptance, accepted ADR-020, affected architecture/privacy rules, implementation and tests were inspected. No blocking correctness, scope, privacy or factuality findings remain.
 
 The implementation preserves exact UTF-8 source bytes and raw codepoint identity separately from normalized Markdown. Supplied metadata and locale remain explicit; omitted values are retained between revisions. Identical current inputs deduplicate, while changed source, metadata or locale creates a new immutable revision.
 

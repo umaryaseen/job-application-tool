@@ -10,10 +10,13 @@ from ..domain.common import Locale
 from ..domain.document import DocumentLine, DocumentPlan, DocumentSection
 from ..domain.fact import (
     ContactFact,
+    ContactName,
     EducationFact,
     EmploymentFact,
     FactRef,
     LanguageFact,
+    ProjectFact,
+    ResponsibilityFact,
     SkillFact,
 )
 from ..domain.profile import ProfileRevision
@@ -45,6 +48,17 @@ def format_date_range(period: Any) -> str:
     return f"{start} – end date unknown"
 
 
+def _project_period_text(period: Any) -> str:
+    if period.start is None:
+        end = (
+            _date_text(period.end)
+            if period.end_state == "known"
+            else ("ongoing" if period.end_state == "ongoing" else "end date unknown")
+        )
+        return f"start date unknown – {end}"
+    return format_date_range(period)
+
+
 def _entity_name(profile: ProfileRevision, entity_id: str) -> str:
     for entity in profile.entities:
         if entity.entity_id == entity_id:
@@ -54,12 +68,23 @@ def _entity_name(profile: ProfileRevision, entity_id: str) -> str:
 
 def fact_line_text(profile: ProfileRevision, fact: Any) -> str:
     if isinstance(fact, ContactFact):
+        if isinstance(fact.value, ContactName):
+            return fact.value.value
         return f"{fact.value.kind.title()}: {fact.value.value}"
     if isinstance(fact, EmploymentFact):
         return (
             f"{fact.title} — {_entity_name(profile, fact.employer_id)}"
             f" | {format_date_range(fact.period)}"
         )
+    if isinstance(fact, ResponsibilityFact):
+        return fact.text
+    if isinstance(fact, ProjectFact):
+        details = [f"{fact.project_name} — {fact.role}", _project_period_text(fact.period)]
+        if fact.technologies:
+            details.append("Technologies: " + ", ".join(fact.technologies))
+        if fact.description:
+            details.append(fact.description)
+        return " | ".join(details)
     if isinstance(fact, EducationFact):
         degree = fact.degree_name or "Degree not specified"
         status = fact.degree_status
@@ -108,6 +133,19 @@ def _start_key(fact: Any) -> tuple[int, int, int, str]:
     )
 
 
+def _project_key(fact: ProjectFact) -> tuple[int, int, int, int, str]:
+    point = fact.period.start
+    if point is None:
+        return (0, 0, 0, 0, fact.fact_id)
+    return (
+        1,
+        -point.year,
+        -getattr(point, "month", 0),
+        -getattr(point, "day", 0),
+        fact.fact_id,
+    )
+
+
 def compile_baseline(
     profile: ProfileRevision,
     *,
@@ -122,7 +160,8 @@ def compile_baseline(
     sections: list[DocumentSection] = []
 
     contacts = sorted(
-        _approved_facts(profile, "contact"), key=lambda fact: (fact.kind, fact.fact_id)
+        _approved_facts(profile, "contact"),
+        key=lambda fact: (0 if isinstance(fact.value, ContactName) else 1, fact.fact_id),
     )
     if contacts:
         sections.append(
@@ -156,12 +195,35 @@ def compile_baseline(
         )
 
     employment = sorted(_approved_facts(profile, "employment"), key=_start_key, reverse=True)
-    if employment:
+    responsibilities = _approved_facts(profile, "responsibility")
+    projects = _approved_facts(profile, "project")
+    experience_lines: list[DocumentLine] = []
+    for employer in employment:
+        employment_ref = FactRef(fact_id=employer.fact_id, revision=employer.revision)
+        group_lines = [_fact_line(profile, employer)]
+        linked_responsibilities = sorted(
+            [item for item in responsibilities if item.employment_ref == employment_ref],
+            key=lambda item: item.fact_id,
+        )
+        group_lines.extend(_fact_line(profile, item) for item in linked_responsibilities)
+        linked_projects = sorted(
+            [item for item in projects if item.employment_ref == employment_ref],
+            key=_project_key,
+        )
+        group_lines.extend(_fact_line(profile, item) for item in linked_projects)
+        experience_lines.extend(group_lines)
+    standalone_projects = sorted(
+        [item for item in projects if item.employment_ref is None],
+        key=_project_key,
+    )
+    if standalone_projects:
+        experience_lines.extend(_fact_line(profile, item) for item in standalone_projects)
+    if experience_lines:
         sections.append(
             DocumentSection(
                 section_id="experience",
                 label="Professional Experience",
-                lines=[_fact_line(profile, fact) for fact in employment],
+                lines=experience_lines,
             )
         )
 

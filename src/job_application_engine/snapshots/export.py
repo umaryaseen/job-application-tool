@@ -18,7 +18,7 @@ from ..verification.document import validate_document_plan
 from ..verification.support import EvidenceKey, verify_support_captures
 from .manifest import digest_file, verify_manifest_files
 from .review import _verify_ready, load_final_approval
-from .store import SnapshotError, _snapshot_root
+from .store import SnapshotError, _snapshot_root, _validate_qa
 
 T = TypeVar("T")
 
@@ -81,6 +81,14 @@ def _check_current(
         report_data = json.loads((snapshot / "qa/report.json").read_text(encoding="utf-8"))
     except (OSError, ValueError) as error:
         raise ExportError("snapshot plan or QA evidence is unreadable") from error
+    try:
+        _validate_qa(
+            (snapshot / "pdf/output.pdf").read_bytes(),
+            (snapshot / "qa/report.json").read_bytes(),
+            profile,
+        )
+    except (OSError, SnapshotError) as error:
+        raise ExportError(str(error)) from error
     if report_data.get("overall_status") != "pass":
         raise ExportError("mandatory QA or visual review is not passing")
     try:

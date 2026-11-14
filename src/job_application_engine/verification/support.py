@@ -37,8 +37,27 @@ def model_digest(model: BaseModel, *, exclude: set[str] | None = None) -> str:
     return sha256_text(canonical_json(payload))
 
 
+def _strip_empty_presentation_fields(payload: dict[str, Any]) -> dict[str, Any]:
+    """Keep pre-presentation approval payloads stable when new fields are empty."""
+
+    kind = payload.get("kind")
+    if kind == "education":
+        for key in ("thesis_title", "thesis_description", "coursework"):
+            value = payload.get(key)
+            if value is None or value == []:
+                payload.pop(key, None)
+    elif kind == "skill" and payload.get("category") is None:
+        payload.pop("category", None)
+    return payload
+
+
+def canonical_fact_payload(fact: Fact, *, include_approval: bool = False) -> dict[str, Any]:
+    payload = fact.model_dump(mode="json", exclude=set() if include_approval else {"approval"})
+    return _strip_empty_presentation_fields(payload)
+
+
 def fact_digest(fact: Fact) -> str:
-    return model_digest(fact, exclude={"approval"})
+    return sha256_text(canonical_json(canonical_fact_payload(fact)))
 
 
 def evidence_digest(evidence: EvidenceRecord) -> str:

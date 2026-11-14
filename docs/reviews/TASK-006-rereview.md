@@ -15,8 +15,8 @@ The corrective implementation is an exact ancestor of the documentation head. Th
 ## Independent verification
 
 - `git status --short --branch`, `git rev-parse`, ancestry and delta inspection: passed; clean state, exact hashes, documentation-only tail.
-- `/Users/apple/.local/bin/uv sync --locked`: passed.
-- `/Users/apple/.local/bin/uv run python --version`: Python 3.12.14.
+- `uv sync --locked`: passed.
+- `uv run python --version`: Python 3.12.14.
 - Targeted two-page test: `uv run pytest tests/test_rendering.py::test_production_pdf_handles_long_two_page_plan_without_pruning` — **1 passed**.
 - Full suite: `uv run pytest` — **38 passed** (schema drift and prior regressions included).
 - `uv run ruff check .` — passed.

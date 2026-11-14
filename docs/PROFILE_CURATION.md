@@ -6,6 +6,18 @@ This checklist is used in TASK-009 after the schema, renderer and safeguards exi
 
 Choose an explicit private data directory outside Git. Start with contact details and one current/recent role so incomplete history does not stall schema feedback. Add remaining roles, projects, education, skills and languages deliberately. Importing a legacy CV, if later supported, creates drafts; extraction is not verification.
 
+For the current local session, configure the supplied private root before
+running project commands:
+
+```sh
+export JAE_DATA_DIR=$JAE_DATA_DIR
+uv run jae config-check
+```
+
+The directory must remain outside the repository, be non-symlinked and have
+restricted permissions. Future shells need to export `JAE_DATA_DIR` again;
+the project does not write it to global shell configuration.
+
 | Area | Collect and confirm | Never infer |
 |---|---|---|
 | Identity/contact | Exact display name, city/country, preferred email/phone/links | Contact values from memory or a similar profile |

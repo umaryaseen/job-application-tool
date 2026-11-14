@@ -31,7 +31,7 @@ Count distinct current postings per normalized skill, preserving required/prefer
 
 ## Delivery order
 
-1. Integrate reviewed TASK-010 (PR #2) and use private draft intake under ADR-018; CLEANUP-001 is integrated.
+1. Verify this local integration of TASK-010 (merged PR #2), then use private draft intake under ADR-020; CLEANUP-001 is integrated.
 2. Complete TASK-009 using actual private profile and both bases, preserving approvals and reconciling missing facts. Draft intake does not complete this gate.
 3. Deliver requirement extraction/matching/tailoring through the existing dependencies, comparing both bases before producing a tailored CV.
 4. Complete the application pack with letters, DOCX, tracking and interview notes, tied to existing snapshots.

@@ -14,19 +14,79 @@ from job_application_engine.ats_qa import pdf
 from job_application_engine.ats_qa.report import QAReport, record_visual_observation
 from job_application_engine.ats_qa.text import normalize_extracted_text
 from tests.rendering.fixtures import ORACLES, adversarial_pdf, expected, production_pdf
+from tests.test_document_plan import approved_baseline
 
 
 def measure(path: Path, oracle: str = "adversarial") -> QAReport:
+    profile, reviews = approved_baseline()
     return pdf.run_pdf_qa(
         path,
         expected(oracle),
         report_path=path.parent / "qa.json",
         raster_dir=path.parent / "rasters",
+        profile=profile,
+        reviews=reviews,
     )
 
 
 def statuses(report: QAReport) -> dict[str, str]:
     return {check.check_id: check.status for check in report.checks}
+
+
+@pytest.mark.parametrize("text", ["Contact\nEmail: synthetic@example.com", "Contact\nOther Name"])
+def test_required_identity_fails_when_renderer_omits_or_substitutes_name(text: str) -> None:
+    checks = pdf._text_checks(text, expected("adversarial"))
+    # The low-level text helper has no authority to approve identity at all.
+    assert "required_identity" not in checks
+
+
+def test_substituted_pdf_and_caller_oracle_cannot_bypass_trusted_identity(
+    tmp_path: Path,
+) -> None:
+    profile, reviews = approved_baseline()
+    pdf_path = adversarial_pdf(tmp_path / "substituted.pdf", "identity_substitution")
+    oracle = expected("adversarial").model_copy(
+        update={
+            "required_identity": "Different Applicant",
+            "sections": [
+                expected("adversarial")
+                .sections[0]
+                .model_copy(
+                    update={
+                        "entries": [
+                            expected("adversarial")
+                            .sections[0]
+                            .entries[0]
+                            .model_copy(
+                                update={
+                                    "text": "Different Applicant",
+                                    "fields": {"name": "Different Applicant"},
+                                }
+                            ),
+                            *expected("adversarial").sections[0].entries[1:],
+                        ]
+                    }
+                ),
+                *expected("adversarial").sections[1:],
+            ],
+        }
+    )
+    report = pdf.run_pdf_qa(
+        pdf_path,
+        oracle,
+        profile=profile,
+        reviews=reviews,
+        report_path=tmp_path / "qa.json",
+        raster_dir=tmp_path / "rasters",
+    )
+    assert report.overall_status == "fail"
+    assert all(
+        next(
+            check for check in report.checks if check.check_id == f"required_identity_{engine}"
+        ).status
+        == "fail"
+        for engine in ("poppler", "pypdf")
+    )
 
 
 @pytest.mark.parametrize("two_pages", [False, True])
@@ -39,7 +99,7 @@ def test_real_production_pdf_complete_content_and_geometry(tmp_path: Path, two_p
     assert len(list((path.parent / "rasters").glob("*.png"))) == (2 if two_pages else 1)
     for engine in ("poppler", "pypdf"):
         critical = next(c for c in report.checks if c.check_id == f"critical_fields_{engine}")
-        assert critical.measured == {"found": 19, "total": 19, "fraction": 1.0}
+        assert critical.measured == {"found": 20, "total": 20, "fraction": 1.0}
     saved = QAReport.model_validate_json((path.parent / "qa.json").read_text())
     assert saved.model_dump(mode="json") == report.model_dump(mode="json")
     assert "synthetic@example.com" not in saved.model_dump_json()
@@ -59,6 +119,14 @@ def test_real_production_pdf_complete_content_and_geometry(tmp_path: Path, two_p
         ),
         ("duplicate", ["complete_text_poppler", "complete_text_pypdf"]),
         ("missing", ["complete_text_poppler", "complete_text_pypdf", "critical_fields_poppler"]),
+        (
+            "identity_missing",
+            ["required_identity_poppler", "required_identity_pypdf"],
+        ),
+        (
+            "identity_substitution",
+            ["required_identity_poppler", "required_identity_pypdf"],
+        ),
         ("suffix_loss", ["complete_text_poppler", "complete_text_pypdf"]),
         (
             "qualification",

@@ -8,7 +8,7 @@ Continue from the next unblocked task in PROGRESS; do not restart TASK-001. Read
 
 Milestones progress in order: M1 genuine baseline → M2 requirement matrix → M3 tailored CV with validation → M4 letter/tracker. No later work substitutes for an incomplete first usable CV. Optional M5 tasks can be prioritized after M3/M4 according to their dependencies, without silently widening MVP scope.
 
-ADR-018 permits TASK-010 private draft JD intake after the reviewed technical foundation, while TASK-009 personal acceptance remains pending. This is a narrow independent-work exception, not an M1/M2 release or general waiver of later dependencies.
+ADR-020 permits TASK-010 private draft JD intake after the reviewed technical foundation, while TASK-009 personal acceptance remains pending. This is a narrow independent-work exception, not an M1/M2 release or general waiver of later dependencies.
 
 ## Milestones
 
@@ -19,7 +19,7 @@ ADR-018 permits TASK-010 private draft JD intake after the reviewed technical fo
 | M2 | 010–016 | Reviewed EN/DE requirements and evidence matrix |
 | M3 | 017–020 | Tested tailoring MVP with strict claim and export gates |
 | M4 | 021–023 | Cover letter and SQLite tracker |
-| Requested DOCX | 024, after M3 | Application deliverable under ADR-009/017; not yet implemented |
+| Requested DOCX | 024, after M3 | Application deliverable under ADR-009/019; not yet implemented |
 | M5 | 025–034 | Separate optional decisions/features, each reviewed |
 | Later | 035 | Policy/handoff design only; no implemented portal integration |
 
@@ -36,7 +36,7 @@ ADR-018 permits TASK-010 private draft JD intake after the reviewed technical fo
 | [TASK-007](tasks/TASK-007.md) | M1 | Implement PDF and ATS robustness checks | 006 | 4–6 h |
 | [TASK-008](tasks/TASK-008.md) | M1 | Create immutable snapshots and hash-bound approval/export | 007 | 4–6 h |
 | [TASK-009](tasks/TASK-009.md) | M1 | Curate and accept the first genuine baseline CV | 008 | 2–4 h plus applicant review |
-| [TASK-010](tasks/TASK-010.md) | M2 | Ingest pasted job descriptions as immutable snapshots | 001, 008, CLEANUP-001; ADR-018 exception | 2–3 h |
+| [TASK-010](tasks/TASK-010.md) | M2 | Ingest pasted job descriptions as immutable snapshots | 001, 008, CLEANUP-001; ADR-020 exception | 2–3 h |
 | [TASK-011](tasks/TASK-011.md) | M2 | Extract source-grounded requirement candidates | 010 | 3–5 h |
 | [TASK-012](tasks/TASK-012.md) | M2 | Classify priorities, negation and alternatives | 011 | 3–5 h |
 | [TASK-013](tasks/TASK-013.md) | M2 | Normalize skills with a reviewed alias dictionary | 012 | 2–4 h |

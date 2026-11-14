@@ -55,7 +55,10 @@
       "program": "Synthetic Computing",
       "degree_name": "Synthetic MSc",
       "degree_status": "unknown",
-      "period": {"start": null, "start_state": "unknown", "end": null, "end_state": "unknown"}
+      "period": {"start": null, "start_state": "unknown", "end": null, "end_state": "unknown"},
+      "thesis_title": "Synthetic validation thesis",
+      "thesis_description": "Synthetic research on bounded optimization.",
+      "coursework": ["Synthetic Algorithms", "Synthetic Systems"]
     },
     {
       "fact_id": "language-one",
@@ -73,6 +76,14 @@
       "kind": "authorization",
       "evidence_refs": [{"evidence_id": "attestation-one", "revision": 1}],
       "value": {"status": "unknown"}
+    },
+    {
+      "fact_id": "contact-name",
+      "revision": 1,
+      "subject_id": "synthetic-person",
+      "kind": "contact",
+      "evidence_refs": [{"evidence_id": "attestation-one", "revision": 1}],
+      "value": {"kind": "name", "value": "Synthetic Example"}
     }
   ]
 }

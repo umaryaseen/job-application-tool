@@ -60,7 +60,7 @@ Reviewer: independent reviewer (separate session, laptop checkout)
 
 ### Environment
 
-- Working directory: `/Users/apple/Desktop/webapps/job-application-engine-handoff/job-application-engine` (matches the restored laptop checkout named in `LOCAL_SETUP.md`; not a remote/container environment).
+- Working directory: `<repository>` (matches the restored laptop checkout named in `LOCAL_SETUP.md`; not a remote/container environment).
 - OS: Darwin 22.6.0 (macOS 13.6.x), architecture `x86_64` (`Umars-MBP`).
 - `git status --short --branch`: `## task/001-project-bootstrap`, clean working tree. `HEAD` = `b2fce650ad2dfec53a38051f46423eee31c09d42`, matching the supplied "latest review documentation" commit.
 
@@ -70,7 +70,7 @@ Reviewer: independent reviewer (separate session, laptop checkout)
 
 ### Tooling resolution
 
-`command -v uv` failed in the review shell (`uv` not on `PATH`), matching the prior reviewer's blocker. Inspection of standard install locations found a working executable at `/Users/apple/.local/bin/uv` (version `0.12.13 (0ebbd9274 2026-09-10 x86_64-apple-darwin)`, the same version the implementer recorded in `PROGRESS.md`). No provisioning, application-code, dependency, or lockfile change was needed; the absolute path was used directly for every command below. Root cause is a missing `PATH` entry in this interactive shell, not an absent installation.
+`command -v uv` failed in the review shell (`uv` not on `PATH`), matching the prior reviewer's blocker. Inspection of standard install locations found a working executable at `uv` (version `0.12.13 (0ebbd9274 2026-09-10 x86_64-apple-darwin)`, the same version the implementer recorded in `PROGRESS.md`). No provisioning, application-code, dependency, or lockfile change was needed; the absolute path was used directly for every command below. Root cause is a missing `PATH` entry in this interactive shell, not an absent installation.
 
 ### Commands run (absolute `uv` path), exact output
 

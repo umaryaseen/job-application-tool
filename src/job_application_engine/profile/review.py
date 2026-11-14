@@ -19,6 +19,7 @@ from ..domain.fact import Fact
 from ..domain.profile import ProfileRevision
 from ..domain.variant import ApprovedVariant
 from ..verification.support import (
+    canonical_fact_payload,
     canonical_json,
     evidence_digest,
     sha256_text,
@@ -161,7 +162,7 @@ def record_human_review(
         support_digest = support_bundle_digest(evidence, bindings)
     elif target_type == "fact":
         fact = cast(Fact, target)
-        expected_content = canonical_json(fact.model_dump(mode="json", exclude={"approval"}))
+        expected_content = canonical_json(canonical_fact_payload(fact))
         evidence, bindings = _support_for_fact(profile, fact)
         support_digest = support_bundle_digest(evidence, bindings)
     else:

@@ -20,5 +20,7 @@ Date: 2026-09-08. These records make report disagreements explicit. Foundation d
 | [ADR-014](ADR-014.md) | Vertical slices and scope | ACCEPTED FOR PLANNING |
 | [ADR-015](ADR-015.md) | Local security and rendering isolation | ACCEPTED FOR PLANNING |
 | [ADR-016](ADR-016.md) | Application sources and submission boundary | ACCEPTED FOR PLANNING — NO MVP SUBMISSION |
-| [ADR-017](ADR-017.md) | Current workflow, task-scoped docs and CI platform | ACCEPTED — integrated in merged PR #1 |
-| [ADR-018](ADR-018.md) | Independent draft JD intake before personal acceptance | ACCEPTED — bounded sequencing decision only |
+| [ADR-017](ADR-017.md) | Typed responsibility and project claims for M1 | PROPOSED — IMPLEMENTATION CLEARED BY INDEPENDENT REVIEW |
+| [ADR-018](ADR-018.md) | Applicant-facing baseline presentation projection | PROPOSED — INDEPENDENT REVIEW REQUIRED |
+| [ADR-019](ADR-019.md) | Current workflow, task-scoped docs and CI platform | ACCEPTED — integrated in merged PR #1 |
+| [ADR-020](ADR-020.md) | Independent draft JD intake before personal acceptance | ACCEPTED — bounded sequencing decision only |

@@ -10,6 +10,7 @@ from ..domain.profile import ProfileRevision
 from ..profile.review import LocalReviewReceipt
 from ..verification.document import validate_document_plan
 from ..verification.support import EvidenceKey
+from .presentation import present_plan
 
 
 def render_text(
@@ -20,10 +21,14 @@ def render_text(
     support_captures: Mapping[EvidenceKey, bytes | bytearray | Path] | None = None,
 ) -> str:
     validate_document_plan(plan, profile, reviews=reviews, support_captures=support_captures)
-    blocks = [
-        "\n".join([section.label, *(line.text for line in section.lines)])
-        for section in plan.sections
-    ]
+    blocks: list[str] = []
+    for section in present_plan(plan, profile):
+        lines = [
+            (f"• {line.text}" if line.style == "bullet" else line.text)
+            for line in section.lines
+            if line.style != "page-break"
+        ]
+        blocks.append("\n".join(([section.label] if section.label else []) + lines))
     return "\n\n".join(blocks) + "\n"
 
 

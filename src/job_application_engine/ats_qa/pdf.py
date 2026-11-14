@@ -9,11 +9,17 @@ import subprocess
 import sys
 import tempfile
 import xml.etree.ElementTree as ET
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any
 
+from ..domain.profile import ProfileRevision
+from ..profile.review import LocalReviewReceipt
+from ..profile.validation import validate_profile
+from ..verification.document import _required_identity, profile_digest
+from ..verification.support import EvidenceKey, fact_digest
 from .expected import ExpectedDocument
 from .report import QACheck, QAReport, QAStatus, VisualReview, overall_status
 from .text import normalize_extracted_text
@@ -96,14 +102,27 @@ def _coverage(found: int, total: int) -> dict[str, int | float | None]:
 def _text_checks(text: str, expected: ExpectedDocument) -> dict[str, tuple[bool, Any, Any]]:
     actual = normalize_extracted_text(text)
     wanted = normalize_extracted_text(expected.ordered_text)
-    positions = [actual.find(section.label) for section in expected.sections]
-    headings_ok = all(p >= 0 for p in positions) and positions == sorted(set(positions))
+    positions: list[int] = []
+    for section in expected.sections:
+        if section.label == "Contact" and not section.heading_visible:
+            positions.append(0)
+        else:
+            positions.append(actual.find(section.label))
+    visible_positions = [
+        position
+        for position, section in zip(positions, expected.sections, strict=True)
+        if section.heading_visible
+    ]
+    headings_ok = all(p >= 0 for p in visible_positions) and visible_positions == sorted(
+        set(visible_positions)
+    )
     entry_total = sum(len(section.entries) for section in expected.sections)
     found_entries = 0
     field_total = field_found = 0
     for index, section in enumerate(expected.sections):
         end = positions[index + 1] if index + 1 < len(positions) else len(actual)
-        block = actual[positions[index] + len(section.label) : end] if headings_ok else ""
+        start = positions[index] + (len(section.label) if section.heading_visible else 0)
+        block = actual[start:end] if headings_ok else ""
         cursor = 0
         for entry in section.entries:
             exact = normalize_extracted_text(entry.text)
@@ -200,6 +219,9 @@ def run_pdf_qa(
     *,
     report_path: str | Path,
     raster_dir: str | Path,
+    profile: ProfileRevision | None = None,
+    reviews: Sequence[LocalReviewReceipt] = (),
+    support_captures: Mapping[EvidenceKey, bytes | bytearray | Path] | None = None,
 ) -> QAReport:
     """Measure a local generated PDF against a separately curated oracle.
 
@@ -218,6 +240,15 @@ def run_pdf_qa(
     output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     rasters.mkdir(parents=True, mode=0o700)
     checks: list[QACheck] = []
+    trusted_identity = None
+    identity_fact = None
+    if profile is not None:
+        try:
+            validate_profile(profile, reviews=reviews, support_captures=support_captures)
+            identity_fact = _required_identity(profile)
+            trusted_identity = identity_fact.value.value
+        except (ValueError, TypeError) as error:
+            raise ValueError(f"trusted profile identity is invalid: {error}") from error
 
     def add(
         check_id: str,
@@ -281,7 +312,13 @@ def run_pdf_qa(
                 result.output, expected
             ).items():
                 status: QAStatus = (
-                    ("pass" if passed else "fail") if result.status == "pass" else result.status
+                    (
+                        "not_checked"
+                        if check_id == "required_identity" and trusted_identity is None
+                        else ("pass" if passed else "fail")
+                    )
+                    if result.status == "pass"
+                    else result.status
                 )
                 add(
                     f"{check_id}_{name}",
@@ -292,6 +329,29 @@ def run_pdf_qa(
                     tool_version,
                     result.diagnostic,
                 )
+            identity_status: QAStatus
+            identity_measured: Any = None
+            identity_expected: Any = None
+            if trusted_identity is None:
+                identity_status = "not_checked"
+                identity_expected = "trusted profile identity"
+            elif result.status != "pass":
+                identity_status = result.status
+                identity_expected = trusted_identity
+            else:
+                normalized_identity = normalize_extracted_text(trusted_identity)
+                identity_measured = result.output.count(normalized_identity)
+                identity_expected = {"exactly": 1, "value": trusted_identity}
+                identity_status = "pass" if identity_measured == 1 else "fail"
+            add(
+                f"required_identity_{name}",
+                identity_status,
+                identity_measured,
+                identity_expected,
+                name,
+                tool_version,
+                result.diagnostic,
+            )
 
         pages = inspected.get("pages", [])
         add(
@@ -401,6 +461,12 @@ def run_pdf_qa(
         report_version="1.0",
         artifact_sha256=digest,
         artifact_path=str(pdf),
+        profile_id=profile.profile_id if profile else None,
+        profile_revision=profile.revision if profile else None,
+        profile_digest=profile_digest(profile) if profile else None,
+        identity_fact_id=identity_fact.fact_id if identity_fact else None,
+        identity_revision=identity_fact.revision if identity_fact else None,
+        identity_digest=fact_digest(identity_fact) if identity_fact else None,
         overall_status=overall_status(checks, visual),
         checks=checks,
         visual_review=visual,

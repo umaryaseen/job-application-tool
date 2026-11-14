@@ -15,12 +15,12 @@ The implementation-to-documentation delta is documentation-only (`docs/PROGRESS.
 ## Verification
 
 - `git status --short --branch`, `git rev-parse`, ancestry and `git diff --name-status d842707..b04e4f2`: passed; clean state, exact identities, descendant, documentation-only delta.
-- `/Users/apple/.local/bin/uv sync --locked`: passed.
-- `/Users/apple/.local/bin/uv run python --version`: Python 3.12.14.
-- `/Users/apple/.local/bin/uv run pytest`: **28 passed**.
-- `/Users/apple/.local/bin/uv run ruff check .`: passed.
-- `/Users/apple/.local/bin/uv run ruff format --check .`: passed (28 files already formatted).
-- `/Users/apple/.local/bin/uv run mypy src`: passed, no issues in 21 source files.
+- `uv sync --locked`: passed.
+- `uv run python --version`: Python 3.12.14.
+- `uv run pytest`: **28 passed**.
+- `uv run ruff check .`: passed.
+- `uv run ruff format --check .`: passed (28 files already formatted).
+- `uv run mypy src`: passed, no issues in 21 source files.
 - Generated synthetic baseline text at `tests/fixtures/documents/baseline.txt` inspected; German UTF-8 characters and explicit ongoing/unknown dates are preserved.
 
 No findings or limitations remain.

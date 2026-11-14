@@ -22,9 +22,9 @@ Corrective task: execute the three commands in a fresh external synthetic `JAE_D
 ## Independent verification
 
 - Commit identities, ancestry, clean state, and documentation-only tail: passed.
-- `/Users/apple/.local/bin/uv sync --locked`: passed; Python 3.12.14.
+- `uv sync --locked`: passed; Python 3.12.14.
 - Persistent full `uv run pytest -q`: exit 0, **80 passed** (run completed in approximately 76 seconds).
-- `/Users/apple/.local/bin/uv run python tests/reproduce_task008.py`: exit 0; synthetic API workflow produced matching manifest/approval digests and exact export bytes.
+- `uv run python tests/reproduce_task008.py`: exit 0; synthetic API workflow produced matching manifest/approval digests and exact export bytes.
 - Ruff check and format: passed (55 files formatted); mypy: passed, no issues in 35 source files.
 - Schema/provenance/QA regressions and A28–A29 tamper/interruption/eligibility tests were included in the 80-test suite and passed.
 
