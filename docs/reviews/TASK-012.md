@@ -281,3 +281,61 @@ PDF renderer tests were not run, as instructed.
 The FILLER matrix confirms that this is not limited to one word: every tested FILLER token placed before an unknown operand after `A degree` remained inside the unreviewed education span. The same coverage rule works for ordinary technology conditions, so the defect is localized to education span construction.
 
 Required follow-up: constrain education, field-alternative, and degree/equivalent spans to the explicitly interpreted grammar; leave trailing or unsupported words outside those spans so they trigger review. Add regressions for the reproductions above, then rerun the focused suite, static checks, fixture digest, and adversarial probes.
+
+---
+
+## Round 5 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `d30ecc7` plus a
+  dedicated temporary directory, no network, session
+  `01a1dad6-b95f-7522-85cc-8a4729064828`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-5 report follows verbatim.
+
+## Round 5
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `b91ead615a465bae32b7ff17880f10c13303401c`
+- Candidate: `d30ecc796c5211db2daea3615b149077d0c6e555`
+- Candidate tree: `18791cc0a9636cc8e0432a6cae98749009f6b980`
+- Working tree: clean; no tracked files modified.
+
+### Commands
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git diff --stat/name-status b91ead6..d30ecc7` | 0 | Six paths; 225 additions, 37 deletions. Full corrective delta inspected. |
+| Focused pytest command from handoff | 0 | 270 passed, no skips |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir .../mypy` | 0 | No issues in 47 source files |
+| `git diff --check b91ead6..d30ecc7` | 0 | Clean |
+| `sha256sum tests/fixtures/requirements/classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| Final `git status --porcelain` | 0 | Clean |
+
+PDF renderer tests were not run, as instructed.
+
+### Probe outcomes
+
+- Eight F-11 reproductions all returned `condition=null` with review.
+- Four F-11 controls remained accepted.
+- Twenty-six nearby degree variants produced no exceptions; unsupported trailing terms were reviewed.
+- Forty F-01–F-10 regression cases remained review-required.
+- An 80-case OR/AND, punctuation, symbol and unknown-operand matrix produced zero unreviewed partial conditions.
+- Six duplicate-scope cases matched expected grouping.
+- Four exact 200,000-byte inputs completed or failed boundedly: classification in 0.410s and 0.609s; bounded `ExtractionError` in 0.211s and 0.459s.
+- The literal no-separator field rule behaved as documented: `ComputerSciencewith` remained one literal field, while a fifth separated field word required review.
+- Filler probes exposed the finding below. Ordinary filler controls such as `Strong Python skills` and `Hands-on experience with Docker` remained accepted.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-12 | blocking | `src/job_application_engine/extraction/groups.py:159-182, 406-437, 598-605` | `FILLER` is also used as `_FIELD_STOP`, and coverage exempts every filler word. A meaningful degree field composed of filler words is therefore dropped without review, producing a broader partial condition. | `Requirements\nA degree in formal language or equivalent experience.` returns `ANY["degree", "equivalent experience"]`, `review_reasons=[]`, and omits `formal language`. `A degree in formal language.` and `A degree in technical language.` return only `degree` with no review. |
+
+This violates the requirement that every meaningful operand be represented or sent to review. The implementation remains local, deterministic, source-bound, dependency-neutral, and documentation is otherwise faithful, including the generic TASK-009 pending note. Fix the filler-only field handling, add regressions for these cases, and repeat the focused checks and probes.
