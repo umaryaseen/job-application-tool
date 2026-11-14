@@ -12,7 +12,7 @@ ADR-020 permits TASK-010 private draft JD intake after the reviewed technical fo
 
 ADR-021 additionally permits implementation/review of source-only TASK-011–014
 on their existing technical dependencies while personal acceptance is open.
-Only TASK-011 is the current implementation task. M1/M2 release and
+TASK-011 is integrated; TASK-012 is the current implementation task. M1/M2 release and
 TASK-015 onward retain their existing gates; no career matching or artifact
 approval is authorized by draft JD analysis.
 

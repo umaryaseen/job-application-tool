@@ -1,0 +1,724 @@
+# TASK-012 independent implementation review
+
+## Round 1 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex, a separate agent session — `codex exec` (OpenAI Codex
+  v0.160.0, model `gpt-6.1-terra`, reasoning effort `xhigh`), sandbox
+  `workspace-write` limited to a throwaway detached checkout plus temporary
+  directories, no network, session `01a1da7b-cb48-7e92-8e7c-a0b8c840bf3c`.
+  Implementer: Claude Code (Claude Opus 5.5).
+- Candidate `f41df6b83fa0d48e5cd86b5675d9d155a4446429`, tree `de22bec2`. The
+  checkout's tracked files were unchanged afterwards (`git status`: only the
+  untracked report and `.review-tmp/` scratch). Process exit 0.
+- Harness note: the implementer's prompt placed pytest temporary data inside the
+  checkout, which the private-data-root policy correctly rejects; the reviewer
+  worked around it with a review-only `sitecustomize.py`. Later rounds use a
+  temporary directory outside the checkout.
+- The reviewer could not commit (sandbox blocks the worktree index), so the
+  implementer commits the report below verbatim.
+
+---
+
+VERDICT: CHANGES REQUIRED
+
+# TASK-012 independent implementation review
+
+- Reviewer: Codex, independent review session (not the implementer)
+- Date: 2026-11-14
+- Implementer: Claude Code
+- Base commit: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`; tree `5e02c63af4544dd489517b056c07ff37e2313704`
+- Fixture commit inspected: `2988f636`; fixture review `docs/reviews/TASK-012-FIXTURES.md` is already approved
+- Candidate commit: `f41df6b83fa0d48e5cd86b5675d9d155a4446429`; tree `de22bec2e3a536965f505fa982d26e9f6d7ffd63`
+- Scope: cumulative `f6a3bf0..f41df6b`, TASK-012 implementation, tests and documentation. No implementation files were modified during this review.
+
+## Commands and results
+
+All commands were run in the supplied detached checkout. The review read AGENTS.md, `docs/REVIEW_HANDOFF.md`, `docs/REVIEW_PROTOCOL.md`, `docs/PROGRESS.md`, TASK-012, A17–A19, ADR-007/011/021, the architecture requirement-model section, security/privacy guidance, JOB_EXTRACTION and the fixture README.
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Detached candidate checkout; only review scratch appeared later under `.review-tmp/`. |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate and tree matched the handoff. |
+| `git diff --stat f6a3bf0..f41df6b` / `git diff --name-status f6a3bf0..f41df6b` | 0 | Full cumulative diff inspected: 18 paths, including fixture commit, implementation, tests and docs; no dependency/lockfile change. |
+| `git diff f6a3bf0..f41df6b -- <affected files>` | 0 | Reviewed CLI, domain models, classification, grouping, priority, spans, rules, tests and docs. |
+| `.venv/bin/python -m pytest tests/test_requirement_classification.py tests/test_requirement_spans.py tests/test_ingestion.py -ra -p no:cacheprovider --basetemp=.review-tmp/pytest` | 1 | 193 collected: 24 passed, 169 failed because this sandbox places `tmp_path` inside the checkout and the intentional private-data-root policy rejects it. The failures were configuration-policy failures before behavior execution. |
+| `PYTHONPATH=.review-tmp .venv/bin/python -m pytest tests/test_requirement_classification.py tests/test_requirement_spans.py tests/test_ingestion.py -ra -p no:cacheprovider --basetemp=.review-tmp/pytest-harness` | 0 | 193 passed in 13.70s. The review-only `sitecustomize.py` patched repository-root detection so synthetic pytest data could exercise the implementation without changing tracked code or accessing private data. |
+| `.venv/bin/ruff check .` | 0 | All checks passed. |
+| `.venv/bin/ruff format --check .` | 0 | 77 files already formatted. |
+| `.venv/bin/mypy src --cache-dir .review-tmp/mypy` | 0 | No issues in 47 source files. |
+| `git diff --check f6a3bf0..f41df6b` | 0 | No whitespace errors. |
+| `git add docs/reviews/TASK-012.md` | 128 | The managed sandbox forbids writes to the linked worktree index (`.git/worktrees/.../index.lock`); the requested report file is present, but cannot be committed from this checkout. |
+| `PYTHONPATH=src:.review-tmp .venv/bin/python .review-tmp/adversarial.py` | 0 | 20 semantic cases, Unicode/parity checks, 3 tamper checks, hostile/large input checks and 2 CLI error checks completed. |
+| `PYTHONPATH=src:.review-tmp .venv/bin/python .review-tmp/probe_partial.py` | 0 | 10 alternative/unknown-operand probes; exposed silent partial conditions. |
+| `PYTHONPATH=src:.review-tmp .venv/bin/python .review-tmp/probe_thresholds.py` | 0 | 17 threshold probes; exposed the raw out-of-range validation error and silent large-number omission. |
+| `PYTHONPATH=src:.review-tmp .venv/bin/python .review-tmp/probe_duplicates.py` | 0 | 4 duplicate-context probes; exposed cross-heading duplicate grouping. |
+| `PYTHONPATH=src:.review-tmp .venv/bin/python .review-tmp/probe_tamper.py` | 0 | Relabel, split, invented-span and forged-digest cases were rejected. |
+| `PYTHONPATH=src:.review-tmp .venv/bin/python .review-tmp/probe_dense.py` | 0 | Five 199,000-byte dense cases completed in 0.17–0.41s; annotation-limit cases raised bounded `ExtractionError`, unsupported grammar remained reviewable. |
+| `PYTHONPATH=src:.review-tmp .venv/bin/python .review-tmp/probe_cli999.py` | 0 | The subprocess returned exit 2 for an out-of-range duration, but emitted raw Pydantic validation details (see F-03). |
+| Scope/dependency/network scans with `rg` and diff inspection | 0 | No new dependency, provider, persistence, matching, tailoring, alias/normalization, correction-version or renderer feature was added; classifier and extraction paths perform no network or posting execution. |
+
+PDF renderer tests were not run. They require nested macOS `sandbox-exec`, Poppler and pinned Typst assets that cannot run inside this sandbox; hosted CI is the appropriate check for that separate renderer path.
+
+## Probe outcomes
+
+- Preferred headings and marker scopes did not produce `mandatory`; explicit mandatory text under a preferred scope became `unspecified` with review, and marker scope ended at the next heading.
+- Recognized English and German not-required forms stayed `requirement_negated`; unsupported negation stayed `unsupported` and review-required.
+- Supported nested `ANY`/`ALL`, degree-or-equivalent, CEFR and integer threshold examples matched the approved oracle.
+- CRLF, BOM, combining marks and emoji quotes/signals round-tripped exactly; saved `job-extract` and `job-classify` results matched direct extraction/classification and did not mutate the synthetic job files.
+- Recomputed classification digests did not authorize relabelled, split or invented rows.
+- Dense 200,000-byte-class inputs stayed bounded or failed with `ExtractionError`; no hostile text executed and no socket was opened.
+
+## Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-01 | blocking | `src/job_application_engine/extraction/groups.py:277-319`, `:512-523` | Unsupported alternatives with an unrecognized operand can yield a supported partial condition with no review. Slash detection only runs between two recognized atoms, and a comma-only/unknown-operand gap has no connective for the final safety pass. This violates the documented rule that unsupported alternatives remain review-required and are never partially kept. | Synthetic source `Requirements ⏎ Python / Rust is required.` (or `Python / QuuxDB`) returns `condition=Python`, `review_reasons=[]`. `Requirements ⏎ Python, QuuxDB is required.` does the same. Both operands are not fully represented by the extracted signals. |
+| F-02 | blocking | `src/job_application_engine/extraction/groups.py:323-363` | The education shortcut can consume a later `or a related/similar field` after the equivalent branch and emit only the first two alternatives without review. The third OR is treated as a field qualifier even though it follows `equivalent experience`, contrary to the all-connectives-accounted invariant. | `Requirements ⏎ A degree or equivalent experience or a related field.` returns an `ANY` group `degree / equivalent experience`, `needs_review=false`, with the trailing alternative omitted. `... or similar field.` behaves the same. |
+| F-03 | blocking | `src/job_application_engine/extraction/groups.py:366-407`; `src/job_application_engine/domain/requirement.py:132-167` | Out-of-range integer durations are not converted to a bounded review outcome. A three-digit value such as 999 reaches `Threshold(value=999)` even though the model limit is 99 and raises raw `pydantic_core.ValidationError`; a four-digit value such as 1000 is not extracted at all and can leave a bare `Python` condition with no review. The CLI returns 2 but exposes the raw validator detail. | `Requirements ⏎ 999 years of Python experience.` raises `ValidationError: value Input should be less than or equal to 99`. `Requirements ⏎ 1000 years of Python experience.` returns no threshold and no review. |
+| F-04 | blocking | `src/job_application_engine/extraction/classification.py:87-126` | Duplicate grouping ignores source heading/section identity. Identical text and qualifiers under different headings are grouped as duplicates, despite the fixture README explicitly requiring that same text under different headings not be merged. | `Requirements ⏎ - Python is required. ⏎ Qualifications ⏎ - Python is required.` produces one duplicate group containing both rows (`[[0, 1]]`). The rows retain spans, but the duplicate classification is wrong and can distort later requirement counts. |
+
+## Architecture, security and acceptance assessment
+
+The implementation stays within TASK-012’s intended source-only boundary: output is draft, revision/hash/extraction-bound, read-only, deterministic, and does not access profiles, providers, persistence or the network. The exact candidate rows and spans are structurally checked, and the forged-digest probes confirm that deterministic reclassification rejects relabelled or invented content. Static checks and the focused suite pass when run with the review-only data-root harness.
+
+The four blocking findings violate core A18/A19 acceptance and the handoff’s explicit safety invariants: unsupported alternatives may become hard partial conditions, a supported group may omit a visible alternative, malformed numeric input can escape as an unbounded internal validation error, and duplicate semantics do not match the independently approved fixture rules. The candidate therefore requires a narrow corrective implementation and a new independent review.
+
+## Required follow-up
+
+- Fix F-01 by treating every separator/alternative candidate, including unknown operands and bare slash/comma forms, as accounted only when the complete clause is represented; otherwise emit `condition=null` with review.
+- Fix F-02 by rejecting or reviewing any extra connective after the degree/equivalent pair instead of attaching it to the first degree term.
+- Fix F-03 by detecting out-of-range/oversized numeric literals, returning a bounded `ExtractionError` or explicit review result, and keeping CLI diagnostics sanitized and bounded.
+- Fix F-04 by incorporating heading/section context into duplicate equivalence or deriving duplicate groups from the extraction’s section identity; preserve each source span.
+
+The corrective commit should rerun the focused suite, Ruff, format, mypy, diff-check and these adversarial probes before returning for independent review.
+
+---
+
+## Round 2 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `fbc4c97` plus a
+  dedicated temporary directory, no network, session
+  `01a1da93-7347-7e43-b38f-0c2461886496`. Checkout tracked files unchanged; exit 0.
+- Pytest used a temporary directory outside the checkout (no policy workaround).
+
+The reviewer's round-2 report follows verbatim.
+
+## Round 2
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Round-1 head: `f41df6b83fa0d48e5cd86b5675d9d155a4446429`
+- Candidate: `fbc4c970854e77a9b3957439da7d1a600bb0f69c`
+- Candidate tree: `22baf8e8a58c58e79ef22b2bde663e06a3c20518`
+- Corrective delta inspected in full: 8 paths, 678 diff lines. Working tree remained clean.
+
+### Commands
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Clean detached checkout |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate/tree matched handoff |
+| `git diff f41df6b..fbc4c97` | 0 | Full corrective delta inspected |
+| Focused pytest command from handoff | 0 | **221 passed** |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir ...` | 0 | No issues in 47 source files |
+| `git diff --check f41df6b..fbc4c97` | 0 | Clean |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| `probe_round2.py` | 0 | 49 cases, no exceptions |
+| Numeric, education, connector, cue, CEFR and scope probes | 0 | 94 cases total, no raw exceptions |
+| 200,000-byte dense probe | 0 | 4 bounded `ExtractionError` results; one classified in 0.547s |
+| CLI sanitization probe | 0 | 4 cases; no raw Pydantic diagnostics |
+
+PDF/renderer tests were not run, as instructed.
+
+### Probe outcomes
+
+- F-01 reproductions and nearby slash, pipe, ampersand, plus, comma and semicolon variants now produce `condition=null` with review.
+- F-02 trailing related-field alternatives now remain review-required.
+- F-03 round-1 values (`999`, `1000`, `10,000`, `3yrs`, leading zeros and decimals) produce no threshold and require review; CLI output is sanitized.
+- F-04 duplicate groups now respect heading and marker scope. Same-scope duplicates still group correctly.
+- Controls for `CI/CD`, `C++`, `Ideally, Python`, `Python, preferably`, and supported conjunctions passed without false review.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-05 | blocking | `src/job_application_engine/extraction/groups.py:376-482,443-456,520-565` | Unsupported or uncaptured threshold text can be omitted or interpreted without review, and malformed scopes can be emitted as valid. | `six years of Python experience.` → `condition=Python`, no threshold, no review. `1000-year Python experience.` and `3-year Python experience.` behave the same. `3 years minimum of Python experience.` → unqualified threshold with no review. `English C2 minimum.` → unqualified C2 with no review. `3 years of.` → scope `of`, no review. |
+| F-06 | blocking | `src/job_application_engine/extraction/groups.py:332-373,569-581` | The education shortcut still bypasses comma/semicolon continuation checks, allowing trailing unknown operands to be dropped. | `A degree; QuuxDB is required.` → `condition=degree`, no review. `A degree or a related field; QuuxDB is required.` and `Bachelor's degree or equivalent experience; QuuxDB is required.` also return supported conditions without review. |
+| F-07 | blocking | `src/job_application_engine/extraction/groups.py:575-612` | Unknown operands after a recognized term can remain a single-term condition when separated by unsupported filler or punctuation. | `Python plus QuuxDB is required.`, `Python with QuuxDB is required.`, `Python but QuuxDB is required.`, `Python: QuuxDB is required.`, and `Python, preferably; QuuxDB.` all return `condition=Python` without review. |
+| F-08 | blocking | `docs/PROGRESS.md:40-52` | The corrective documentation adds applicant-specific private revision details to the tracked TASK-009 state note. This conflicts with the required sanitized note and the repository privacy policy. | The note includes applicant CV revision metadata, a payload count, and a profile degree/date defect. Replace with a generic pending-review state without applicant-specific facts. |
+
+The corrective code remains source-only, deterministic, revision-bound, dependency-neutral and bounded on dense inputs. The fixture oracle is byte-identical. F-05–F-08 remain unresolved correctness/privacy defects, so the candidate requires another narrow corrective commit and independent re-review.
+
+---
+
+## Round 3 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `2f43f4f` plus a
+  dedicated temporary directory, no network, session
+  `01a1daac-aee9-7e32-a0a1-569cf6a223aa`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-3 report follows verbatim, except that five header lines ending in
+Markdown hard-break spaces were turned into list items for whitespace checks.
+
+## Round 3
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Corrective base: `fbc4c970854e77a9b3957439da7d1a600bb0f69c`
+- Candidate: `2f43f4f2aa370f4e8b1c20ea358d01aab5fa3ba7`
+Candidate tree: `4d59b1a5fcf27b5ab0ce1060d254dfe60df9ef60`
+
+VERDICT: CHANGES REQUIRED
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Clean detached checkout |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate/tree matched handoff |
+| Full corrective `git diff fbc4c97..2f43f4f` | 0 | 7 paths, 481 patch lines, 271 additions/35 deletions; fully inspected |
+| Focused pytest command | 0 | 249 passed, no skips |
+| `.venv/bin/ruff check --no-cache .` | 0 | No violations |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir ...` | 0 | 47 source files, no issues |
+| `git diff --check fbc4c97..2f43f4f` | 0 | Clean |
+| `sha256sum ...classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 ...classification.json` | 0 | Expected digest `16b05e8f...5b18d1` |
+| Final `git status --short --branch` | 0 | Clean; no tracked files modified |
+
+PDF renderer tests were not run, as instructed.
+
+### Probe outcomes
+
+- Round-1 F-01/F-02/F-03/F-04 reproductions passed: unsupported alternatives remained `condition=null` with review; malformed durations produced no threshold; duplicate groups respected heading/marker scope.
+- `probe_semantics.py`: 74 cases, zero exceptions.
+- Unknown-operand matrix: 126 variants, zero unreviewed partial conditions.
+- Filler matrix: 14 generic descriptor words; none hid a named operand.
+- Education probes: 32 cases, zero exceptions.
+- Dense probes: exact 200,000-byte inputs completed in 0.18–0.36s or raised bounded `ExtractionError`.
+- CLI probe: one reviewed out-of-range result and four sanitized exit-2 failures; no traceback, Pydantic diagnostics or private paths.
+- `docs/PROGRESS.md` now has a generic TASK-009 pending note.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-09 | blocking | `src/job_application_engine/extraction/groups.py:420-426,465-472,671-687` | Unsupported threshold operators appearing after the scoped phrase, or outside the operator lexicon, can leave a structured `unqualified` threshold. Coverage adds review but does not remove the invalid threshold, contradicting the documented rule that unsupported operators create no threshold. | `3 years of Python experience minimum.` → threshold `unqualified`, value `3`, scope `Python experience minimum`, `condition=null`, review only `uninterpreted_text`. `English B2 level minimum.` similarly emits an unqualified B2 threshold. `About at least 3 years of Python experience.` emits `gte=3` despite contradictory unsupported text. |
+| F-10 | non-blocking | `src/job_application_engine/extraction/groups.py:532-539` | The conservative coverage rule flags reasonable prose such as `Experience building REST APIs with Python.` as `uninterpreted_text`, withholding the condition for review. This is documented and does not create a partial condition. | Result is `condition=null`, `needs_review=true`; intended false alarm, with no hidden named operand. |
+
+F-01–F-08 are otherwise fixed, and the implementation remains deterministic, local, revision-bound, dependency-neutral and bounded. F-09 must be corrected and independently re-reviewed before approval.
+
+---
+
+## Round 4 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `b91ead6` plus a
+  dedicated temporary directory, no network, session
+  `01a1dabd-6d4c-7272-9c8f-fd8f93d3131b`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-4 report follows verbatim.
+
+## Round 4
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Corrective base: `2f43f4f2aa370f4e8b1c20ea358d01aab5fa3ba7`
+- Candidate: `b91ead615a465bae32b7ff17880f10c13303401c`
+- Candidate tree: `0acd2740cd63a2329bb382b9674d52c351fa5ac1`
+- Full corrective delta inspected: 6 paths, 146 insertions, 10 deletions.
+- Artifacts read: `AGENTS.md`, `docs/REVIEW_HANDOFF.md`, rounds 1–3 of `docs/reviews/TASK-012.md`, `docs/REVIEW_PROTOCOL.md`, `docs/PROGRESS.md`, `docs/JOB_EXTRACTION.md`, TASK-012, A17–A19, ADR-007/011/021, architecture/security guidance, and the fixture README.
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Clean detached checkout |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate and tree matched handoff |
+| `git diff 2f43f4f..b91ead6` | 0 | Full corrective delta inspected |
+| Focused pytest command from handoff | 0 | 258 passed, no skips, 32.99s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files already formatted |
+| `.venv/bin/mypy src --cache-dir .../mypy` | 0 | No issues in 47 source files |
+| `git diff --check 2f43f4f..b91ead6` | 0 | Clean |
+| `sha256sum tests/fixtures/requirements/classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest `16b05e8f...5b18d1` |
+| `probe_round4.py` | 0 | 768 unknown-operand variants; 0 false negatives. 11 education cases; 8 unreviewed conditions. 151 FILLER entries tested: 0 hidden after Python, 151 hidden after education. 23 threshold cases, 6 duplicate-scope cases, 6 large-input cases; no raw exceptions. |
+| `probe_f11.py` | 0 | 8 direct reproductions of the new education-span defect |
+| `probe_numeric_scope.py` | 0 | 18 numeric/scope variants, no exceptions |
+| `probe_cli_round4.py` | 0 | 3 CLI cases: reviewed `999`-year input, reviewed stray operator, sanitized tamper failure |
+| Final `git status --short --branch` | 0 | Clean; no tracked files modified |
+
+PDF renderer tests were not run, as instructed.
+
+### Probe outcomes
+
+- F-01–F-08 reproductions and nearby variants remain fixed.
+- F-09 reproductions and nearby unsupported operators produce no thresholds and require review; accepted operators retain thresholds.
+- Duplicate grouping respects heading and marker scope.
+- Reasonable FILLER controls such as `Strong Python skills`, `Solid knowledge of SQL`, and `Hands-on experience with Docker` remain accepted. The documented conservative F-10 case still requires review.
+- Large inputs completed in 0.117–0.454s or raised bounded `ExtractionError`; the 150,021-byte CEFR-limit case raised a bounded error in 2.665s.
+- `docs/PROGRESS.md` contains a generic TASK-009 pending note without applicant-specific facts. Documentation matches the F-09 behavior.
+- No new dependency, network, persistence, profile access, or out-of-scope feature was introduced.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-11 | blocking | `src/job_application_engine/extraction/groups.py:379-421, 649-708` | The education shortcut makes the `education` condition span from the first education signal through nearly the entire clause. Because `_uninterpreted` treats the complete condition span as interpreted, arbitrary trailing words, unsupported separators, and unknown operands bypass the coverage rule. This violates A19’s requirement that unsupported grammar remain review-required and permits a partial education condition with `needs_review: false`. | `Requirements\nA degree in Computer Science with Rust experience.` returns condition `education("degree in Computer Science with Rust experience")`, no review. `A degree in Computer Science plus QuuxML.`, `A degree, QuuxML.`, and `A degree or a related field plus QuuxML.` behave likewise. The equivalent branch also hides text: `A degree in Computer Science with Rust experience or equivalent practical experience.` returns an unreviewed `ANY` group. |
+
+The FILLER matrix confirms that this is not limited to one word: every tested FILLER token placed before an unknown operand after `A degree` remained inside the unreviewed education span. The same coverage rule works for ordinary technology conditions, so the defect is localized to education span construction.
+
+Required follow-up: constrain education, field-alternative, and degree/equivalent spans to the explicitly interpreted grammar; leave trailing or unsupported words outside those spans so they trigger review. Add regressions for the reproductions above, then rerun the focused suite, static checks, fixture digest, and adversarial probes.
+
+---
+
+## Round 5 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `d30ecc7` plus a
+  dedicated temporary directory, no network, session
+  `01a1dad6-b95f-7522-85cc-8a4729064828`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-5 report follows verbatim.
+
+## Round 5
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `b91ead615a465bae32b7ff17880f10c13303401c`
+- Candidate: `d30ecc796c5211db2daea3615b149077d0c6e555`
+- Candidate tree: `18791cc0a9636cc8e0432a6cae98749009f6b980`
+- Working tree: clean; no tracked files modified.
+
+### Commands
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git diff --stat/name-status b91ead6..d30ecc7` | 0 | Six paths; 225 additions, 37 deletions. Full corrective delta inspected. |
+| Focused pytest command from handoff | 0 | 270 passed, no skips |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir .../mypy` | 0 | No issues in 47 source files |
+| `git diff --check b91ead6..d30ecc7` | 0 | Clean |
+| `sha256sum tests/fixtures/requirements/classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| Final `git status --porcelain` | 0 | Clean |
+
+PDF renderer tests were not run, as instructed.
+
+### Probe outcomes
+
+- Eight F-11 reproductions all returned `condition=null` with review.
+- Four F-11 controls remained accepted.
+- Twenty-six nearby degree variants produced no exceptions; unsupported trailing terms were reviewed.
+- Forty F-01–F-10 regression cases remained review-required.
+- An 80-case OR/AND, punctuation, symbol and unknown-operand matrix produced zero unreviewed partial conditions.
+- Six duplicate-scope cases matched expected grouping.
+- Four exact 200,000-byte inputs completed or failed boundedly: classification in 0.410s and 0.609s; bounded `ExtractionError` in 0.211s and 0.459s.
+- The literal no-separator field rule behaved as documented: `ComputerSciencewith` remained one literal field, while a fifth separated field word required review.
+- Filler probes exposed the finding below. Ordinary filler controls such as `Strong Python skills` and `Hands-on experience with Docker` remained accepted.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-12 | blocking | `src/job_application_engine/extraction/groups.py:159-182, 406-437, 598-605` | `FILLER` is also used as `_FIELD_STOP`, and coverage exempts every filler word. A meaningful degree field composed of filler words is therefore dropped without review, producing a broader partial condition. | `Requirements\nA degree in formal language or equivalent experience.` returns `ANY["degree", "equivalent experience"]`, `review_reasons=[]`, and omits `formal language`. `A degree in formal language.` and `A degree in technical language.` return only `degree` with no review. |
+
+This violates the requirement that every meaningful operand be represented or sent to review. The implementation remains local, deterministic, source-bound, dependency-neutral, and documentation is otherwise faithful, including the generic TASK-009 pending note. Fix the filler-only field handling, add regressions for these cases, and repeat the focused checks and probes.
+
+---
+
+## Round 6 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `12221f7` plus a
+  dedicated temporary directory, no network, session
+  `01a1daea-32a9-7222-81ad-5a209f7e47be`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-6 report follows verbatim.
+
+## Round 6
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Candidate: `12221f750ad899a80f0ef309faef88f47edb2ec5`
+- Candidate tree: `1838ca18b0c00791fe43434d058b19a10cf7a056`
+- Working tree: clean; no tracked files modified.
+
+### Commands
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Detached candidate checkout, clean |
+| `git rev-parse HEAD` / `HEAD^{tree}` | 0 | Candidate/tree matched handoff |
+| `git diff --stat/name-status d30ecc7..12221f7` | 0 | 6 paths; 204 additions, 34 deletions |
+| Full corrective diff capture | 0 | 374 lines, 20,361 bytes; inspected in full |
+| Focused pytest command | 0 | 281 passed in 34.09s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir .../mypy` | 0 | No issues in 47 source files |
+| `git diff --check d30ecc7..12221f7` | 0 | Clean |
+| `sha256sum .../classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 .../classification.json` | 0 | Expected digest matched |
+| Final `git status --short --branch` | 0 | Clean |
+
+PDF renderer tests were not run, as instructed.
+
+### Probe outcomes
+
+- F-01–F-11 reproductions and nearby variants remained review-required. Symbol, punctuation, unknown-operand, threshold, duplicate-scope, and degree-tail controls behaved as recorded.
+- F-12 direct cases now preserve `formal language`, `technical language`, and German descriptive fields.
+- A 1,872-case alternative/unknown-operand matrix found 24 unreviewed unknown cases; all were the degree-field defect below. No technology-only partial conditions remained.
+- 142 FILLER entries were exercised across 568 cases; 98 could participate in hiding `QuuxDB` inside a degree field.
+- Four exact 200,000-byte inputs completed or raised bounded `ExtractionError` in 0.128–0.399s. No raw exceptions or slow paths occurred.
+- Eight of eleven reasonable filler controls were accepted. `Spoken German` and `Written German` were conservatively sent to review without hiding a condition.
+- `docs/PROGRESS.md` retains a generic TASK-009 pending note. No new dependency, network access, persistence, profile access, or out-of-scope feature was introduced.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-13 | blocking | `src/job_application_engine/extraction/groups.py:180-187,443-475,636-643` | After removing global FILLER treatment, `_FIELD_STOP` omits function/connective words such as `but` and `also` (and German `aber`/`auch`). The degree parser consumes those words and an unknown following operand as a four-word field. The condition span then covers the operand, so coverage cannot require review. | `Requirements\nA degree in Computer Science but QuuxDB is required.` returns condition `degree in Computer Science but QuuxDB` with no review. `Studium der Informatik aber QuuxDB ist erforderlich.` behaves the same. |
+| F-14 | non-blocking | `src/job_application_engine/extraction/groups.py:146-180,636-643` | The new conservative coverage rule produces false alarms for reasonable prose involving content descriptors that are no longer global filler. | `Requirements\nSpoken German.` and `Written German.` return no condition with `uninterpreted_text`; no meaning is hidden. |
+
+F-13 violates the requirement that unsupported operands and grammar remain review-required. Add missing function/connective boundaries and regression tests for English and German variants, then repeat the focused checks and probes.
+
+---
+
+## Round 7 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `faee434` plus a
+  dedicated temporary directory, no network, session
+  `01a1dafe-8d5a-7053-8c37-062dd97dac63`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-7 report follows verbatim.
+
+## Round 7
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation review session
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Candidate: `faee434c498789f964c189393ef6ceefc3595f7e`
+- Candidate tree: `bf154850fb18763c55b109af83c485505341b61a`
+- Corrective delta: `12221f7..faee434`
+- Working tree: clean; probes and scratch data stayed under the designated temporary directory.
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Detached candidate checkout, clean |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate and tree matched handoff |
+| `git diff --stat/name-status 12221f7..faee434` | 0 | 6 paths; 152 insertions, 21 deletions |
+| Full `git diff 12221f7..faee434` inspection | 0 | Corrective code, tests and documentation inspected |
+| Focused pytest command from handoff | 0 | **291 passed** in 39.07s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir=.../mypy` | 0 | No issues in 47 source files |
+| `git diff --check 12221f7..faee434` | 0 | Clean |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| `probe_round7.py` | 0 | 96 semantic cases, 4 duplicate probes and 3 dense probes; no exceptions |
+| `probe_filler.py` | 0 | 852 filler cases, 0 exceptions; 8 unreviewed degree-field outputs |
+| `probe_matrix.py` | 0 | 960 unknown-operand/separator cases, 0 exceptions; unsafe outputs reduced to the same filler/link patterns |
+| `probe_threshold_suspicious.py` | 0 | 36 threshold/value/scope cases, 0 exceptions; malformed operators reviewed |
+| `probe_dense_exact.py` | 0 | Five exactly 200,000-byte inputs; 3 bounded `ExtractionError`s, 2 successful classifications, 0 raw exceptions; 0.108–0.281s |
+| Direct F-13/F-14/F-15 reproduction probe | 0 | 8 cases; F-13/F-14 expected outcomes confirmed and F-15 reproduced |
+| Final status, diff-check and fixture hash | 0 | Clean tree; digest unchanged |
+
+PDF renderer tests were not run, as instructed; they require nested `sandbox-exec` and hosted CI.
+
+### Probe outcomes
+
+- F-13’s four reproductions and 15 nearby degree/connective variants all returned `condition=null` with review.
+- F-14’s direct modifiers (`Spoken German`, `Written German`, `Verhandlungssicheres Deutsch`) now retain the language condition without review.
+- F-01–F-12 remain as recorded. The focused regression suite passed, and the alternative/unknown-operand matrix found no new technology-only partial conditions.
+- Duplicate grouping respected heading and marker scope. Same-scope duplicates grouped; identical text across headings did not.
+- Valid duration and CEFR controls retained typed thresholds. Out-of-range, malformed and unsupported operator forms required review. Reviewed rows may retain a literal source scope, but no unreviewed malformed threshold was found.
+- Dense 200,000-byte inputs remained bounded or completed quickly without raw exceptions.
+- The TASK-009 progress note is generic and contains no applicant-specific facts. The documentation describes the intended filler-stop and modifier rules.
+- No dependency, network, persistence, profile access or out-of-scope feature was added.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-15 | blocking | `src/job_application_engine/extraction/groups.py:149-163, 181-185, 469-478, 649-655` | `FILLER` entries containing `ß` are stored uncasefolded, while degree-field parsing compares `word.group().casefold()` against `_FIELD_STOP`. Thus `fließend`, `fließende` and `fließenden` do not stop a degree field. The field absorbs a following unrecognized operand, and coverage sees it as interpreted. This violates the rule that every filler word ends a degree field and allows an unsupported operand without review. | `Requirements\nA degree in Computer Science fließend QuuxDB.` returns `condition="degree in Computer Science fließend QuuxDB"`, `needs_review=false`, `review_reasons=[]`. The inflected forms behave the same. |
+| F-16 | non-blocking | `src/job_application_engine/extraction/groups.py:187-191, 649-655, 797-806` | Modifier coverage remains conservative for some reasonable language prose. No meaning is hidden, but common forms remain review-required because the modifier grammar is narrow. | `Native-level German.` and `Written and spoken German.` return no condition with review. This is a false alarm only; the rows do not produce partial conditions. |
+
+F-15 requires a narrow correction that normalizes filler comparisons consistently and adds regressions for all three `ß` forms. Then rerun the focused suite, static checks, fixture digest, and adversarial probes.
+
+---
+
+## Round 8 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `f5d65ee` plus a
+  dedicated temporary directory, no network, session
+  `01a1db14-6e76-7ad1-8a75-13f35f7db03e`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-8 report follows verbatim.
+
+## Round 8
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Candidate: `f5d65eea7edf397eafb4f753088dcd35f1d30056`
+- Candidate tree: `4488048e34045ecb42682bbcc1983d1a03e7a4c3`
+- Delta reviewed: `faee434c498789f964c189393ef6ceefc3595f7e..f5d65eea7edf397eafb4f753088dcd35f1d30056`
+- Working tree remained clean; all probes were outside the checkout.
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Detached candidate, clean |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate/tree matched handoff |
+| `git diff --stat/name-status faee434..f5d65ee` | 0 | 6 paths; 141 insertions, 18 deletions |
+| Full corrective diff inspection | 0 | Code, tests and documentation inspected |
+| Focused pytest command | 0 | **297 passed** in 35.84s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir …/codex-r8-tmp/mypy-final` | 0 | No issues in 47 source files |
+| `git diff --check faee434..f5d65ee` | 0 | Clean |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest matched: `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| `round8_probe.py` | 0 | 62 cases, 0 exceptions |
+| `regressions.py` | 0 | 26 F-01–F-16 regression cases, 0 exceptions |
+| `filler_outside.py` | 0 | All 142 FILLER words reviewed around `QuuxDB`; 0 unsafe, 0 exceptions |
+| `matrix.py` | 0 | 269 alternative/unknown-operand cases, 0 exceptions; no unsafe non-degree cases |
+| `dense_probe.py` | 0 | Six exact 200,000-byte inputs; 0 raw exceptions; bounded failures or completion in ~0.11–0.39s |
+| `operator_symbols.py`, `operator_postfix.py`, `negative_thresholds.py` | 0 | Symbol/sign threshold probes completed; exposed F-17 |
+
+PDF renderer tests were not run, as instructed; nested `sandbox-exec` is unavailable here.
+
+### Probe outcomes
+
+F-15 is fixed for `fließend`, `fließende`, `fließenden`, and valid uppercase/case-folded variants. Language controls such as `Fließend Deutsch`, `FLIESSEND Deutsch`, and `FLIEẞEND Deutsch` retain the language condition without review.
+
+F-01–F-14 reproductions remained consistent with prior reports: unsupported alternatives and operands require review; malformed thresholds do not produce unreviewed structured thresholds; duplicate grouping stays within heading/marker scope; valid formal-language degree fields remain represented; F-13 connective tails require review; F-14 direct written/spoken modifiers remain covered.
+
+All 142 actual FILLER entries caused review when placed between `Python` and `QuuxDB`. The remaining no-review unknown-token cases were the documented literal ≤4-word degree-field grammar; fifth-word, filler, connective and punctuation variants were reviewed.
+
+Coverage false alarms remain nonblocking and meaning-preserving: `Native-level German`, `Written and spoken German`, `Python with Docker experience`, and similar unsupported prose require review.
+
+`docs/PROGRESS.md` retains a generic TASK-009 pending state without applicant facts. The case-folding documentation matches the implementation.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-17 | blocking | `src/job_application_engine/extraction/groups.py:531-603, 666-667` | Numeric and CEFR parsers accept unsupported signs/comparison symbols as an `unqualified` threshold. Only `/`, `|`, `&`, and `+` are checked as symbols; `-`, `−`, `~`, `≈`, `≤`, `≥`, `<`, and `>` around amounts/levels are ignored. This can turn a negative value positive or discard an operator without review. | `Requirements\n−3 years of Python experience.` → `condition=Python`, `duration/unqualified/value=3`, no review. `Requirements\n~3 years of Python experience.` behaves the same. `Requirements\nEnglish ≤C2.` → `language_level/unqualified/C2`, no review. |
+| F-16 | non-blocking | `src/job_application_engine/extraction/groups.py:194-199, 804-813` | Coverage remains conservative for some reasonable modifier prose. No condition is hidden. | `Native-level German.` and `Written and spoken German.` remain review-required. |
+
+F-17 requires rejecting unsupported symbolic operators/signs or explicitly parsing them into typed operators, with regression coverage for prefix, postfix, negative and Unicode variants.
+
+---
+
+## Round 9 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `1722e32` plus a
+  dedicated temporary directory, no network, session
+  `01a1db2d-6f76-7c20-9c73-ecc36796ab58`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-9 report follows verbatim.
+
+## Round 9
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Candidate: `1722e32b10fb2685369cd55cf71916133c5188aa`
+- Candidate tree: `6dfdc90926d91dcb279231e33fb0f50bef8bb570`
+- Delta: `f5d65eea7edf397eafb4f753088dcd35f1d30056..1722e32`
+- Working tree remained clean. Probe scripts and data were kept under the permitted temporary directory.
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch`; `git rev-parse HEAD`; `git rev-parse HEAD^{tree}` | 0 | Detached candidate; head/tree matched handoff |
+| Full corrective diff inspection | 0 | 6 paths; 306 diff lines / 18,176 bytes; no dependency or lockfile change |
+| Focused pytest command from handoff | 0 | **314 passed** in 45.24s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files already formatted |
+| `.venv/bin/mypy src --cache-dir=.../mypy` | 0 | No issues in 47 source files |
+| `git diff --check f5d65ee..1722e32` | 0 | Clean |
+| `sha256sum tests/fixtures/requirements/classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| `probe_regressions_r9.py` | 0 | 73 F-01–F-17/control probes; 0 failures |
+| `probe_groups_small.py` | 0 | 623 alternative/unknown-operand cases; 0 exceptions or unsupported partial conditions |
+| `probe_filler_r9.py` | 0 | All 142 FILLER entries tested around unknown operands; 0 unsafe cases; 23 reasonable controls |
+| `probe_duplicates_r9.py` | 0 | 13 duplicate-scope cases; grouping matched heading/marker boundaries |
+| Corrected threshold matrix | 0 | 57 value/scope/operator cases; 0 implementation exceptions |
+| Unicode sign matrix | 0 | 305 prefix/postfix/CEFR sign variants; exposed the finding below |
+| Exact 200,000-byte dense probe | 0 | 5 cases; bounded `ExtractionError` outcomes in 0.103–0.121s; no raw exceptions |
+| CLI F-18 reproductions through `jae job-classify` | 0 | 2 jobs classified successfully and returned unreviewed thresholds |
+| PDF renderer tests | — | Not run as instructed; nested `sandbox-exec` is unavailable here |
+
+An initial exploratory threshold script had one harness-side indexing error for a line treated as an explicit heading; the corrected matrix had zero exceptions.
+
+### Probe outcomes
+
+F-01–F-15 reproductions remain fixed. The 623-case matrix found no unsupported OR/alternative or unknown operand that produced an unreviewed partial or single-term condition. The 142-entry FILLER audit found no hidden operand. Conservative false alarms remain, including `Python using Docker`, `Native-level German`, `Written and spoken German`, and `Python for backend development`; these preserve review and hide no meaning, so F-16 remains non-blocking.
+
+Valid threshold controls remained typed and review-free: `2–4 years of SQL experience`, `German B1-B2`, `Deutsch auf mindestens C1-Niveau`, and `Experience (3+ years) in Python`. Out-of-range, vague, malformed, contradictory, and unsupported operator forms were reviewed or withheld. Duplicate grouping stayed within one heading/marker scope.
+
+The TASK-009 note in `docs/PROGRESS.md` is generic and contains no applicant-specific facts. The new sign description in `docs/JOB_EXTRACTION.md` is broader than the implementation shown below.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-18 | blocking | `src/job_application_engine/extraction/groups.py:145-151, 547-600, 762-775`; `docs/JOB_EXTRACTION.md:132-135` | Sign/comparison detection is incomplete and asymmetric. `SYMBOL_POSTFIX` does not recognize dash/minus variants; `_COMPARISON` omits them and fullwidth/small sign forms; stray-symbol clearing scans only `_COMPARISON`. Consequently, adjacent signs can remain inside a literal scope or be ignored entirely, yielding an unreviewed threshold. | `Requirements` / `3 years − Python experience.` returns `condition=Python`, an unqualified duration of `3`, scope `− Python experience`, and no review. `Requirements` / `English C2−.` returns `condition=English`, an unqualified C2 threshold, and no review. `Requirements` / `＋3 years of Python experience.` returns `condition=Python`, duration `3`, and no review. ASCII `-`, en dash, em dash, fullwidth plus, and several Unicode dash variants reproduce the same class of failure. |
+
+Required correction: reject or otherwise withhold thresholds for sign/comparison variants on either side of amounts and CEFR levels, and clear all thresholds when such symbols occur outside an accepted threshold. Preserve valid numeric/CEFR ranges and `C1-Niveau` through explicit span handling, with regression tests for prefix, postfix, Unicode, and fullwidth variants.
+
+---
+
+## Round 10 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `ad83f8d` plus a
+  dedicated temporary directory, no network, session
+  `01a1db45-4465-7fb1-be4f-4f2a491090a1`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-10 report follows verbatim.
+
+## Round 10
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex independent implementation reviewer
+- Date: 2026-11-14
+- Candidate: `ad83f8d47c727afd4de3b93dee3ee3d6b68fb383`
+- Candidate tree: `1e31d033ea80dd8857c3f6268559b82e9a260e52`
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Working tree: clean; no tracked files modified.
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git diff 1722e32..ad83f8d` | 0 | Six paths; 188 additions, 24 deletions; full 1,414-line/76,650-byte delta inspected |
+| Focused pytest command from handoff | 0 | 328 passed, no skips, 43.42s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir .../mypy` | 0 | No issues in 47 source files |
+| `git diff --check 1722e32..ad83f8d` | 0 | Clean |
+| `sha256sum tests/fixtures/requirements/classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest matched: `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| Regression probe | 0 | 59 F-01–F-18 checks; 0 failures |
+| Alternative/unknown-operand matrix | 0 | 2,400 candidates; all reviewed with no condition; 0 unsafe partial conditions |
+| FILLER audit | 0 | 142 entries across 568 cases; no non-degree hidden operands |
+| Duplicate probe | 0 | 13 scope/qualifier cases; 0 mismatches |
+| Threshold probe | 0 | 12 valid controls review-free; no malformed unreviewed thresholds |
+| Unicode sign matrix | 0 | 5,844 Unicode Sm/Pd cases; direct sign variants handled as expected |
+| Exact 200,000-byte dense probe | 0 | Six inputs failed with bounded `ExtractionError` in 0.10–0.15s; no raw exceptions |
+| CLI probe | 0 | Five cases exited 0; diagnostics sanitized |
+| PDF renderer tests | — | Not run, as instructed |
+
+### Probe outcomes
+
+F-01–F-17 remain fixed. Unsupported alternatives, unknown operands, filler-list entries, malformed thresholds, duplicate scopes and dense inputs behaved as required. The TASK-009 note in `docs/PROGRESS.md` remains generic and contains no applicant facts.
+
+The direct F-18 reproductions withheld thresholds and required review. A nearby Unicode check found that every `Pd` dash is accepted when directly joining a CEFR level to a word, including EN DASH, EM DASH, FIGURE DASH, WAVE DASH and TWO-EM DASH.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-19 | blocking | `src/job_application_engine/extraction/groups.py:164-178`; `docs/JOB_EXTRACTION.md:133-136` | The CEFR compound exception accepts every Unicode `Pd` dash, although the documented exception permits only a word-joining hyphen. Non-hyphen dashes therefore create an unreviewed threshold. | `Requirements\nEnglish C2—Niveau.` returns an unqualified `C2` threshold with `review_reasons=[]`. `C2–Niveau`, `C2‒Niveau`, `C2⸺Niveau` and `C2～Niveau` behave the same. |
+| F-20 | non-blocking | `src/job_application_engine/extraction/groups.py:157-162` | Sign-before detection creates a conservative false alarm when a preceding recognized `C++` term contributes the plus sign. | `Requirements\nC++ 3 years of experience.` keeps condition `C++`, removes the threshold and adds `unsupported_number`; meaning remains visible for review. |
+
+---
+
+## Round 11 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `07375b1` plus a
+  dedicated temporary directory, no network, session
+  `01a1db5e-2738-73d3-82f7-a55faeefda5a`. Checkout tracked files unchanged; exit 0.
+- Hosted CI 43628074843 on `07375b1` (checkout: merge into unchanged main
+  `f6a3bf0`, tree `bf360e66`): 458 passed, Ruff/format/mypy passed.
+
+The reviewer's round-11 report follows verbatim.
+
+## Round 11
+
+VERDICT: APPROVED
+
+- Reviewer: Codex independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Candidate: `07375b1b12d055960ccc6b4333cc66e71c01fabc`
+- Candidate tree: `bf360e66f002f7f7efc121c58343dd1c08e564d8`
+- Working tree: clean; no tracked files modified.
+
+### Commands
+
+| Command | Exit | Result |
+|---|---:|---|
+| Full corrective `git diff --find-renames --find-copies ad83f8d..07375b1` | 0 | 6 paths; 286 diff lines, 17,781 bytes; 124 additions, 19 deletions; fully inspected |
+| Focused pytest command from handoff | 0 | 338 passed, no skips |
+| `.venv/bin/ruff check --no-cache .` | 0 | 0 diagnostics |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir .../mypy` | 0 | No issues in 47 source files |
+| `git diff --check ad83f8d..07375b1` | 0 | Clean |
+| `sha256sum tests/fixtures/requirements/classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest matched: `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| F-01–F-20 regression probe | 0 | 140 cases; 0 exceptions; 0 unexpected unsafe conditions; 7 expected clean controls |
+| Alternative/unknown-operand batch | 0 | 532 rows; 0 unreviewed partial conditions |
+| FILLER audit | 0 | 142 entries × 5 contexts = 710 cases; 0 hidden operands; 0 exceptions |
+| Duplicate probe | 0 | 5 scope/qualifier cases; all matched expected grouping |
+| Threshold/value/scope probe | 0 | 26 cases; no exceptions or invented spans |
+| Unicode `Pd`/`Sm` probe | 0 | 26 dash variants and 1,896 math-symbol cases; 0 unsafe thresholds |
+| Exact 200,000-byte probe | 0 | 6 cases; 3 bounded `ExtractionError`s and 3 reviewed classifications; 0.112–0.518s |
+| CLI sanitization probe | 0 | 4 cases; valid request exit 0, invalid requests exit 2; diagnostics sanitized |
+| Final status and diff check | 0 | Clean checkout |
+
+PDF renderer tests were not run, as required by the handoff.
+
+### Probe outcomes
+
+F-19 is fixed. All 26 Unicode dash variants were tested in `C2<dash>Niveau`: ASCII hyphen, U+2010, and U+2011 were accepted; all other `Pd` dashes required review and produced no threshold.
+
+F-20 is fixed. `C++ 3 years of experience.` preserves the duration threshold without review. Nearby `C++ +3 years` and `C++3 years` remain reviewed with no threshold.
+
+F-01–F-18 remain fixed across their direct reproductions and nearby variants. No OR/alternative or unknown operand produced an unreviewed partial or single-term condition. Existing conservative coverage false alarms remain meaning-preserving and correspond to the recorded non-blocking F-10, F-14, and F-16 behavior.
+
+Every FILLER entry required review when placed around an unknown operand. Reasonable controls such as `Strong Python skills`, `Solid knowledge of SQL`, `Hands-on experience with Docker`, valid groups, and valid numeric/CEFR thresholds remained accepted.
+
+Threshold values and scopes were source-literal and raw-span verified. Malformed, contradictory, signed, out-of-range, or unsupported forms were reviewed or withheld. Duplicate grouping respected heading, marker, and qualifier scope.
+
+The exact 200,000-byte inputs stayed bounded without raw exceptions. No network, execution of posting text, persistence, profile access, or dependency change was observed. The TASK-009 note in `docs/PROGRESS.md` remains a generic pending state without applicant facts.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| — | — | — | No new F-21+ findings. | All required corrective and adversarial probes passed. |

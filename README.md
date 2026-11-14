@@ -42,13 +42,14 @@ The explicit setup command downloads only checksum-pinned public Typst package f
 | `jae job-ingest` | Save bounded UTF-8 file/stdin, source metadata and immutable JD revisions |
 | `jae job-show` | Verify and show a saved JD revision and its supplied metadata |
 | `jae job-extract` | Read-only draft source candidates with exact raw quotes/offsets; priority remains unspecified |
+| `jae job-classify` | Read-only draft priority, negation, ANY/ALL alternatives and thresholds for those candidates |
 | `jae build-cv` | Render an explicitly reviewed profile and document plan into a PDF |
 | `jae snapshot-build` | Create an immutable private PDF/TXT/QA/source snapshot |
 | `jae snapshot-approve` | Record explicit review of that exact snapshot |
 | `jae snapshot-export` | Revalidate current eligibility and export approved PDF/TXT bytes |
 | `python -m job_application_engine.ats_qa` | Measure a PDF against independently supplied expectations |
 
-Use `--help` for actual command arguments. Base comparison, reviewed requirement classification, tailoring, letters, DOCX, interviews, tracking and skill analytics are not implemented commands yet. No application LLM, browser or submission integration is active.
+Use `--help` for actual command arguments. Base comparison, requirement review/correction, tailoring, letters, DOCX, interviews, tracking and skill analytics are not implemented commands yet. No application LLM, browser or submission integration is active.
 
 ## Save a vacancy
 
@@ -67,7 +68,9 @@ uv run jae job-extract --job-id example-ai-role
 ```
 
 All candidates remain draft and need review; required/preferred and negative
-wording is preserved without assigning priority. See [the extraction guide](docs/JOB_EXTRACTION.md).
+wording is preserved without assigning priority. `jae job-classify` adds
+source-bound draft priority, negation, alternative and threshold labels; any
+grammar it cannot represent is flagged for review. See [the extraction guide](docs/JOB_EXTRACTION.md).
 
 ## Baseline example
 

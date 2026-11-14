@@ -1,0 +1,1405 @@
+[
+  {
+    "id": "en-01",
+    "locale": "en",
+    "text": "Python is required.",
+    "expected": [
+      {
+        "quote": "Python is required.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-02",
+    "locale": "en",
+    "text": "Requirements\nFluent English is preferred.",
+    "expected": [
+      {
+        "quote": "Fluent English is preferred.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "explicit_preferred_cue",
+        "negation": "none",
+        "condition": "English",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-03",
+    "locale": "en",
+    "text": "Requirements\nGerman is not required.",
+    "expected": [
+      {
+        "quote": "German is not required.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "explicitly_not_required",
+        "negation": "requirement_negated",
+        "condition": "German",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-04",
+    "locale": "en",
+    "text": "Requirements\nNo German required, but English is essential.",
+    "expected": [
+      {
+        "quote": "No German required, but English is essential.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "conflicting_clause_cues",
+        "negation": "requirement_negated",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "conflicting_priority_cues",
+          "no_supported_condition",
+          "unsupported_grouping"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-05",
+    "locale": "en",
+    "text": "Requirements\nPython or Java is required.",
+    "expected": [
+      {
+        "quote": "Python or Java is required.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": {
+          "any": [
+            "Python",
+            "Java"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-06",
+    "locale": "en",
+    "text": "# Qualifications\nA bachelor's degree in Computer Science or equivalent practical experience is required.",
+    "expected": [
+      {
+        "quote": "A bachelor's degree in Computer Science or equivalent practical experience is required.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": {
+          "any": [
+            "bachelor's degree in Computer Science",
+            "equivalent practical experience"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-07",
+    "locale": "en",
+    "text": "Requirements\nBachelor's degree in Computer Science or a related field.",
+    "expected": [
+      {
+        "quote": "Bachelor's degree in Computer Science or a related field.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": "Bachelor's degree in Computer Science or a related field",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-08",
+    "locale": "en",
+    "text": "Requirements\nExperience with Python and either Django or Flask is required.",
+    "expected": [
+      {
+        "quote": "Experience with Python and either Django or Flask is required.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": {
+          "all": [
+            "Python",
+            {
+              "any": [
+                "Django",
+                "Flask"
+              ]
+            }
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-09",
+    "locale": "en",
+    "text": "Requirements\nPython and Django or Flask.",
+    "expected": [
+      {
+        "quote": "Python and Django or Flask.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition",
+          "unparsed_alternative",
+          "unparsed_conjunction",
+          "unsupported_grouping"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-10",
+    "locale": "en",
+    "text": "Nice to have:\n- Docker experience is a must.\n- Kubernetes.",
+    "expected": [
+      {
+        "quote": "Docker experience is a must.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "clause_conflicts_with_heading",
+        "negation": "none",
+        "condition": "Docker",
+        "thresholds": [],
+        "review_reasons": [
+          "heading_clause_conflict"
+        ]
+      },
+      {
+        "quote": "Kubernetes.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "heading_preferred_cue",
+        "negation": "none",
+        "condition": "Kubernetes",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-11",
+    "locale": "en",
+    "text": "Requirements\nPython is required and AWS is a plus.",
+    "expected": [
+      {
+        "quote": "Python is required and AWS is a plus.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "conflicting_clause_cues",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "conflicting_priority_cues",
+          "no_supported_condition",
+          "unparsed_conjunction",
+          "unsupported_grouping"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-12",
+    "locale": "en",
+    "text": "What you bring\nAt least 3 years of experience with Python is required.",
+    "expected": [
+      {
+        "quote": "At least 3 years of experience with Python is required.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [
+          {
+            "measure": "duration",
+            "operator": "gte",
+            "value": 3,
+            "unit": "years",
+            "scope": "experience with Python"
+          }
+        ],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-13",
+    "locale": "en",
+    "text": "Requirements\n3-5 years of professional experience.",
+    "expected": [
+      {
+        "quote": "3-5 years of professional experience.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [
+          {
+            "measure": "duration",
+            "operator": "range",
+            "value": 3,
+            "unit": "years",
+            "upper": 5,
+            "scope": "professional experience"
+          }
+        ],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-14",
+    "locale": "en",
+    "text": "Requirements\nSeveral years of experience in data engineering.",
+    "expected": [
+      {
+        "quote": "Several years of experience in data engineering.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition",
+          "vague_quantity"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-15",
+    "locale": "en",
+    "text": "Requirements\n- Python is required.\n- SQL is a plus.\n- Python is required.",
+    "expected": [
+      {
+        "quote": "Python is required.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [],
+        "review_reasons": []
+      },
+      {
+        "quote": "SQL is a plus.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "explicit_preferred_cue",
+        "negation": "none",
+        "condition": "SQL",
+        "thresholds": [],
+        "review_reasons": []
+      },
+      {
+        "quote": "Python is required.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": [
+      [
+        0,
+        2
+      ]
+    ]
+  },
+  {
+    "id": "en-16",
+    "locale": "en",
+    "text": "Must have:\n- Docker.\nNice to have:\n- Docker.",
+    "expected": [
+      {
+        "quote": "Docker.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "heading_mandatory_cue",
+        "negation": "none",
+        "condition": "Docker",
+        "thresholds": [],
+        "review_reasons": []
+      },
+      {
+        "quote": "Docker.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "heading_preferred_cue",
+        "negation": "none",
+        "condition": "Docker",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-17",
+    "locale": "en",
+    "text": "Requirements\n- Python is required.\nNice to have\n- Terraform experience.\n- Docker.",
+    "expected": [
+      {
+        "quote": "Python is required.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [],
+        "review_reasons": []
+      },
+      {
+        "quote": "Nice to have",
+        "role": "priority_marker",
+        "priority": "unspecified",
+        "basis": "priority_marker",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": []
+      },
+      {
+        "quote": "Terraform experience.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "heading_preferred_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition"
+        ]
+      },
+      {
+        "quote": "Docker.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "heading_preferred_cue",
+        "negation": "none",
+        "condition": "Docker",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-18",
+    "locale": "en",
+    "text": "Requirements\nGerman at C1 level or higher is required.",
+    "expected": [
+      {
+        "quote": "German at C1 level or higher is required.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "German",
+        "thresholds": [
+          {
+            "measure": "language_level",
+            "operator": "gte",
+            "level": "C1",
+            "unit": "cefr",
+            "scope": "German"
+          }
+        ],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-19",
+    "locale": "en",
+    "text": "Requirements\nExperience with Docker, Kubernetes, and AWS.",
+    "expected": [
+      {
+        "quote": "Experience with Docker, Kubernetes, and AWS.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": {
+          "all": [
+            "Docker",
+            "Kubernetes",
+            "AWS"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-20",
+    "locale": "en",
+    "text": "Requirements\nPython, SQL, Docker.",
+    "expected": [
+      {
+        "quote": "Python, SQL, Docker.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition",
+          "unsupported_grouping"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-21",
+    "locale": "en",
+    "text": "Responsibilities\nYou must build Python services.",
+    "expected": [
+      {
+        "quote": "You must build Python services.",
+        "role": "non_requirement",
+        "priority": "unspecified",
+        "basis": "not_a_requirement_kind",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "cue_outside_requirement_section"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-22",
+    "locale": "en",
+    "text": "Requirements\nPython or Go is required.",
+    "expected": [
+      {
+        "quote": "Python or Go is required.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition",
+          "unparsed_alternative"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-23",
+    "locale": "en",
+    "text": "Requirements\nKubernetes is not required but a plus.",
+    "expected": [
+      {
+        "quote": "Kubernetes is not required but a plus.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "explicit_preferred_cue",
+        "negation": "requirement_negated",
+        "condition": "Kubernetes",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-24",
+    "locale": "en",
+    "text": "Requirements\nYou must not require visa sponsorship.",
+    "expected": [
+      {
+        "quote": "You must not require visa sponsorship.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "unsupported",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition",
+          "unsupported_negation"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-25",
+    "locale": "en",
+    "text": "Requirements\nMaster's degree or equivalent.",
+    "expected": [
+      {
+        "quote": "Master's degree or equivalent.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": {
+          "any": [
+            "Master's degree",
+            "equivalent"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-26",
+    "locale": "en",
+    "text": "Requirements\nBachelor's or Master's degree.",
+    "expected": [
+      {
+        "quote": "Bachelor's or Master's degree.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition",
+          "unparsed_alternative"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-27",
+    "locale": "en",
+    "text": "Requirements\nExperience with AWS and/or Azure is desirable.",
+    "expected": [
+      {
+        "quote": "Experience with AWS and/or Azure is desirable.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "explicit_preferred_cue",
+        "negation": "none",
+        "condition": {
+          "any": [
+            "AWS",
+            "Azure"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-28",
+    "locale": "en",
+    "text": "Minimum qualifications:\n- Python.",
+    "expected": [
+      {
+        "quote": "Python.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "heading_mandatory_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-29",
+    "locale": "en",
+    "text": "Requirements\n5+ years of Python experience and 2 years of AWS experience.",
+    "expected": [
+      {
+        "quote": "5+ years of Python experience and 2 years of AWS experience.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [
+          {
+            "measure": "duration",
+            "operator": "gte",
+            "value": 5,
+            "unit": "years",
+            "scope": "Python experience"
+          },
+          {
+            "measure": "duration",
+            "operator": "unqualified",
+            "value": 2,
+            "unit": "years",
+            "scope": "AWS experience"
+          }
+        ],
+        "review_reasons": [
+          "multiple_thresholds",
+          "unparsed_conjunction",
+          "unsupported_grouping"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "en-30",
+    "locale": "en",
+    "text": "Requirements\nPython experience of at least 3 years.",
+    "expected": [
+      {
+        "quote": "Python experience of at least 3 years.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [
+          {
+            "measure": "duration",
+            "operator": "gte",
+            "value": 3,
+            "unit": "years",
+            "scope": null
+          }
+        ],
+        "review_reasons": [
+          "threshold_scope_unclear"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-01",
+    "locale": "de",
+    "text": "Anforderungen\nSehr gute Deutschkenntnisse sind zwingend erforderlich.",
+    "expected": [
+      {
+        "quote": "Sehr gute Deutschkenntnisse sind zwingend erforderlich.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "Deutschkenntnisse",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-02",
+    "locale": "de",
+    "text": "Anforderungen\nEnglischkenntnisse sind wünschenswert.",
+    "expected": [
+      {
+        "quote": "Englischkenntnisse sind wünschenswert.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "explicit_preferred_cue",
+        "negation": "none",
+        "condition": "Englischkenntnisse",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-03",
+    "locale": "de",
+    "text": "Anforderungen\nDeutschkenntnisse sind nicht erforderlich.",
+    "expected": [
+      {
+        "quote": "Deutschkenntnisse sind nicht erforderlich.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "explicitly_not_required",
+        "negation": "requirement_negated",
+        "condition": "Deutschkenntnisse",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-04",
+    "locale": "de",
+    "text": "Ihr Profil\nPython oder Java wird vorausgesetzt.",
+    "expected": [
+      {
+        "quote": "Python oder Java wird vorausgesetzt.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": {
+          "any": [
+            "Python",
+            "Java"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-05",
+    "locale": "de",
+    "text": "Dein Profil\nAbgeschlossenes Studium der Informatik oder eine vergleichbare Qualifikation ist erforderlich.",
+    "expected": [
+      {
+        "quote": "Abgeschlossenes Studium der Informatik oder eine vergleichbare Qualifikation ist erforderlich.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": {
+          "any": [
+            "Studium der Informatik",
+            "vergleichbare Qualifikation"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-06",
+    "locale": "de",
+    "text": "Anforderungen\nErfahrung mit Python und entweder Django oder Flask ist erforderlich.",
+    "expected": [
+      {
+        "quote": "Erfahrung mit Python und entweder Django oder Flask ist erforderlich.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": {
+          "all": [
+            "Python",
+            {
+              "any": [
+                "Django",
+                "Flask"
+              ]
+            }
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-07",
+    "locale": "de",
+    "text": "Anforderungen\nPython und Django oder Flask.",
+    "expected": [
+      {
+        "quote": "Python und Django oder Flask.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition",
+          "unparsed_alternative",
+          "unparsed_conjunction",
+          "unsupported_grouping"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-08",
+    "locale": "de",
+    "text": "Wünschenswert:\n- Docker ist ein Muss.\n- Kubernetes.",
+    "expected": [
+      {
+        "quote": "Docker ist ein Muss.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "clause_conflicts_with_heading",
+        "negation": "none",
+        "condition": "Docker",
+        "thresholds": [],
+        "review_reasons": [
+          "heading_clause_conflict"
+        ]
+      },
+      {
+        "quote": "Kubernetes.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "heading_preferred_cue",
+        "negation": "none",
+        "condition": "Kubernetes",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-09",
+    "locale": "de",
+    "text": "Anforderungen\nPython ist erforderlich, AWS ist von Vorteil.",
+    "expected": [
+      {
+        "quote": "Python ist erforderlich, AWS ist von Vorteil.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "conflicting_clause_cues",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "conflicting_priority_cues",
+          "no_supported_condition",
+          "unsupported_grouping"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-10",
+    "locale": "de",
+    "text": "Ihr Profil\nMindestens 3 Jahre Berufserfahrung in der Softwareentwicklung sind erforderlich.",
+    "expected": [
+      {
+        "quote": "Mindestens 3 Jahre Berufserfahrung in der Softwareentwicklung sind erforderlich.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [
+          {
+            "measure": "duration",
+            "operator": "gte",
+            "value": 3,
+            "unit": "years",
+            "scope": "Berufserfahrung in der Softwareentwicklung"
+          }
+        ],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-11",
+    "locale": "de",
+    "text": "Anforderungen\n2–4 Jahre Erfahrung mit SQL.",
+    "expected": [
+      {
+        "quote": "2–4 Jahre Erfahrung mit SQL.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": "SQL",
+        "thresholds": [
+          {
+            "measure": "duration",
+            "operator": "range",
+            "value": 2,
+            "unit": "years",
+            "upper": 4,
+            "scope": "Erfahrung mit SQL"
+          }
+        ],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-12",
+    "locale": "de",
+    "text": "Anforderungen\nMehrere Jahre Erfahrung im Projektmanagement.",
+    "expected": [
+      {
+        "quote": "Mehrere Jahre Erfahrung im Projektmanagement.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition",
+          "vague_quantity"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-13",
+    "locale": "de",
+    "text": "Anforderungen\n- Python ist erforderlich.\n- Python ist erforderlich.",
+    "expected": [
+      {
+        "quote": "Python ist erforderlich.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [],
+        "review_reasons": []
+      },
+      {
+        "quote": "Python ist erforderlich.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "id": "de-14",
+    "locale": "de",
+    "text": "Anforderungen\n2,5 Jahre Erfahrung mit Java sind von Vorteil.",
+    "expected": [
+      {
+        "quote": "2,5 Jahre Erfahrung mit Java sind von Vorteil.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "explicit_preferred_cue",
+        "negation": "none",
+        "condition": "Java",
+        "thresholds": [],
+        "review_reasons": [
+          "unsupported_number"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-15",
+    "locale": "de",
+    "text": "Anforderungen\nFranzösisch ist von Vorteil, aber kein Muss.",
+    "expected": [
+      {
+        "quote": "Französisch ist von Vorteil, aber kein Muss.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "explicit_preferred_cue",
+        "negation": "requirement_negated",
+        "condition": "Französisch",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-16",
+    "locale": "de",
+    "text": "Anforderungen\nDeutschkenntnisse auf mindestens C1-Niveau sind erforderlich.",
+    "expected": [
+      {
+        "quote": "Deutschkenntnisse auf mindestens C1-Niveau sind erforderlich.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "Deutschkenntnisse",
+        "thresholds": [
+          {
+            "measure": "language_level",
+            "operator": "gte",
+            "level": "C1",
+            "unit": "cefr",
+            "scope": "Deutschkenntnisse"
+          }
+        ],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-17",
+    "locale": "de",
+    "text": "Anforderungen\nErfahrung mit Docker, Kubernetes und AWS.",
+    "expected": [
+      {
+        "quote": "Erfahrung mit Docker, Kubernetes und AWS.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": {
+          "all": [
+            "Docker",
+            "Kubernetes",
+            "AWS"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-18",
+    "locale": "de",
+    "text": "Anforderungen\nDeutsch- und Englischkenntnisse sind erforderlich.",
+    "expected": [
+      {
+        "quote": "Deutsch- und Englischkenntnisse sind erforderlich.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": {
+          "all": [
+            "Deutsch",
+            "Englischkenntnisse"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-19",
+    "locale": "de",
+    "text": "Ihre Aufgaben\nSie müssen Python-Services entwickeln.",
+    "expected": [
+      {
+        "quote": "Sie müssen Python-Services entwickeln.",
+        "role": "non_requirement",
+        "priority": "unspecified",
+        "basis": "not_a_requirement_kind",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "cue_outside_requirement_section"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-20",
+    "locale": "de",
+    "text": "Anforderungen\nReisebereitschaft ohne Einschränkungen.",
+    "expected": [
+      {
+        "quote": "Reisebereitschaft ohne Einschränkungen.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "unsupported",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition",
+          "unsupported_negation"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-21",
+    "locale": "de",
+    "text": "Anforderungen\nKeine Deutschkenntnisse erforderlich.",
+    "expected": [
+      {
+        "quote": "Keine Deutschkenntnisse erforderlich.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "explicitly_not_required",
+        "negation": "requirement_negated",
+        "condition": "Deutschkenntnisse",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-22",
+    "locale": "de",
+    "text": "Anforderungen\n- Python ist erforderlich.\nVon Vorteil\n- Docker.",
+    "expected": [
+      {
+        "quote": "Python ist erforderlich.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [],
+        "review_reasons": []
+      },
+      {
+        "quote": "Von Vorteil",
+        "role": "priority_marker",
+        "priority": "unspecified",
+        "basis": "priority_marker",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": []
+      },
+      {
+        "quote": "Docker.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "heading_preferred_cue",
+        "negation": "none",
+        "condition": "Docker",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-23",
+    "locale": "de",
+    "text": "Anforderungen\nErfahrung mit AWS und/oder Azure ist wünschenswert.",
+    "expected": [
+      {
+        "quote": "Erfahrung mit AWS und/oder Azure ist wünschenswert.",
+        "role": "requirement",
+        "priority": "preferred",
+        "basis": "explicit_preferred_cue",
+        "negation": "none",
+        "condition": {
+          "any": [
+            "AWS",
+            "Azure"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-24",
+    "locale": "de",
+    "text": "Anforderungen\nPython bzw. Java.",
+    "expected": [
+      {
+        "quote": "Python bzw. Java.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": [
+          "no_supported_condition",
+          "unparsed_alternative",
+          "unsupported_grouping"
+        ]
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-25",
+    "locale": "de",
+    "text": "Anforderungen\nMaster oder vergleichbare Berufserfahrung.",
+    "expected": [
+      {
+        "quote": "Master oder vergleichbare Berufserfahrung.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": {
+          "any": [
+            "Master",
+            "vergleichbare Berufserfahrung"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-26",
+    "locale": "de",
+    "text": "Anforderungen\nStudium der Informatik oder einem verwandten Fach.",
+    "expected": [
+      {
+        "quote": "Studium der Informatik oder einem verwandten Fach.",
+        "role": "requirement",
+        "priority": "unspecified",
+        "basis": "no_priority_cue",
+        "negation": "none",
+        "condition": "Studium der Informatik oder einem verwandten Fach",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-27",
+    "locale": "de",
+    "text": "Anforderungen\nSowohl Python als auch Java sind erforderlich.",
+    "expected": [
+      {
+        "quote": "Sowohl Python als auch Java sind erforderlich.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "explicit_mandatory_cue",
+        "negation": "none",
+        "condition": {
+          "all": [
+            "Python",
+            "Java"
+          ]
+        },
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-28",
+    "locale": "de",
+    "text": "Muss-Kriterien:\n- Python.",
+    "expected": [
+      {
+        "quote": "Python.",
+        "role": "requirement",
+        "priority": "mandatory",
+        "basis": "heading_mandatory_cue",
+        "negation": "none",
+        "condition": "Python",
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  },
+  {
+    "id": "de-29",
+    "locale": "de",
+    "text": "Was wir bieten\nKostenlose Deutschkurse.",
+    "expected": [
+      {
+        "quote": "Kostenlose Deutschkurse.",
+        "role": "non_requirement",
+        "priority": "unspecified",
+        "basis": "not_a_requirement_kind",
+        "negation": "none",
+        "condition": null,
+        "thresholds": [],
+        "review_reasons": []
+      }
+    ],
+    "duplicates": []
+  }
+]
