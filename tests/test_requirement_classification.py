@@ -831,3 +831,48 @@ def test_f15_every_lexicon_is_casefold_normalized() -> None:
         assert words, name
         for word in words:
             assert word == word.casefold(), (name, word)
+
+
+# Regressions for independent review round 8 (docs/reviews/TASK-012.md).
+@pytest.mark.parametrize(
+    "line",
+    [
+        "−3 years of Python experience.",
+        "-3 years of Python experience.",
+        "~3 years of Python experience.",
+        "≈3 years of Python experience.",
+        "<3 years of Python experience.",
+        "> 3 years of Python experience.",
+        "≤3 years of Python experience.",
+        "≥ 3 years of Python experience.",
+        "3 years+ of Python experience.",
+        "English ≤C2.",
+        "English ~B2.",
+        "English B2 ≥.",
+        "3 years of Python experience ≥ 2 projects.",
+    ],
+)
+def test_f17_signs_and_comparison_symbols_create_no_threshold(line, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert row.thresholds == []
+    assert "unsupported_number" in row.review_reasons
+
+
+@pytest.mark.parametrize(
+    ("line", "found"),
+    [
+        ("2–4 years of SQL experience.", ("range", 2, None, "SQL experience")),
+        ("German B1-B2.", ("range", None, "B1", "German")),
+        ("Deutsch auf mindestens C1-Niveau.", ("gte", None, "C1", "Deutsch")),
+        ("Experience (3+ years) in Python.", ("gte", 3, None, "Python")),
+    ],
+)
+def test_f17_controls_keep_supported_thresholds(line, found, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    (item,) = row.thresholds
+    assert (
+        item.operator,
+        item.value,
+        item.level,
+        item.scope.quote if item.scope else None,
+    ) == found

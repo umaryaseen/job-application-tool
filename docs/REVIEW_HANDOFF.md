@@ -6,7 +6,16 @@ The TASK-012 fixture labels are already independently
 [approved](reviews/TASK-012-FIXTURES.md); do not re-derive or change them to fit
 output. Review the implementation commit supplied with this handoff.
 
-## Round 8: corrective re-review
+## Round 9: corrective re-review
+
+Round 8 on `f5d65ee` returned CHANGES REQUIRED for F-17 (F-16 non-blocking).
+Re-review `f5d65ee..<candidate>`: adjacent signs/comparison symbols reject
+thresholds (hyphen only before an amount, so "C1-Niveau" and ranges still
+work), stray comparison symbols withhold thresholds, and scope leads skip
+closing brackets. Confirm F-01–F-15 stay as recorded. Append a "Round 9"
+section.
+
+## Round 8 (completed)
 
 Round 7 on `faee434` returned CHANGES REQUIRED for F-15 (F-16 non-blocking).
 Re-review `faee434..<candidate>`: all word sets are now case-folded at
@@ -114,7 +123,7 @@ the repository is rejected by design), `uv run ruff check .`,
 your own adversarial inputs. The full suite needs macOS `sandbox-exec`, Poppler
 and the pinned Typst assets; inspect hosted CI for the exact published head
 rather than repeating renderer tests in a sandbox that cannot nest them.
-Implementer results are in PROGRESS (417 passed locally); they are not a
+Implementer results are in PROGRESS (434 passed locally); they are not a
 substitute for your checks.
 
 Record actual commands/results, exact head/tree, findings and one verdict in

@@ -129,7 +129,9 @@ Each candidate row keeps its literal quote and adds:
   minimum", "or more", etwa, bis zu) create no threshold and need review. Any
   operator word elsewhere in the clause outside an accepted threshold ("3 years
   of Python experience minimum", "About at least 3 years") withholds all of the
-  clause's thresholds.
+  clause's thresholds. Signs and comparison symbols are not operators: next to
+  an amount ("−3 years", "~3 years", "English ≤C2") they reject the threshold,
+  and elsewhere in the clause they withhold its thresholds.
 - `review_reasons` / `needs_review`: why a person must look at the row.
   `review_state` stays `draft` for every row.
 

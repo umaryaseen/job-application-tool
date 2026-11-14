@@ -142,6 +142,12 @@ OPERATOR_WORD = re.compile(
     r"unter|oder\s+(?:mehr|länger|höher|besser))(?!\w)",
     re.I,
 )
+# Signs and comparison symbols are not supported operators: next to an amount
+# they reject the threshold ("−3 years", "~3 years", "English ≤C2"); anywhere
+# else outside an accepted threshold they withhold the clause's thresholds.
+_COMPARISON = "~∼≈≃≅≤≥⩽⩾<>±∓=≠"
+SYMBOL_PREFIX = re.compile(r"[-−–—" + re.escape(_COMPARISON) + r"]\s*$")
+SYMBOL_POSTFIX = re.compile(r"\s*[+" + re.escape(_COMPARISON) + r"]")
 UNIT_WORD = re.compile(r"(?<!\w)(?:years?|yrs?|jahre?n?|months?|monate?n?|monat)(?!\w)", re.I)
 
 
@@ -204,7 +210,7 @@ CEFR = re.compile(
     r"oder\s+(?:höher|besser))))?(?!\w)"
 )
 _SCOPE_LEAD = re.compile(
-    r"\s*['’]?\s*(?:(?:in\s+der|in\s+einem|in\s+einer|of|in|with|im|mit)"
+    r"[\s'’)\]]*(?:(?:in\s+der|in\s+einem|in\s+einer|of|in|with|im|mit)"
     r"(?:\s+|(?=[.,;:!?)]|$)))?",
     re.I,
 )
@@ -538,8 +544,11 @@ def _duration(source: str, clause: SourceSpan, signal: LexicalSignal) -> Thresho
     )
     gte = _prefix(PREFIX_GTE, source, clause.start, signal.span.start)
     gt = _prefix(PREFIX_GT, source, clause.start, signal.span.start)
-    if _prefix(UNSUPPORTED_PREFIX, source, clause.start, signal.span.start) or (
-        UNSUPPORTED_POSTFIX.match(source, signal.span.end, clause.end)
+    if (
+        _prefix(UNSUPPORTED_PREFIX, source, clause.start, signal.span.start)
+        or _prefix(SYMBOL_PREFIX, source, clause.start, signal.span.start)
+        or UNSUPPORTED_POSTFIX.match(source, signal.span.end, clause.end)
+        or SYMBOL_POSTFIX.match(source, signal.span.end, clause.end)
     ):
         return "unsupported_number"
     folded = " ".join(number.split()).casefold()
@@ -584,8 +593,11 @@ def _cefr(source: str, clause: SourceSpan, match: re.Match[str]) -> Threshold | 
     start, end = clause.start + match.start(), clause.start + match.end()
     gte = _prefix(PREFIX_GTE, source, clause.start, start)
     gt = _prefix(PREFIX_GT, source, clause.start, start)
-    if _prefix(UNSUPPORTED_PREFIX, source, clause.start, start) or (
-        UNSUPPORTED_POSTFIX.match(source, end, clause.end)
+    if (
+        _prefix(UNSUPPORTED_PREFIX, source, clause.start, start)
+        or _prefix(SYMBOL_PREFIX, source, clause.start, start)
+        or UNSUPPORTED_POSTFIX.match(source, end, clause.end)
+        or SYMBOL_POSTFIX.match(source, end, clause.end)
     ):
         return "unsupported_number"
     raised = bool(match["plus"] or match["suffix"] or gte)
@@ -747,9 +759,17 @@ def analyze_structure(
         result.thresholds.append(item.model_copy(update={"scope": scope}))
     result.thresholds.sort(key=lambda item: (item.span.start, item.span.end))
     accepted = SpanCover(item.span for item in result.thresholds)
-    if result.thresholds and any(
-        not accepted.contains(span_of(source, clause.start + m.start(), clause.start + m.end()))
-        for m in OPERATOR_WORD.finditer(clause.quote)
+    stray_symbols = (
+        span_of(source, clause.start + i, clause.start + i + 1)
+        for i, char in enumerate(clause.quote)
+        if char in _COMPARISON
+    )
+    if result.thresholds and (
+        any(
+            not accepted.contains(span_of(source, clause.start + m.start(), clause.start + m.end()))
+            for m in OPERATOR_WORD.finditer(clause.quote)
+        )
+        or any(not accepted.contains(mark) for mark in stray_symbols)
     ):
         result.reasons.add("unsupported_number")
         result.thresholds = []
