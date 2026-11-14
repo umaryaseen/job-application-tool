@@ -24,3 +24,4 @@ Date: 2026-09-08. These records make report disagreements explicit. Foundation d
 | [ADR-018](ADR-018.md) | Applicant-facing baseline presentation projection | PROPOSED — INDEPENDENT REVIEW REQUIRED |
 | [ADR-019](ADR-019.md) | Current workflow, task-scoped docs and CI platform | ACCEPTED — integrated in merged PR #1 |
 | [ADR-020](ADR-020.md) | Independent draft JD intake before personal acceptance | ACCEPTED — bounded sequencing decision only |
+| [ADR-021](ADR-021.md) | Independent source-only JD analysis before personal acceptance | ACCEPTED — source-only TASK-011–014 implementation; no milestone release |

@@ -4,6 +4,8 @@
 - State at planning handoff: NOT STARTED
 - Estimate: 3–5 h; planning range, excludes unresolved human input and review waiting
 - Dependencies: [TASK-010](TASK-010.md)
+- Sequencing: [ADR-021](../adr/ADR-021.md) permits source-only implementation
+  before personal acceptance; no milestone release or matching gate is waived.
 - Decisions: [ADR-007](../adr/ADR-007.md), [ADR-013](../adr/ADR-013.md), [ADR-015](../adr/ADR-015.md)
 
 ## Objective
@@ -17,6 +19,11 @@ Requirement text needs stable quotes and offsets, even when interpretation is un
 ## Affected modules
 
 domain/requirement.py; extraction/spans.py; extraction/rules.py; tests/test_requirement_spans.py. Paths are intended additions unless already present; inspect before editing.
+
+Expose read-only `jae job-extract --job-id ID [--revision N]` for a verified
+saved source. Return draft candidates as JSON without changing intake files or
+creating persistent requirement review/approval records. Priority remains
+unspecified in this task; classification is TASK-012.
 
 ## Acceptance criteria
 

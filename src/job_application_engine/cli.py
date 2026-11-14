@@ -13,6 +13,7 @@ from .config import ConfigurationError, private_data_root
 from .domain.document import DocumentPlan
 from .domain.job import JobMetadata
 from .domain.profile import ProfileRevision
+from .extraction.rules import extract_saved_job
 from .ingestion.text import ingest_job, load_job_revision, read_source
 from .profile.load import DuplicateJsonKeyError
 from .profile.review import LocalReviewReceipt
@@ -45,6 +46,12 @@ def build_parser() -> argparse.ArgumentParser:
     show.add_argument("--job-id", required=True)
     show.add_argument("--revision", type=int)
     show.set_defaults(handler=_job_show)
+    extract = subparsers.add_parser(
+        "job-extract", help="show draft source-grounded candidates from a saved JD"
+    )
+    extract.add_argument("--job-id", required=True)
+    extract.add_argument("--revision", type=int)
+    extract.set_defaults(handler=_job_extract)
     build = subparsers.add_parser(
         "build-cv",
         help="build a baseline PDF from an explicitly reviewed plan and profile",
@@ -153,6 +160,19 @@ def _job_show(args: argparse.Namespace) -> int:
         print("jae: private job storage is unavailable", file=sys.stderr)
         return 2
     print(result.record.model_dump_json(indent=2))
+    return 0
+
+
+def _job_extract(args: argparse.Namespace) -> int:
+    try:
+        result = extract_saved_job(args.job_id, revision=args.revision)
+    except ValueError as error:
+        print(f"jae: {error}", file=sys.stderr)
+        return 2
+    except OSError:
+        print("jae: private job storage is unavailable", file=sys.stderr)
+        return 2
+    print(result.model_dump_json(indent=2))
     return 0
 
 

@@ -14,6 +14,12 @@ This is the required test plan, not a claim tests already exist or pass. Each na
 
 M1 technical fixture success may be recorded separately from personal acceptance. **The milestone is not complete until the applicant's genuine CV is curated, generated and reviewed.** The reports and chat memory cannot supply verified facts automatically.
 
+Sequencing exceptions: ADR-020 permits independent draft intake; ADR-021 permits
+implementation/review of source-only TASK-011–014 on reviewed technical
+dependencies. Neither exception completes M1 or releases M2. The M2 milestone
+still requires M1 and reviewed TASK-010–016; matching/tailoring/export gates
+remain unchanged.
+
 ## Mandatory test matrix
 
 | ID | Named behavior / fixture | Assertion | Task |

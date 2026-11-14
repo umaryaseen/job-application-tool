@@ -1,13 +1,10 @@
 # Current implementation state
 
-Last reconciled: 2026-11-14 against published snapshot `58f0c183` and its
-review records. Local merge `266e5ef3` is complete: the combined code received
-independent **APPROVED WITH FOLLOW-UP** review and the documentation follow-up
-received **APPROVED** review. The sanitized publication is open in
-[PR #3](https://github.com/umaryaseen/job-application-tool/pull/3), not yet
-merged into main. The operating-document correction received
-[APPROVED scoped review](reviews/TASK-009-PUBLICATION-STATE.md); hosted CI
-must still be checked on the latest PR head.
+Last reconciled: 2026-11-14 against main `83497777` (merged PR #3). The
+reviewed baseline fixes, sanitized publication and status correction are
+integrated. Final publication CI at `b48781a` passed 147 tests and lint/types.
+TASK-009 personal acceptance remains open. Accepted ADR-021 permits source-only
+analysis on reviewed dependencies; TASK-011 is the current implementation.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -19,9 +16,10 @@ must still be checked on the latest PR head.
 | CLEANUP-001 | Reviewed and merged into main through PR #1 | [Review](reviews/CLEANUP-001.md), merge `0d81aa1` |
 | TASK-010 | Reviewed and merged into main through PR #2 | [Review](reviews/TASK-010.md), [intake guide](JOB_INTAKE.md), merge `0cc9119` |
 | Local integration | MERGE COMMITTED; CODE AND DOCUMENTATION REVIEWED | [Code review](reviews/MERGE-TASK-009-MAIN.md), [documentation review](reviews/MERGE-TASK-009-MAIN-DOCS.md); local merge `266e5ef3` |
-| Sanitized publication | PR #3 OPEN; NOT MERGED | [Publication note](reviews/TASK-009-PUBLICATION.md); CI and review gates apply to the latest PR head |
+| Sanitized publication | PR #3 MERGED | [Publication note](reviews/TASK-009-PUBLICATION.md); main `83497777`, final published CI `43541161616` |
 | Publication state correction | APPROVED, documentation only | [Scoped review](reviews/TASK-009-PUBLICATION-STATE.md); no runtime or approval-policy changes |
-| TASK-011–020 | NOT IMPLEMENTED | Requirements, matching and tailoring |
+| TASK-011 | IMPLEMENTED — AWAITING REVIEW | Draft source-grounded candidates, read-only `job-extract`; [guide](JOB_EXTRACTION.md), [ADR-021](adr/ADR-021.md) |
+| TASK-012–020 | NOT IMPLEMENTED | Later source analysis, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
 
@@ -78,12 +76,27 @@ acceptance. Later task and milestone gates remain in force.
 
 ## Next action
 
-Verify hosted CI on PR #3's latest head before merging the reviewed publication
-into main. Do not repeat the completed local merge, its original documentation
-review or the publication state review. Then
-resume TASK-009's exact content and artifact acceptance with the applicant;
+Implement/review TASK-011 only: bounded EN/DE source quotes, independently
+reviewed fixtures, read-only CLI and exact raw source identity. Do not start
+matching or treat draft candidates as approved requirements. Also resume
+TASK-009's exact content and artifact acceptance with the applicant;
 appearance-only approval retains its original scope. Before any downstream
 feature makes `source_url` clickable or fetchable, that feature's implementer
 must validate allowed URL schemes (F-02). TASK-010 continues to store the value
 as metadata only. Personal records remain outside Git and CI. No export or
 application is created.
+
+## TASK-011 candidate
+
+Adds bounded source segmentation and typed draft annotations tied to a verified
+raw JD revision/hash. Unicode-codepoint quotes and lexical subspans round-trip;
+repeated clauses have distinct IDs. Known sections retain responsibility and
+benefit/context scope; explicit unknown headings reset it. Unknown/mixed clauses
+stay ambiguous. All priority stays unspecified and all candidates need review.
+No intake mutation, requirement approval, provider, network or dependency was added.
+
+The [fixture review](reviews/TASK-011-FIXTURES.md) independently approved the
+16 EN/16 DE literal-label corpus before it was used as the test oracle. Local
+focused A17/CLI suite: **57 passed in 2.56s**. Ruff check and format passed
+(73 files); mypy passed (44 source files). Full supported macOS CI and independent
+implementation review remain pending; no M1/M2 acceptance is claimed.

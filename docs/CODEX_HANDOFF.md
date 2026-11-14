@@ -16,6 +16,9 @@ and Applied AI / Full Stack bases, preserve their evidence and versions, and
 obtain actual baseline document acceptance. Existing files do not establish it.
 
 ADR-020 separately permits TASK-010 draft JD intake before that personal gate.
+ADR-021 permits source-only TASK-011–014 implementation on reviewed dependencies;
+only TASK-011 is the current implementation. It never authorizes matching,
+tailoring or personal approval. Read JOB_EXTRACTION for the draft-only behavior.
 Check PROGRESS before choosing work: do not restart already implemented intake
 or interpret a stored posting as personal baseline acceptance.
 
