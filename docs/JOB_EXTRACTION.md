@@ -59,3 +59,87 @@ general language accuracy.
 CV acceptance is open. Full M1/M2 release, career matching, tailoring and export
 retain their gates. Employer text never becomes career evidence. Stored source
 URLs remain metadata; later link/fetch features must validate allowed schemes.
+
+## Classify priority, negation and alternatives
+
+TASK-012 interprets the same candidates with a second deterministic layer:
+
+```bash
+uv run jae job-classify --job-id example-ai-role
+uv run jae job-classify --job-id example-ai-role --revision 1
+```
+
+The command re-verifies the saved revision, rebuilds the TASK-011 extraction
+and prints JSON bound to its job record, raw hash and `extraction_digest`. It is
+read-only like `job-extract` and uses no profile, model, network or new
+dependency. Oversized annotation counts fail with exit 2 instead of truncating.
+
+Each candidate row keeps its literal quote and adds:
+
+- `role`: `requirement`, `priority_marker` (a standalone line such as
+  `Nice to have` that scopes later lines) or `non_requirement`
+  (responsibility/benefit/company-context text, never prioritized).
+- `priority` (`mandatory`, `preferred`, `unspecified`) with a fixed `basis`
+  code and every `cues` span used. Only explicit EN/DE cue words decide
+  priority. General headings such as Requirements or Ihr Profil supply none;
+  headings or marker lines containing a cue apply only to clauses without
+  their own cue. Disagreement between clause and heading, or mandatory plus
+  preferred/not-required cues in one clause, yields `unspecified` and review.
+  A preferred section never becomes mandatory.
+- `negation`: `requirement_negated` for recognized forms such as
+  "German not required", "kein Muss" or "Keine Deutschkenntnisse erforderlich"
+  (the condition then names what is *not* required); any other negation word
+  is `unsupported` and needs review.
+- `condition`: a literal term or `any`/`all` tree. Supported grammar is
+  recognized technology/language terms joined by commas and one consistent
+  conjunction (or/oder/and/or/und/oder → `any`; and/und/sowie → `all`),
+  explicit either…or / both…and / sowohl…als auch / parentheses for nesting,
+  and `<degree> or equivalent experience/qualification` (oder vergleichbare …)
+  as one `any` group. A degree term is explicit grammar only: consecutive
+  education words, optionally `in/of/der/des/im` plus a field of at most four
+  words (stopping at any filler word, connective or punctuation; content
+  descriptors are not filler, so "formal language" stays in the field; a link
+  with no field word is withheld for review), optionally
+  "or a related field" directly after. The field is taken literally, so words
+  appended to it without any separator count as part of the field name; any
+  other text after the term is outside it. If any OR/AND in the clause is outside that
+  grammar — or a `/`, `|`, `&`, `+` outside a recognized term, or a comma or
+  semicolon joining the terms to further unrecognized text ("Python, QuuxDB")
+  — the condition is `null` and the row needs review: an OR is never split or
+  partially kept. Coverage rule: every word outside the interpreted spans
+  (leaf terms, connectives, cues, negation, thresholds) must be on a small EN/DE filler
+  list (experience, with, strong, Kenntnisse, sehr gute, …; compared
+  case-folded, so `ß` and `ss` match). Content-bearing
+  descriptors (technical, formal, academic, university, language, written, …)
+  are exempt only as modifiers directly before a degree, as spoken/written/
+  native-style modifiers directly before a recognized language, or as
+  "language" directly after one ("Written German", "German language skills").
+  Any other word
+  could be an unrecognized operand ("Python with QuuxDB"), so the condition is
+  withheld with `uninterpreted_text`, and the clause's thresholds are withheld
+  too, since unplaced words may qualify them. This deliberately sends many real
+  clauses ("Experience building REST APIs with Python") to review rather than
+  risk a partial condition.
+- `thresholds`: integer year/month durations up to 99 (`gte`, `gt`, `range`,
+  `unqualified`) and CEFR levels with operator, unit and literal scope. A scope
+  ends at the next cue, negation or numeric amount; without a condition the
+  literal scope is the threshold's interpretation. Vague, decimal, leading-zero,
+  larger or otherwise uncaptured amounts ("1000 years", "3yrs", "six years",
+  "3-year") and unsupported operator words (up to, about, maximum, "3 years
+  minimum", "or more", etwa, bis zu) create no threshold and need review. Any
+  operator word elsewhere in the clause outside an accepted threshold ("3 years
+  of Python experience minimum", "About at least 3 years") withholds all of the
+  clause's thresholds.
+- `review_reasons` / `needs_review`: why a person must look at the row.
+  `review_state` stays `draft` for every row.
+
+`duplicates` groups repeated requirements only within one heading/marker scope
+and only when the case-folded quote and every qualifier are identical; the same
+text under different headings is not merged. Every member keeps its own span.
+
+Structural validation rejects relabelled, split or invented content even when
+checksums are recomputed: each label must equal the deterministic rule output
+for the exact source. That proves reproducibility, not that the posting was
+understood. An independently reviewed 30 EN / 29 DE synthetic oracle covers the
+documented grammar only. Requirement correction/review versions are TASK-014;
+nothing here approves a requirement, matches a career fact or authorizes export.

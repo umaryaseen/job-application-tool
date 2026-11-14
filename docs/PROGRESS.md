@@ -1,11 +1,13 @@
 # Current implementation state
 
-Last reconciled: 2026-11-14 against main `83497777` (merged PR #3). The
-reviewed baseline fixes, sanitized publication and status correction are
-integrated. Final publication CI at `b48781a` passed 147 tests and lint/types.
-TASK-009 personal acceptance remains open. Accepted ADR-021 permits source-only
-analysis on reviewed dependencies; TASK-011 is reviewed on
-[PR #4](https://github.com/umaryaseen/job-application-tool/pull/4), not yet merged.
+Last reconciled: 2026-11-14 against main `f6a3bf05` (merged PR #4). TASK-011
+draft source candidates are integrated; final PR #4 CI 43545596860 passed 204
+tests with lint/types and its checkout tree matched the reviewed tree. TASK-009
+personal acceptance remains open. Accepted ADR-021 permits source-only analysis
+on reviewed dependencies; TASK-012 is on draft
+[PR #5](https://github.com/umaryaseen/job-application-tool/pull/5): round-1
+to round-7 reviews found blocking defects, now corrected and awaiting
+round-8 re-review.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -13,14 +15,15 @@ analysis on reviewed dependencies; TASK-011 is reviewed on
 | TASK-005 | APPROVED WITH FOLLOW-UP | Renderer comparison remains unmeasured |
 | TASK-006–008 | APPROVED in prior history | Existing renderer/QA/snapshot reviews |
 | M1-FIX-001–005 and focused corrections | Approved implementations recorded locally | [Local baseline history](history/PROGRESS_LOCAL_TASK_009.md), individual review files |
-| TASK-009 / M1 | Technical QA pass and applicant appearance approval recorded for baseline-r0009 | Exact PDF/TXT content, final artifact acceptance and export remain pending |
+| TASK-009 / M1 | baseline-r0009 has technical QA and appearance-only approval; a later private content revision awaits applicant review | See [baseline state](#preserve-the-local-baseline-result); content approval, new baseline, final artifact acceptance and export pending |
 | CLEANUP-001 | Reviewed and merged into main through PR #1 | [Review](reviews/CLEANUP-001.md), merge `0d81aa1` |
 | TASK-010 | Reviewed and merged into main through PR #2 | [Review](reviews/TASK-010.md), [intake guide](JOB_INTAKE.md), merge `0cc9119` |
 | Local integration | MERGE COMMITTED; CODE AND DOCUMENTATION REVIEWED | [Code review](reviews/MERGE-TASK-009-MAIN.md), [documentation review](reviews/MERGE-TASK-009-MAIN-DOCS.md); local merge `266e5ef3` |
 | Sanitized publication | PR #3 MERGED | [Publication note](reviews/TASK-009-PUBLICATION.md); main `83497777`, final published CI `43541161616` |
 | Publication state correction | APPROVED, documentation only | [Scoped review](reviews/TASK-009-PUBLICATION-STATE.md); no runtime or approval-policy changes |
-| TASK-011 | REVIEWED ON PR #4; NOT MERGED | [Implementation review](reviews/TASK-011.md), [guide](JOB_EXTRACTION.md), [ADR-021](adr/ADR-021.md); final-head CI required before integration |
-| TASK-012–020 | NOT IMPLEMENTED | Later source analysis, matching and tailoring |
+| TASK-011 | Reviewed and merged into main through PR #4 | [Implementation review](reviews/TASK-011.md), [guide](JOB_EXTRACTION.md), merge `f6a3bf0` |
+| TASK-012 | CORRECTED — AWAITING RE-REVIEW | [Fixture review](reviews/TASK-012-FIXTURES.md) APPROVED; [implementation review](reviews/TASK-012.md) rounds 1–7 CHANGES REQUIRED (F-01–F-15), corrections pending round 8, see [handoff](REVIEW_HANDOFF.md) |
+| TASK-013–020 | NOT IMPLEMENTED | Skill aliases, review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
 
@@ -35,79 +38,155 @@ That is not PDF/TXT content approval, final artifact approval or permission to
 export. Those gates remain pending. This reconciliation does not read, replace,
 approve or regenerate private profiles, receipts, plans or artifacts.
 
+Reconciled 2026-11-14: the private records hold a later content revision that
+awaits applicant review, so r0009's content is not the current candidate for
+content approval. Its details and the review packet stay in the private data
+root. Next: applicant review, any required correction or typed-model change
+with independent review, then a new baseline, QA and separate final approval.
+
 Pre-sync local progress and handoffs are archived under `history/`; their old
 task gates describe their historical candidates. Published documentation uses
 portable path references. The original bytes and full local commit history
 remain in the retained workstation branch and external merge backup. The
 unpublished TASK-009 branch and merge commits were not imported as publication
-ancestors; shared main ancestry remains. Earlier baseline
-iterations and failed QA remain historical. Do not replace current private
-records with an older profile or infer that artifact r0009 means profile
-revision 9.
+ancestors; shared main ancestry remains. Earlier baseline iterations and failed
+QA remain historical. Do not replace current private records with an older
+profile or infer that artifact r0009 means profile revision 9.
 
-## Reviewed implementation and publication
+## Integrated history in brief
 
-CLEANUP-001 adds supported macOS CI, stage-local Typst package resolution and
-checksum-pinned public assets installed explicitly. TASK-010 adds private,
-bounded UTF-8 JD intake, original bytes, faithful normalized Markdown, supplied
-metadata, integrity checks, duplicate detection and immutable numbered revisions.
-It does not read career facts or create application submissions or outcomes.
-Independent macOS verification of the combined tree passed 147 tests with no
-skips or xfails. Locked sync, Typst asset verification, Ruff, format, mypy,
-installed CLI help and Git whitespace checks exited 0. The reviewer also
-exercised synthetic intake and real rendering; see the [review](reviews/MERGE-TASK-009-MAIN.md)
-for commands, environment and limits. This was a local run, not combined-tree CI.
-Published snapshot `58f0c183` starts from main `0cc9119` and preserves the
-reviewed non-documentation files. Its independent publication review and
-outgoing-history audit were reported as approved before push. That does not
-qualify hosted CI; inspect the latest head and check results on PR #3.
+CLEANUP-001 added supported macOS CI, stage-local Typst package resolution and
+checksum-pinned public assets. TASK-010 added private bounded UTF-8 JD intake
+with original bytes, faithful Markdown, metadata, integrity checks, duplicates
+and immutable revisions. PR #3 published the reviewed baseline fixes as a
+sanitized snapshot (CI `43539855170`, 147 passed). Local ADR-017/018 keep their
+meanings; main's cleanup and intake decisions are [ADR-019](adr/ADR-019.md) and
+[ADR-020](adr/ADR-020.md) per [the reconciliation note](MERGE_RECONCILIATION.md).
+TASK-011 added read-only `jae job-extract`: exact raw Unicode-codepoint quotes,
+section scope and lexical hints, all draft with unspecified priority, verified
+by an independently reviewed 16 EN/16 DE oracle and hosted CI. Detailed
+evidence lives in each linked review.
 
-Hosted [CI 43539855170](https://github.com/umaryaseen/job-application-tool/actions/runs/43539855170)
-verified published snapshot `58f0c183`: **147 passed in 80.68s**, Ruff and
-format passed (68 files), and mypy passed (40 source files). The separate
-reviewer fetched the actual run and job logs. This records that exact snapshot;
-check the final PR head separately after the documentation-only correction.
+## TASK-012 implementation (corrected, awaiting re-review)
 
-Local ADR-017/018 retain their original meanings and template identities.
-Main's conflicting decision IDs are now [ADR-019](adr/ADR-019.md) (cleanup) and
-[ADR-020](adr/ADR-020.md) (draft-intake sequencing). The mapping is recorded in
-[the reconciliation note](MERGE_RECONCILIATION.md); historical approvals are not
-rewritten or extended. ADR-020 originally allowed independent draft intake;
-ADR-021 also permits source-only TASK-011–014 implementation on reviewed
-dependencies before personal acceptance. Neither releases M1/M2 or enables
-career matching, tailoring or export. Later gates remain in force.
+Adds read-only `jae job-classify`: a deterministic layer over the unchanged
+TASK-011 candidates. Explicit EN/DE cues give mandatory/preferred/unspecified
+with cue spans and a fixed basis code; general headings carry no priority;
+cue headings and standalone marker lines (`Nice to have`, `Von Vorteil`) scope
+later clauses; clause/heading or mixed-cue conflicts stay unspecified and need
+review, so a preferred section never becomes mandatory. Recognized
+"not required"/"kein Muss" forms are `requirement_negated`; other negation is
+`unsupported`. Supported ANY/ALL trees cover term lists with one consistent
+conjunction, either/both/sowohl…als auch/parentheses nesting and
+degree-or-equivalent; any other OR/AND makes the condition `null` with review,
+so no OR is split or partially kept. Integer durations and CEFR levels record
+operator/unit/literal scope. Duplicates merge only with identical qualifiers.
+Validation requires each label to equal the rule output for the exact source,
+so recomputed checksums cannot authorize relabelled content. Output stays
+draft; no persistence, profile access, provider, network or dependency.
+
+The 30 EN / 29 DE oracle (`2988f63`) was committed before any classifier code
+and approved by an independent Codex review with no discrepancies. An
+adversarial probe found quadratic behaviour and a raw validation error on dense
+200,000-byte clauses; both were fixed before commit (logarithmic span cover,
+windowed prefix searches, explicit 4,096/16,384 annotation limits failing with
+exit 2). Dense maximum-size clauses now finish in under 0.5 s.
+
+Candidate `f41df6b` passed 313 tests locally and in hosted CI 43605582149.
+Independent Codex review round 1 returned **CHANGES REQUIRED**: a slash or comma
+to an unrecognized term kept a partial condition (F-01); a "related field" after
+the equivalent branch was swallowed (F-02); 999/1000-year amounts raised a raw
+validation error or vanished (F-03); duplicates merged across headings (F-04).
+The corrective commit accounts for `/ | & +` outside terms and comma/semicolon
+list continuation, consumes field alternatives only before the equivalent
+branch, bounds durations (≤99, no leading zeros, uncaptured amounts such as
+"1000 years"/"3yrs" go to review and end scopes), scopes duplicates by
+heading/marker and converts any model-validation gap into `ExtractionError`.
+The oracle is unchanged. All 18 finding-specific regression cases fail on
+`f41df6b` and pass now; the reviewer's own probe scripts reproduce the fixes.
+
+Round 2 on `fbc4c97` returned **CHANGES REQUIRED**: uncaptured or
+under-interpreted numeric text ("six years", "3-year", "3 years minimum",
+"English C2 minimum", scope `of`) passed without review (F-05); the education
+path and unknown operands behind filler/punctuation still left partial
+conditions ("A degree; QuuxDB", "Python with QuuxDB") (F-06, F-07); and the
+TASK-009 note here was too specific for a public repository (F-08). The fix
+replaces case-by-case checks with a coverage rule (non-filler words outside
+interpreted spans withhold the condition with `uninterpreted_text`), flags any
+year/month unit word not captured exactly and unsupported operator words before
+or after amounts, requires a scope to contain a word, and reduces the TASK-009
+note to a generic pending state. 19 of the 20 new finding cases fail on
+`fbc4c97` (the remaining one is a guard case); controls with only filler keep
+their conditions.
+
+Round 3 on `2f43f4f` confirmed F-01–F-08 fixed (126 unknown-operand variants,
+no unreviewed partial condition) and returned **CHANGES REQUIRED** for F-09: an
+operator word away from the number or a contradictory pair still left a
+structured threshold, only flagged. Now any operator word outside an accepted
+threshold span drops the clause's thresholds with `unsupported_number`, and
+`uninterpreted_text` withholds thresholds as well as the condition. All six
+F-09 cases fail on `2f43f4f`. Non-blocking F-10 (reasonable prose such as
+"Experience building REST APIs with Python" goes to review) is the documented
+conservative trade-off.
+
+Round 4 on `b91ead6` confirmed F-01–F-10 (768 unknown-operand variants, no
+unreviewed partial condition) and returned **CHANGES REQUIRED** for F-11: the
+degree term spanned almost the whole clause, so coverage treated trailing text
+("A degree in Computer Science with Rust experience", "A degree, QuuxML") as
+interpreted. The degree term is now explicit grammar (education words, an
+optional field of at most four words, an optional related-field phrase), and
+coverage counts only leaf terms and connectives, never a whole group span. A
+CEFR-dense clause now fails early instead of building thousands of models.
+All eight F-11 cases fail on `b91ead6`.
+
+Round 5 on `d30ecc7` confirmed F-11 and an 80-case operand matrix, and returned
+**CHANGES REQUIRED** for F-12: a degree field made of filler words ("A degree
+in formal language") was dropped because field parsing stopped at filler and
+coverage excused those words. Field parsing now stops only at function words
+and connectives, and content-bearing descriptors left the global filler list;
+they are exempt only as adjacent degree modifiers or as "language" after a
+recognized language. The four F-12 reproductions fail on `d30ecc7`.
+
+Round 6 on `12221f7` confirmed F-12 (no technology-only partial condition in a
+1,872-case matrix) and returned **CHANGES REQUIRED** for F-13: after the F-12
+change, degree fields no longer stopped at "but/also/aber/auch", so a following
+unknown operand joined the field. Every filler word now stops a field (content
+descriptors are no longer filler, so F-12 stays fixed), and a field link with
+no field word withholds the degree condition. Non-blocking F-14 ("Written
+German" sent to review) is addressed with adjacent language modifiers.
+
+Round 7 on `faee434` confirmed F-13/F-14 and returned **CHANGES REQUIRED** for
+F-15: word lexicons stored `ß` forms ("fließend") while lookups used
+`casefold()` (`ß` → `ss`), so those filler words did not end a degree field.
+All lexicons are now built case-folded, guarded by an invariant test over
+every word set. Non-blocking F-16 ("Native-level German", "Written and spoken
+German" go to review) remains the documented conservative behaviour.
+
+Implementer verification of the correction on macOS (Python 3.12, locked
+environment, `JAE_TYPST_PACKAGE_ROOT` assets verified offline):
+
+| Command | Result |
+| --- | --- |
+| `uv run pytest tests/test_requirement_classification.py tests/test_requirement_spans.py tests/test_ingestion.py` | Exit 0; 297 passed |
+| `uv run pytest -ra` | Exit 0; **417 passed** in 104.27s, no skips |
+| `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 77 files formatted |
+| `uv run mypy src` | Exit 0; 47 source files |
+| `git diff --check` | Exit 0 |
+
+Limits: small explicit cue/term allowlists, not general EN/DE parsing; "you'll
+need", postfix operators ("3 years minimum", "or more"), education OR lists
+(Bachelor's or Master's), comma-only skill lists and symbol-joined alternatives
+intentionally stay unsupported and need review; parenthetical qualifiers are
+not interpreted. Re-review of the corrective delta and final-head hosted CI are
+pending.
 
 ## Next action
 
-Verify final-head CI and merge reviewed PR #4 before starting TASK-012's
-source-only priority/negation/group classification. Do not repeat the completed
-decision, fixture or implementation reviews. Do not start career matching or
-treat draft candidates as approved requirements. Also resume
-TASK-009's exact content and artifact acceptance with the applicant;
-appearance-only approval retains its original scope. Before any downstream
-feature makes `source_url` clickable or fetchable, that feature's implementer
-must validate allowed URL schemes (F-02). TASK-010 continues to store the value
-as metadata only. Personal records remain outside Git and CI. No export or
-application is created.
-
-## TASK-011 reviewed implementation
-
-Adds bounded source segmentation and typed draft annotations tied to a verified
-raw JD revision/hash. Unicode-codepoint quotes and lexical subspans round-trip;
-repeated clauses have distinct IDs. Known sections retain responsibility and
-benefit/context scope; explicit unknown headings reset it. Unknown/mixed clauses
-stay ambiguous. All priority stays unspecified and all candidates need review.
-No intake mutation, requirement approval, provider, network or dependency was added.
-
-The [fixture review](reviews/TASK-011-FIXTURES.md) independently approved the
-16 EN/16 DE literal-label corpus before it was used as the test oracle. Local
-focused A17/CLI suite: **57 passed in 2.56s**. Ruff check and format passed
-(73 files); mypy passed (44 source files). The independent implementation review
-ran **84 extraction/intake tests**, additional adversarial/boundary probes and
-the same lint/types. Hosted [CI 43544575739](https://github.com/umaryaseen/job-application-tool/actions/runs/43544575739)
-on published implementation `c72d93a` passed **204 tests in 153.70s**, with
-Ruff/format/mypy passing. Its actual CI checkout tree matched local `d47311e`
-and published tree `54340c9a`. The [review](reviews/TASK-011.md) returned
-APPROVED WITH FOLLOW-UP; the sole low finding was the stale intake-only
-sentence, corrected above in this documentation closure. Final-head CI still
-needs verification after that closure. No M1/M2 acceptance is claimed.
+Obtain the independent round-8 re-review of the TASK-012 corrective delta, verify
+final-head hosted CI, then mark PR #5 ready and merge. Then TASK-013
+(reviewed skill aliases, separate from lexical extraction) and TASK-014
+(source-bound correction/review versions). Separately, TASK-009 waits on
+applicant review of the private content revision; appearance-only approval
+keeps its scope. Before any downstream feature makes `source_url`
+clickable or fetchable, validate allowed URL schemes (F-02). Personal records
+stay outside Git and CI; no matching, tailoring, export or application occurs.

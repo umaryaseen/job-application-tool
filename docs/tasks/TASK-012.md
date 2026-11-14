@@ -4,6 +4,8 @@
 - State at planning handoff: NOT STARTED
 - Estimate: 3–5 h; planning range, excludes unresolved human input and review waiting
 - Dependencies: [TASK-011](TASK-011.md)
+- Sequencing: [ADR-021](../adr/ADR-021.md) permits source-only implementation
+  before personal acceptance; no milestone release or matching gate is waived.
 - Decisions: [ADR-007](../adr/ADR-007.md), [ADR-011](../adr/ADR-011.md)
 
 ## Objective
@@ -17,6 +19,10 @@ Mandatory/preferred and OR/AND semantics materially change matching. Preserve am
 ## Affected modules
 
 extraction/priority.py; extraction/groups.py; domain/requirement.py; tests/test_requirement_classification.py. Paths are intended additions unless already present; inspect before editing.
+
+Implemented as a separate read-only layer (`extraction/classification.py`,
+`jae job-classify`) over the unchanged TASK-011 candidates; see
+[JOB_EXTRACTION](../JOB_EXTRACTION.md) and [PROGRESS](../PROGRESS.md) for state.
 
 ## Acceptance criteria
 
