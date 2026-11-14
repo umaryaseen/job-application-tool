@@ -10,6 +10,8 @@ import hashlib
 from collections import defaultdict
 from pathlib import Path
 
+from pydantic import ValidationError
+
 from ..domain.job import JobRevision
 from ..domain.requirement import (
     MAX_CONDITION_DEPTH,
@@ -110,11 +112,15 @@ def _equivalence_key(row: ClassifiedCandidate) -> object:
     )
 
 
-def _duplicates(rows: list[ClassifiedCandidate], job: JobRevision) -> list[DuplicateGroup]:
+def _duplicates(
+    rows: list[ClassifiedCandidate], job: JobRevision, scopes: dict[str, object]
+) -> list[DuplicateGroup]:
+    """Group repeats only within the same heading and marker scope (README rule 11)."""
     groups: dict[object, list[str]] = defaultdict(list)
     for row in rows:
         if row.role == "requirement":
-            groups[_equivalence_key(row)].append(row.candidate_id)
+            key = (scopes[row.candidate_id], _equivalence_key(row))
+            groups[key].append(row.candidate_id)
     result = []
     for members in groups.values():
         if len(members) > 1:
@@ -137,6 +143,7 @@ def _classify(
     }
     rows: list[ClassifiedCandidate] = []
     marker: list[PriorityCue] = []
+    scopes: dict[str, object] = {}
     budget = _Budget()
     section: str | None = None
     for candidate in extraction.candidates:
@@ -183,6 +190,10 @@ def _classify(
                 )
             )
             continue
+        scopes[candidate.candidate_id] = (
+            candidate.section_id,
+            marker[0].origin_id if marker else None,
+        )
         inherited = marker or headings.get(candidate.section_id or "", [])
         heading, heading_conflict = heading_level([Cue(cue.level, cue.span) for cue in inherited])
         priority, basis, reasons = decide_priority(clause, heading)
@@ -229,7 +240,7 @@ def _classify(
         extraction_digest=extraction.analysis_digest,
         locale=job.locale,
         candidates=rows,
-        duplicates=_duplicates(rows, job),
+        duplicates=_duplicates(rows, job, scopes),
         classification_digest="0" * 64,
     )
     return result.model_copy(
@@ -339,7 +350,11 @@ def validate_classification(
     except ValueError:
         raise ExtractionError("classification structure is invalid") from None
     _validate_structure(checked, extraction, source, job)
-    if _classify(extraction, source, job) != checked:
+    try:
+        expected = _classify(extraction, source, job)
+    except ValidationError:
+        raise ExtractionError("JD classification produced an invalid annotation") from None
+    if expected != checked:
         raise ExtractionError("classification does not match the deterministic source rules")
 
 
@@ -347,7 +362,11 @@ def classify_requirements(
     extraction: RequirementExtraction, source: str, *, job: JobRevision
 ) -> RequirementClassification:
     validate_extraction(extraction, source, job)
-    result = _classify(extraction, source, job)
+    try:
+        result = _classify(extraction, source, job)
+    except ValidationError:
+        # Defence in depth: rule gaps must never leak raw model details or JD text.
+        raise ExtractionError("JD classification produced an invalid annotation") from None
     _validate_structure(result, extraction, source, job)
     return result
 

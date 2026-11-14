@@ -63,7 +63,12 @@ The prompt names the base/candidate commits, the documents to read, the exact
 scope, forbids access outside the checkout (no `$JAE_DATA_DIR`, no network)
 and requires one `VERDICT:` line. Commit the report verbatim under
 `docs/reviews/` with a short provenance header (CLI version, model, sandbox,
-session id). A read-only sandbox cannot run `uv`; when runtime verification is
-required, the reviewer prompt must say so and the implementer records which
-checks the reviewer could not run. Unapproved orchestration branches
+session id). Read-only is enough for document/fixture reviews. For runtime
+checks, run `uv sync --locked --group dev --offline` in the review checkout,
+use `--sandbox workspace-write` on that throwaway checkout (network stays off),
+and have the reviewer call `.venv/bin/python -m pytest ... -p no:cacheprovider
+--basetemp="$TMPDIR/<name>"`: pytest data inside the checkout is correctly
+rejected by the private-data-root policy, and `uv` cannot write its cache in the
+sandbox. Renderer tests cannot nest `sandbox-exec`; rely on hosted CI for them.
+Check `git status` in the checkout afterwards. Unapproved orchestration branches
 (WORKFLOW-001, TASK-036, TASK-039 worktrees) are not part of this workflow.

@@ -96,6 +96,14 @@ _WORD_NUMBERS = {
     "fünf": 5,
 }
 _VAGUE = {"several", "many", "mehrere"}
+MAX_DURATION = 99  # Threshold model bound; larger values go to review, never to a raw error
+# Any numeric duration, including forms the TASK-011 signal does not capture
+# (four digits, no space, "yrs"); uncaptured ones need review.
+ANY_DURATION = re.compile(
+    r"(?<![\w.,])\d[\d.,]*\s*(?:[-–]\s*\d[\d.,]*\s*)?\+?\s*"
+    r"(?:years?|yrs?|jahre?n?|months?|mos?|monate?n?)(?!\w)",
+    re.I,
+)
 _AMOUNT = re.compile(r"(?P<number>.+?)\s+(?P<unit>\S+)", re.S)
 PREFIX_GTE = re.compile(
     r"(?<!\w)(?:at\s+least|a\s+minimum\s+of|minimum\s+of|minimum|min\.?|mindestens|wenigstens)\s*$",
@@ -358,7 +366,9 @@ def _education(
                 ConditionTerm(term_kind=kind, span=right),
             ],
         )
-        return group, [*fields, conn]
+        # A "related field" after the equivalent branch is a further alternative,
+        # not part of the degree term; leaving it unconsumed sends it to review.
+        return group, [*[f for f in fields if f.end <= conn.start], conn]
     end = trim_end(source, start, limit)
     return ConditionTerm(term_kind="education", span=span_of(source, start, end)), fields
 
@@ -381,9 +391,13 @@ def _duration(source: str, clause: SourceSpan, signal: LexicalSignal) -> Thresho
     if folded in _WORD_NUMBERS:
         value = _WORD_NUMBERS[folded]
     elif (parsed := _NUMBER.fullmatch(number)) is not None:
+        if any(len(n) > 1 and n.startswith("0") for n in (parsed["value"], parsed["upper"] or "")):
+            return "unsupported_number"
         value, plus = int(parsed["value"]), parsed["plus"] is not None
         upper = int(parsed["upper"]) if parsed["upper"] else None
     else:
+        return "unsupported_number"
+    if value > MAX_DURATION or (upper is not None and upper > MAX_DURATION):
         return "unsupported_number"
     if upper is not None:
         if plus or gte or gt or upper <= value:
@@ -442,6 +456,67 @@ def _scope(
     return span_of(source, start, end) if end > start else None
 
 
+def _captured_durations(
+    source: str, clause: SourceSpan, signals: list[LexicalSignal]
+) -> tuple[list[LexicalSignal], bool]:
+    """Keep year/month signals that exactly match a numeric amount in the clause.
+
+    Returns (usable signals, partial) where ``partial`` marks an amount the
+    lexical signal did not capture exactly (four digits, "3yrs", "10,000 years").
+    A signal inside such a larger amount is dropped so it cannot invent a value.
+    """
+    years = [signal for signal in signals if signal.kind == "years"]
+    starts = [signal.span.start for signal in years]
+    exact = {(signal.span.start, signal.span.end) for signal in years}
+    dropped: set[int] = set()
+    partial = False
+    for amount in ANY_DURATION.finditer(clause.quote):
+        start, end = clause.start + amount.start(), clause.start + amount.end()
+        if (start, end) in exact:
+            continue
+        partial = True
+        index = bisect.bisect_left(starts, start)
+        while index < len(years) and years[index].span.start < end:
+            dropped.add(index)
+            index += 1
+    return [signal for index, signal in enumerate(years) if index not in dropped], partial
+
+
+def _symbols(clause: SourceSpan) -> list[tuple[int, str]]:
+    return [(clause.start + i, char) for i, char in enumerate(clause.quote) if char in "/|&+"]
+
+
+def _list_continues(
+    source: str, clause: SourceSpan, run: SourceSpan, protected: list[SourceSpan]
+) -> bool:
+    """True when a comma/semicolon joins the term run to further unrecognized text.
+
+    A comma that only separates the run from a cue/negation (``Ideally, Python``)
+    or ends the clause does not extend the list.
+    """
+    starts = {span.start for span in protected}
+    ends = {span.end for span in protected}
+    after = run.end
+    while after < clause.end and source[after].isspace():
+        after += 1
+    if after < clause.end and source[after] in ",;":
+        rest = after + 1
+        while rest < clause.end and source[rest].isspace():
+            rest += 1
+        if rest < clause.end and rest not in starts and source[rest] not in ".;:!?)":
+            return True
+    before = run.start
+    while before > clause.start and source[before - 1].isspace():
+        before -= 1
+    if before > clause.start and source[before - 1] in ",;":
+        prior = before - 1
+        while prior > clause.start and source[prior - 1].isspace():
+            prior -= 1
+        if prior > clause.start and prior not in ends:
+            return True
+    return False
+
+
 def analyze_structure(
     source: str,
     clause: SourceSpan,
@@ -463,8 +538,11 @@ def analyze_structure(
     consumed: list[SourceSpan] = list(protected)
     languages = [signal for signal in signals if signal.kind == "language"]
     found_all: list[Threshold] = []
+    years, partial = _captured_durations(source, clause, signals)
+    if partial:
+        result.reasons.add("unsupported_number")
     for item in [
-        *(_duration(source, clause, s) for s in signals if s.kind == "years"),
+        *(_duration(source, clause, s) for s in years),
         *(_cefr(source, clause, match) for match in cefr_matches),
     ]:
         if isinstance(item, str):
@@ -472,7 +550,8 @@ def analyze_structure(
         else:
             found_all.append(item)
     # A scope ends at the next cue/negation, numeric anchor or threshold (with its prefix).
-    stops = sorted({*anchors, *cue_starts, *(t.span.start for t in found_all)})
+    amounts = [clause.start + m.start() for m in ANY_DURATION.finditer(clause.quote)]
+    stops = sorted({*anchors, *amounts, *cue_starts, *(t.span.start for t in found_all)})
     for item in found_all:
         if item.measure == "duration":
             scope = _scope(source, item, clause, stops)
@@ -503,13 +582,23 @@ def analyze_structure(
     elif len(runs) == 1 and len([t for t in runs[0] if t.type == "atom"]) <= MAX_CONDITION_TERMS:
         try:
             condition = _Parser(runs[0]).parse(source)
-            consumed.append(span_of(source, runs[0][0].span.start, runs[0][-1].span.end))
+            run = span_of(source, runs[0][0].span.start, runs[0][-1].span.end)
+            consumed.append(run)
+            if _list_continues(source, clause, run, protected):
+                result.reasons.add("unsupported_grouping")
         except _Unsupported:
             result.reasons.add("unsupported_grouping")
     elif runs:
         result.reasons.add("unsupported_grouping")
 
     cover = SpanCover(consumed)
+    # Symbol separators outside a recognized term or supported structure can join
+    # an unrecognized operand ("Python / Rust", "Python & QuuxDB"); never drop them.
+    terms = SpanCover(signal.span for signal in signals)
+    for index, char in _symbols(clause):
+        mark = span_of(source, index, index + 1)
+        if not cover.contains(mark) and not terms.contains(mark):
+            result.reasons.add("unparsed_alternative" if char in "/|" else "unparsed_conjunction")
     for match in CONNECTIVE.finditer(clause.quote):
         found = span_of(source, clause.start + match.start(), clause.start + match.end())
         if cover.contains(found):

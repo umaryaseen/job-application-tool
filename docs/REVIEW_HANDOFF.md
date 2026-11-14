@@ -6,6 +6,19 @@ The TASK-012 fixture labels are already independently
 [approved](reviews/TASK-012-FIXTURES.md); do not re-derive or change them to fit
 output. Review the implementation commit supplied with this handoff.
 
+## Round 2: corrective re-review
+
+Round 1 on `f41df6b` returned CHANGES REQUIRED (F-01–F-04; see
+[the review](reviews/TASK-012.md)). Re-review the corrective delta
+`f41df6b..<candidate>`: verify each finding is fixed for its reproduction and
+for nearby variants, that the generalized symbol/comma/semicolon,
+duration-bound, scope-stop and duplicate-scope rules do not hide other
+partial conditions, that controls (CI/CD, "Ideally, Python", supported lists)
+still work, that the fixture oracle is byte-identical, and that the
+documentation tail (PROGRESS incl. the sanitized TASK-009 state note, guide,
+CODEX_HANDOFF harness note) is faithful. Append a "Round 2" section to
+`docs/reviews/TASK-012.md` content in your report; do not rewrite round 1.
+
 Base: main `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`.
 Branch: `task/012-requirement-semantics`. Fixture commit `2988f63` precedes the
 implementation commit; inspect both with `git diff f6a3bf0..<candidate>`.
@@ -44,12 +57,14 @@ REVIEW_PROTOCOL, JOB_EXTRACTION and the fixture README.
 ## Verification
 
 Runtime: `uv run pytest tests/test_requirement_classification.py
-tests/test_requirement_spans.py tests/test_ingestion.py -ra`, `uv run ruff check .`,
+tests/test_requirement_spans.py tests/test_ingestion.py -ra` (in a sandbox, call
+`.venv/bin/python -m pytest` with `--basetemp` outside the checkout; data inside
+the repository is rejected by design), `uv run ruff check .`,
 `uv run ruff format --check .`, `uv run mypy src`, `git diff --check`. Also try
 your own adversarial inputs. The full suite needs macOS `sandbox-exec`, Poppler
 and the pinned Typst assets; inspect hosted CI for the exact published head
 rather than repeating renderer tests in a sandbox that cannot nest them.
-Implementer results are in PROGRESS (313 passed locally); they are not a
+Implementer results are in PROGRESS (341 passed locally); they are not a
 substitute for your checks.
 
 Record actual commands/results, exact head/tree, findings and one verdict in

@@ -95,18 +95,24 @@ Each candidate row keeps its literal quote and adds:
   conjunction (or/oder/and/or/und/oder → `any`; and/und/sowie → `all`),
   explicit either…or / both…and / sowohl…als auch / parentheses for nesting,
   and `<degree> or equivalent experience/qualification` (oder vergleichbare …)
-  as one `any` group. "or a related field" stays inside the degree term. If
-  any OR/AND in the clause is outside that grammar, the condition is `null`
-  and the row needs review: an OR is never split or partially kept.
-- `thresholds`: integer year/month durations (`gte`, `gt`, `range`,
-  `unqualified`) and CEFR levels with operator, unit and literal scope. Vague
-  or decimal quantities create no threshold and need review.
+  as one `any` group. "or a related field" stays inside the degree term only
+  before the equivalent branch. If any OR/AND in the clause is outside that
+  grammar — or a `/`, `|`, `&`, `+` outside a recognized term, or a comma or
+  semicolon joining the terms to further unrecognized text ("Python, QuuxDB")
+  — the condition is `null` and the row needs review: an OR is never split or
+  partially kept. Parenthetical qualifiers and filler words around a term are
+  not interpreted; the literal clause stays visible.
+- `thresholds`: integer year/month durations up to 99 (`gte`, `gt`, `range`,
+  `unqualified`) and CEFR levels with operator, unit and literal scope. A scope
+  ends at the next cue, negation or numeric amount. Vague, decimal, leading-zero,
+  larger or otherwise uncaptured amounts ("1000 years", "3yrs") create no
+  threshold and need review.
 - `review_reasons` / `needs_review`: why a person must look at the row.
   `review_state` stays `draft` for every row.
 
-`duplicates` groups repeated requirements only when the case-folded quote and
-every qualifier are identical; the same text under different headings is not
-merged. Every member keeps its own span.
+`duplicates` groups repeated requirements only within one heading/marker scope
+and only when the case-folded quote and every qualifier are identical; the same
+text under different headings is not merged. Every member keeps its own span.
 
 Structural validation rejects relabelled, split or invented content even when
 checksums are recomputed: each label must equal the deterministic rule output

@@ -461,3 +461,110 @@ def test_actual_cli_rejects_invalid_storage_with_sanitized_diagnostics(
     assert result.stdout == ""
     assert "Traceback" not in result.stderr
     assert str(tmp_path) not in result.stderr
+
+
+# Regressions for independent review round 1 (docs/reviews/TASK-012.md).
+@pytest.mark.parametrize(
+    ("source", "reason"),
+    [
+        ("Requirements\nPython / Rust is required.", "unparsed_alternative"),
+        ("Requirements\nPython / QuuxDB is required.", "unparsed_alternative"),
+        ("Requirements\nPython/QuuxDB.", "unparsed_alternative"),
+        ("Requirements\nPython, QuuxDB is required.", "unsupported_grouping"),
+        ("Requirements\nQuuxDB, Python is required.", "unsupported_grouping"),
+        ("Anforderungen\nPython, QuuxDB ist erforderlich.", "unsupported_grouping"),
+    ],
+)
+def test_f01_slash_or_comma_to_unrecognized_operand_is_not_partial(
+    source, reason, tmp_path: Path
+) -> None:
+    row = analyze(source, tmp_path)[2].candidates[0]
+    assert row.condition is None
+    assert reason in row.review_reasons and row.needs_review
+
+
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        ("Requirements\nCI/CD is required.", "CI/CD"),
+        ("Requirements\nIdeally, Python.", "Python"),
+        ("Requirements\nPython, preferably.", "Python"),
+        ("Requirements\nExperience with Docker, Kubernetes, and AWS.", None),
+    ],
+)
+def test_f01_controls_keep_supported_conditions(source, expected, tmp_path: Path) -> None:
+    row = analyze(source, tmp_path)[2].candidates[0]
+    assert row.condition is not None
+    if expected is not None:
+        assert condition(row.condition) == expected
+    assert not {"unparsed_alternative", "unsupported_grouping"} & set(row.review_reasons)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "Requirements\nA degree or equivalent experience or a related field.",
+        "Requirements\nA degree or equivalent experience or similar field.",
+        "Anforderungen\nStudium oder vergleichbare Qualifikation oder einem verwandten Fach.",
+    ],
+)
+def test_f02_trailing_alternative_after_equivalent_is_not_dropped(source, tmp_path: Path) -> None:
+    row = analyze(source, tmp_path)[2].candidates[0]
+    assert row.condition is None
+    assert "unparsed_alternative" in row.review_reasons
+
+
+@pytest.mark.parametrize(
+    "amount", ["999 years", "100 months", "1000 years", "10,000 years", "3yrs", "5 yrs"]
+)
+def test_f03_out_of_range_or_uncaptured_durations_need_review(amount, tmp_path: Path) -> None:
+    source = f"Requirements\n{amount} of Python experience."
+    row = analyze(source, tmp_path)[2].candidates[0]
+    assert row.thresholds == []
+    assert "unsupported_number" in row.review_reasons
+
+
+def test_f03_cli_reports_review_instead_of_raw_validation_error(tmp_path: Path) -> None:
+    job = saved("Requirements\n999 years of Python experience.", tmp_path)
+    result = cli(tmp_path, "--job-id", job.record.job_id)
+    assert result.returncode == 0, result.stderr
+    assert "pydantic" not in result.stderr.casefold()
+    row = json.loads(result.stdout)["candidates"][0]
+    assert "unsupported_number" in row["review_reasons"]
+
+
+@pytest.mark.parametrize(
+    ("source", "groups"),
+    [
+        ("Requirements\n- Python is required.\nQualifications\n- Python is required.", 0),
+        ("Requirements\n- Python is required.\n- Python is required.", 1),
+        ("Requirements\n- Python is required.\nRequired\n- Python is required.", 0),
+    ],
+)
+def test_f04_duplicates_stay_within_one_heading_scope(source, groups, tmp_path: Path) -> None:
+    assert len(analyze(source, tmp_path)[2].duplicates) == groups
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "Requirements\nPython; QuuxDB is required.",
+        "Requirements\nPython & QuuxDB is required.",
+        "Requirements\nPython + QuuxDB is required.",
+        "Requirements\nPython | QuuxDB is required.",
+    ],
+)
+def test_f01_other_symbol_separators_are_not_partial(source, tmp_path: Path) -> None:
+    row = analyze(source, tmp_path)[2].candidates[0]
+    assert row.condition is None and row.needs_review
+
+
+def test_numeric_amounts_end_scopes_and_leading_zeros_need_review(tmp_path: Path) -> None:
+    source = (
+        "Requirements\n- 3 years of Python experience and 1000 months of AWS.\n"
+        "- 000 years of Python experience."
+    )
+    first, second = analyze(source, tmp_path)[2].candidates
+    assert [t.scope.quote if t.scope else None for t in first.thresholds] == ["Python experience"]
+    assert "unsupported_number" in first.review_reasons
+    assert second.thresholds == [] and "unsupported_number" in second.review_reasons
