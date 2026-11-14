@@ -339,3 +339,63 @@ PDF renderer tests were not run, as instructed.
 | F-12 | blocking | `src/job_application_engine/extraction/groups.py:159-182, 406-437, 598-605` | `FILLER` is also used as `_FIELD_STOP`, and coverage exempts every filler word. A meaningful degree field composed of filler words is therefore dropped without review, producing a broader partial condition. | `Requirements\nA degree in formal language or equivalent experience.` returns `ANY["degree", "equivalent experience"]`, `review_reasons=[]`, and omits `formal language`. `A degree in formal language.` and `A degree in technical language.` return only `degree` with no review. |
 
 This violates the requirement that every meaningful operand be represented or sent to review. The implementation remains local, deterministic, source-bound, dependency-neutral, and documentation is otherwise faithful, including the generic TASK-009 pending note. Fix the filler-only field handling, add regressions for these cases, and repeat the focused checks and probes.
+
+---
+
+## Round 6 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `12221f7` plus a
+  dedicated temporary directory, no network, session
+  `01a1daea-32a9-7222-81ad-5a209f7e47be`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-6 report follows verbatim.
+
+## Round 6
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Candidate: `12221f750ad899a80f0ef309faef88f47edb2ec5`
+- Candidate tree: `1838ca18b0c00791fe43434d058b19a10cf7a056`
+- Working tree: clean; no tracked files modified.
+
+### Commands
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Detached candidate checkout, clean |
+| `git rev-parse HEAD` / `HEAD^{tree}` | 0 | Candidate/tree matched handoff |
+| `git diff --stat/name-status d30ecc7..12221f7` | 0 | 6 paths; 204 additions, 34 deletions |
+| Full corrective diff capture | 0 | 374 lines, 20,361 bytes; inspected in full |
+| Focused pytest command | 0 | 281 passed in 34.09s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir .../mypy` | 0 | No issues in 47 source files |
+| `git diff --check d30ecc7..12221f7` | 0 | Clean |
+| `sha256sum .../classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 .../classification.json` | 0 | Expected digest matched |
+| Final `git status --short --branch` | 0 | Clean |
+
+PDF renderer tests were not run, as instructed.
+
+### Probe outcomes
+
+- F-01–F-11 reproductions and nearby variants remained review-required. Symbol, punctuation, unknown-operand, threshold, duplicate-scope, and degree-tail controls behaved as recorded.
+- F-12 direct cases now preserve `formal language`, `technical language`, and German descriptive fields.
+- A 1,872-case alternative/unknown-operand matrix found 24 unreviewed unknown cases; all were the degree-field defect below. No technology-only partial conditions remained.
+- 142 FILLER entries were exercised across 568 cases; 98 could participate in hiding `QuuxDB` inside a degree field.
+- Four exact 200,000-byte inputs completed or raised bounded `ExtractionError` in 0.128–0.399s. No raw exceptions or slow paths occurred.
+- Eight of eleven reasonable filler controls were accepted. `Spoken German` and `Written German` were conservatively sent to review without hiding a condition.
+- `docs/PROGRESS.md` retains a generic TASK-009 pending note. No new dependency, network access, persistence, profile access, or out-of-scope feature was introduced.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-13 | blocking | `src/job_application_engine/extraction/groups.py:180-187,443-475,636-643` | After removing global FILLER treatment, `_FIELD_STOP` omits function/connective words such as `but` and `also` (and German `aber`/`auch`). The degree parser consumes those words and an unknown following operand as a four-word field. The condition span then covers the operand, so coverage cannot require review. | `Requirements\nA degree in Computer Science but QuuxDB is required.` returns condition `degree in Computer Science but QuuxDB` with no review. `Studium der Informatik aber QuuxDB ist erforderlich.` behaves the same. |
+| F-14 | non-blocking | `src/job_application_engine/extraction/groups.py:146-180,636-643` | The new conservative coverage rule produces false alarms for reasonable prose involving content descriptors that are no longer global filler. | `Requirements\nSpoken German.` and `Written German.` return no condition with `uninterpreted_text`; no meaning is hidden. |
+
+F-13 violates the requirement that unsupported operands and grammar remain review-required. Add missing function/connective boundaries and regression tests for English and German variants, then repeat the focused checks and probes.
