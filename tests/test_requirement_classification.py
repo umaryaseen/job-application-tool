@@ -765,3 +765,35 @@ def test_f12_adjacent_modifiers_remain_covered(line, expected, tmp_path: Path) -
     row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
     assert condition(row.condition) == expected
     assert row.review_reasons == []
+
+
+# Regressions for independent review round 6 (docs/reviews/TASK-012.md).
+@pytest.mark.parametrize(
+    "line",
+    [
+        "A degree in Computer Science but QuuxDB is required.",
+        "A degree in Computer Science also QuuxDB.",
+        "Studium der Informatik aber QuuxDB ist erforderlich.",
+        "Studium der Informatik auch QuuxDB.",
+        "A degree in Computer Science using QuuxDB.",
+        "A degree in basic skills.",
+        "A degree in the field of Physics.",
+    ],
+)
+def test_f13_function_words_end_degree_fields(line, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert row.condition is None and row.needs_review
+
+
+@pytest.mark.parametrize(
+    ("line", "expected"),
+    [
+        ("Spoken German.", "German"),
+        ("Written German is required.", "German"),
+        ("Verhandlungssicheres Deutsch.", "Deutsch"),
+    ],
+)
+def test_f14_language_modifiers_keep_conditions(line, expected, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert condition(row.condition) == expected
+    assert row.review_reasons == []

@@ -175,14 +175,19 @@ EDUCATION_MODIFIERS = frozenset(
 )
 # ... and directly after a recognized language ("German language skills").
 LANGUAGE_SUFFIXES = frozenset({"language", "languages"})
-# A degree field stops only at function words and connectives, never at
-# descriptive words, so "A degree in formal language" keeps its whole field.
-_FIELD_STOP = frozenset(
+# A degree field stops at every filler word (function words and depth
+# qualifiers) and at connectives. Content descriptors are not filler, so
+# "A degree in formal language" keeps its whole field.
+_FIELD_STOP = FILLER | frozenset(
     """
-    with mit and or und oder sowie plus including inkl etc both either entweder sowohl
-    bzw is are be will would should ist sind wird werden sein from for by using via as
-    to at on von vom für bei zu zum zur the a an der die das den dem des ein eine einer
-    einen einem eines e z
+    and or und oder sowie plus including inkl etc both either entweder sowohl bzw e z
+    """.split()
+)
+# Directly before a recognized language: "Written German", "verhandlungssicheres Deutsch".
+LANGUAGE_MODIFIERS = frozenset(
+    """
+    spoken written native conversational business mündlich schriftlich mündliche
+    schriftliche verhandlungssicheres verhandlungssichere
     """.split()
 )
 _WORDS = re.compile(r"[^\W\d_]+|\d+")
@@ -442,8 +447,10 @@ def _language_suffixes(
 
 def _education_term_end(
     source: str, education: list[LexicalSignal], limit: int
-) -> tuple[int, list[SourceSpan]]:
+) -> tuple[int, list[SourceSpan] | None]:
     """End of the explicitly interpreted degree term and any related-field span.
+
+    Returns ``None`` for the spans when a field link has no field words.
 
     Grammar: consecutive education words; optionally ``in/of/der/des/im`` plus a
     field of at most four words that stops at filler, connectives or punctuation;
@@ -458,6 +465,7 @@ def _education_term_end(
     link = _FIELD_LINK.match(source, end, limit)
     if link is not None:
         position, words = link.end(), 0
+        head_end = end
         while words < MAX_FIELD_WORDS:
             word = _FIELD_WORD.match(source, position, limit)
             if word is None or word.group().casefold() in _FIELD_STOP:
@@ -467,6 +475,8 @@ def _education_term_end(
             if space is None:
                 break
             position = space.end()
+        if words == 0:
+            return head_end, None  # "in"/"der" without a field: not supported grammar
     gap = _FIELD_GAP.match(source, end, limit)
     alternative = FIELD_ALTERNATIVE.match(source, gap.end() if gap else end, limit)
     if alternative is not None:
@@ -485,7 +495,10 @@ def _education(
     limit = min([clause.end, *[stop for stop in stops if stop > start]])
     semicolon = source.find(";", start, limit)
     limit = semicolon if semicolon != -1 else limit
-    term_end, fields = _education_term_end(source, education, limit)
+    term_end, found = _education_term_end(source, education, limit)
+    if found is None:
+        return None, []
+    fields = found
     term = ConditionTerm(term_kind="education", span=span_of(source, start, term_end))
     fields = [*_adjacent_words(source, clause.start, start, EDUCATION_MODIFIERS), *fields]
     for match in EQUIVALENT.finditer(source, term_end, limit):
@@ -785,6 +798,12 @@ def analyze_structure(
         *consumed,
         *(signal.span for signal in signals),
         *_language_suffixes(source, clause, signals),
+        *(
+            span
+            for signal in signals
+            if signal.kind == "language"
+            for span in _adjacent_words(source, clause.start, signal.span.start, LANGUAGE_MODIFIERS)
+        ),
     ]
     if condition is not None:
         interpreted.extend(_leaf_spans(condition))
