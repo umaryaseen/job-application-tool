@@ -654,3 +654,71 @@ The direct F-18 reproductions withheld thresholds and required review. A nearby 
 |---|---|---|---|---|
 | F-19 | blocking | `src/job_application_engine/extraction/groups.py:164-178`; `docs/JOB_EXTRACTION.md:133-136` | The CEFR compound exception accepts every Unicode `Pd` dash, although the documented exception permits only a word-joining hyphen. Non-hyphen dashes therefore create an unreviewed threshold. | `Requirements\nEnglish C2—Niveau.` returns an unqualified `C2` threshold with `review_reasons=[]`. `C2–Niveau`, `C2‒Niveau`, `C2⸺Niveau` and `C2～Niveau` behave the same. |
 | F-20 | non-blocking | `src/job_application_engine/extraction/groups.py:157-162` | Sign-before detection creates a conservative false alarm when a preceding recognized `C++` term contributes the plus sign. | `Requirements\nC++ 3 years of experience.` keeps condition `C++`, removes the threshold and adds `unsupported_number`; meaning remains visible for review. |
+
+---
+
+## Round 11 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `07375b1` plus a
+  dedicated temporary directory, no network, session
+  `01a1db5e-2738-73d3-82f7-a55faeefda5a`. Checkout tracked files unchanged; exit 0.
+- Hosted CI 43628074843 on `07375b1` (checkout: merge into unchanged main
+  `f6a3bf0`, tree `bf360e66`): 458 passed, Ruff/format/mypy passed.
+
+The reviewer's round-11 report follows verbatim.
+
+## Round 11
+
+VERDICT: APPROVED
+
+- Reviewer: Codex independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Candidate: `07375b1b12d055960ccc6b4333cc66e71c01fabc`
+- Candidate tree: `bf360e66f002f7f7efc121c58343dd1c08e564d8`
+- Working tree: clean; no tracked files modified.
+
+### Commands
+
+| Command | Exit | Result |
+|---|---:|---|
+| Full corrective `git diff --find-renames --find-copies ad83f8d..07375b1` | 0 | 6 paths; 286 diff lines, 17,781 bytes; 124 additions, 19 deletions; fully inspected |
+| Focused pytest command from handoff | 0 | 338 passed, no skips |
+| `.venv/bin/ruff check --no-cache .` | 0 | 0 diagnostics |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir .../mypy` | 0 | No issues in 47 source files |
+| `git diff --check ad83f8d..07375b1` | 0 | Clean |
+| `sha256sum tests/fixtures/requirements/classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest matched: `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| F-01–F-20 regression probe | 0 | 140 cases; 0 exceptions; 0 unexpected unsafe conditions; 7 expected clean controls |
+| Alternative/unknown-operand batch | 0 | 532 rows; 0 unreviewed partial conditions |
+| FILLER audit | 0 | 142 entries × 5 contexts = 710 cases; 0 hidden operands; 0 exceptions |
+| Duplicate probe | 0 | 5 scope/qualifier cases; all matched expected grouping |
+| Threshold/value/scope probe | 0 | 26 cases; no exceptions or invented spans |
+| Unicode `Pd`/`Sm` probe | 0 | 26 dash variants and 1,896 math-symbol cases; 0 unsafe thresholds |
+| Exact 200,000-byte probe | 0 | 6 cases; 3 bounded `ExtractionError`s and 3 reviewed classifications; 0.112–0.518s |
+| CLI sanitization probe | 0 | 4 cases; valid request exit 0, invalid requests exit 2; diagnostics sanitized |
+| Final status and diff check | 0 | Clean checkout |
+
+PDF renderer tests were not run, as required by the handoff.
+
+### Probe outcomes
+
+F-19 is fixed. All 26 Unicode dash variants were tested in `C2<dash>Niveau`: ASCII hyphen, U+2010, and U+2011 were accepted; all other `Pd` dashes required review and produced no threshold.
+
+F-20 is fixed. `C++ 3 years of experience.` preserves the duration threshold without review. Nearby `C++ +3 years` and `C++3 years` remain reviewed with no threshold.
+
+F-01–F-18 remain fixed across their direct reproductions and nearby variants. No OR/alternative or unknown operand produced an unreviewed partial or single-term condition. Existing conservative coverage false alarms remain meaning-preserving and correspond to the recorded non-blocking F-10, F-14, and F-16 behavior.
+
+Every FILLER entry required review when placed around an unknown operand. Reasonable controls such as `Strong Python skills`, `Solid knowledge of SQL`, `Hands-on experience with Docker`, valid groups, and valid numeric/CEFR thresholds remained accepted.
+
+Threshold values and scopes were source-literal and raw-span verified. Malformed, contradictory, signed, out-of-range, or unsupported forms were reviewed or withheld. Duplicate grouping respected heading, marker, and qualifier scope.
+
+The exact 200,000-byte inputs stayed bounded without raw exceptions. No network, execution of posting text, persistence, profile access, or dependency change was observed. The TASK-009 note in `docs/PROGRESS.md` remains a generic pending state without applicant facts.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| — | — | — | No new F-21+ findings. | All required corrective and adversarial probes passed. |

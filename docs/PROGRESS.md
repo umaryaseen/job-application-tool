@@ -4,10 +4,10 @@ Last reconciled: 2026-11-14 against main `f6a3bf05` (merged PR #4). TASK-011
 draft source candidates are integrated; final PR #4 CI 43545596860 passed 204
 tests with lint/types and its checkout tree matched the reviewed tree. TASK-009
 personal acceptance remains open. Accepted ADR-021 permits source-only analysis
-on reviewed dependencies; TASK-012 is on draft
-[PR #5](https://github.com/umaryaseen/job-application-tool/pull/5): round-1
-to round-10 reviews found blocking defects, now corrected and awaiting
-round-11 re-review.
+on reviewed dependencies; TASK-012 on
+[PR #5](https://github.com/umaryaseen/job-application-tool/pull/5) is
+independently APPROVED (review round 11 on `07375b1`) with passing final-head
+CI and awaits merge.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ round-11 re-review.
 | Sanitized publication | PR #3 MERGED | [Publication note](reviews/TASK-009-PUBLICATION.md); main `83497777`, final published CI `43541161616` |
 | Publication state correction | APPROVED, documentation only | [Scoped review](reviews/TASK-009-PUBLICATION-STATE.md); no runtime or approval-policy changes |
 | TASK-011 | Reviewed and merged into main through PR #4 | [Implementation review](reviews/TASK-011.md), [guide](JOB_EXTRACTION.md), merge `f6a3bf0` |
-| TASK-012 | CORRECTED — AWAITING RE-REVIEW | [Fixture review](reviews/TASK-012-FIXTURES.md) APPROVED; [implementation review](reviews/TASK-012.md) rounds 1–10 CHANGES REQUIRED (F-01–F-19), corrections pending round 11, see [handoff](REVIEW_HANDOFF.md) |
+| TASK-012 | APPROVED — AWAITING MERGE | [Fixture review](reviews/TASK-012-FIXTURES.md) APPROVED; [implementation review](reviews/TASK-012.md) rounds 1–10 CHANGES REQUIRED (F-01–F-20), round 11 APPROVED on `07375b1`; CI 43628074843: 458 passed |
 | TASK-013–020 | NOT IMPLEMENTED | Skill aliases, review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -67,7 +67,7 @@ section scope and lexical hints, all draft with unspecified priority, verified
 by an independently reviewed 16 EN/16 DE oracle and hosted CI. Detailed
 evidence lives in each linked review.
 
-## TASK-012 implementation (corrected, awaiting re-review)
+## TASK-012 implementation (approved, awaiting merge)
 
 Adds read-only `jae job-classify`: a deterministic layer over the unchanged
 TASK-011 candidates. Explicit EN/DE cues give mandatory/preferred/unspecified
@@ -185,6 +185,14 @@ accepts only `-`, U+2010 and U+2011. Non-blocking F-20 ("C++ 3 years" lost its
 threshold because the term's "+" counted as a sign) is fixed by ignoring signs
 inside recognized terms. All six F-19 dash cases fail on `ad83f8d`.
 
+Round 11 on `07375b1` returned **APPROVED** with no new findings (140
+regression, 532 operand, 710 filler and about 1,900 Unicode sign cases clean).
+Hosted CI 43628074843 on that head passed 458 tests with Ruff/format/mypy; its
+checkout tree matched `bf360e66`. Remaining non-blocking, meaning-preserving
+false alarms (F-10, F-14, F-16) are the documented conservative behaviour:
+prose such as "Experience building REST APIs with Python" or "Written and
+spoken German" goes to review rather than receiving a partial condition.
+
 Implementer verification of the correction on macOS (Python 3.12, locked
 environment, `JAE_TYPST_PACKAGE_ROOT` assets verified offline):
 
@@ -200,13 +208,11 @@ Limits: small explicit cue/term allowlists, not general EN/DE parsing; "you'll
 need", postfix operators ("3 years minimum", "or more"), education OR lists
 (Bachelor's or Master's), comma-only skill lists and symbol-joined alternatives
 intentionally stay unsupported and need review; parenthetical qualifiers are
-not interpreted. Re-review of the corrective delta and final-head hosted CI are
-pending.
+not interpreted.
 
 ## Next action
 
-Obtain the independent round-11 re-review of the TASK-012 corrective delta, verify
-final-head hosted CI, then mark PR #5 ready and merge. Then TASK-013
+Merge reviewed PR #5 after the scoped review of this documentation closure. Then TASK-013
 (reviewed skill aliases, separate from lexical extraction) and TASK-014
 (source-bound correction/review versions). Separately, TASK-009 waits on
 applicant review of the private content revision; appearance-only approval

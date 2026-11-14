@@ -1,5 +1,18 @@
 # Review handoff: TASK-012 priority, negation and alternatives
 
+**Status: implementation APPROVED** in round 11 on `07375b1` (tree `bf360e66`);
+hosted CI 43628074843 passed 458 tests. See [the review](reviews/TASK-012.md).
+
+## Scoped closure check (pending)
+
+The only change after `07375b1` is this documentation closure: the verbatim
+round-11 report appended to `docs/reviews/TASK-012.md`, PROGRESS state and this
+handoff. Confirm no runtime, test, fixture, dependency or workflow file changed,
+the records are faithful, and the TASK-009 note stays generic. Do not repeat
+runtime reviews for this documentation-only tail.
+
+## Historical review scope
+
 Implementer: Claude Code. Independent reviewer: a separate Codex session (or
 another engineer). TASK-011 is merged (`f6a3bf05`); its reviews are complete.
 The TASK-012 fixture labels are already independently
