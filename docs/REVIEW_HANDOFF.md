@@ -1,55 +1,65 @@
-# Publication handoff: reviewed TASK-009 baseline fixes
+# Continuation: reviewed TASK-011 draft source candidates
 
-Scope: current operating documents only. The original local merge and its
-documentation follow-up are complete. Do not restart those review targets.
-The publication status correction also received
-[APPROVED scoped review](reviews/TASK-009-PUBLICATION-STATE.md). Check CI on
-the final PR head before integration; do not restart the completed review below.
+The decision, fixture and implementation reviews are complete; do not restart
+them. The [implementation review](reviews/TASK-011.md) returned APPROVED WITH
+FOLLOW-UP for local `d47311e` / published `c72d93a`, matching tree `54340c9a`.
+Its sole low-priority status-text finding is corrected in the closure. The
+instructions below preserve the completed review scope. Verify the final
+published PR #4 head and hosted CI before main integration.
 
-- Published base: `58f0c183e3c4ce76be5c7ea72c5f082cbd91c71d`.
-- PR: [#3](https://github.com/umaryaseen/job-application-tool/pull/3), targeting
-  main `0cc9119df20a2be974f8db41ed9869663493f800`.
-- Local source merge: `266e5ef3`, retained on the workstation. The unpublished
-  local merge/TASK-009 commits are not publication-branch ancestors; common
-  main ancestry is retained.
-- Code review: [APPROVED WITH FOLLOW-UP](reviews/MERGE-TASK-009-MAIN.md),
-  including 147 tests passed on macOS against the recorded source tree.
-- Original documentation review:
-  [APPROVED](reviews/MERGE-TASK-009-MAIN-DOCS.md).
-- Sanitization and source identity: [publication note](reviews/TASK-009-PUBLICATION.md).
+Base: merged main `83497777a03e6e8f642edadff9781c6cdeb741ad`.
+Branch: `task/011-requirement-candidates`. Review the exact candidate commit/tree
+provided with this handoff, including its decision/fixture history.
 
-## Completed scoped review
+## Decisions and independently reviewed oracle
 
-The following scope defined the completed review and is retained for audit.
+Read AGENTS, TASK-011, ADR-007/020/021, the relevant architecture/A17/privacy
+sections and REVIEW_PROTOCOL. ADR-021 was independently approved before coding
+and explicitly allows source-only TASK-011–014 on their dependencies. Only
+TASK-011 is implemented here; M1/M2 acceptance and matching/tailoring/export
+remain gated. Never infer applicant approval from a merged PR or synthetic test.
 
-Read AGENTS and [REVIEW_PROTOCOL](REVIEW_PROTOCOL.md). Inspect the exact
-base-to-head correction and record the candidate commit/tree. Confirm:
+The 16 EN/16 DE literal oracle was committed before implementation and separately
+[reviewed](reviews/TASK-011-FIXTURES.md). Do not derive expected labels from the
+parser or change them to conceal a mismatch. Kind and priority are separate;
+every candidate stays draft, needs_review and priority unspecified.
 
-1. Only PROGRESS, this handoff, MERGE_RECONCILIATION and the composite DOCX ADR
-   reference in IMPLEMENTATION_PLAN change. Source, tests, schemas, scripts,
-   dependencies, fixtures, CI and runtime/template identities remain unchanged.
-2. Current documents distinguish the completed local merge, approved prior
-   reviews, published sanitized snapshot and PR #3's pending main integration.
-   Historical review records retain their recorded identities and limitations.
-3. Local 147-test verification is not described as hosted publication CI.
-   Verify the actual latest PR head, workflow result and logs separately; an
-   earlier green run must not qualify changed source without review.
-4. TASK-009 exact PDF/TXT content, final artifact acceptance and export remain
-   pending. Appearance-only approval retains its original scope. No private
-   data is read, changed, imported or approved by this correction.
-5. F-02 remains a future gate: validate allowed URL schemes before a downstream
-   feature makes `source_url` clickable or fetchable. TASK-010 stays metadata-only.
+## Review focus
 
-Check whitespace, relative links and added content for private material. A
-documentation-only correction can receive scoped review without rerunning the
-macOS suite locally. Record the independent verdict under `docs/reviews/`;
-do not modify implementation or merge the PR as part of review.
+Completed implementation-review scope:
 
-## Next action
+- Typed exact raw source identity, original Unicode-codepoint half-open offsets,
+  quote round-trip, candidate/heading IDs, repeated occurrences, section scope,
+  lexical subspans, analysis digest and revision binding.
+- Bounded sentence/list/section segmentation, CRLF/BOM/combining characters,
+  common abbreviations, wrapped prose and unknown headings. Responsibilities,
+  benefits/context, unsupported technologies and mixed/ambiguous clauses must
+  stay visible without turning a negative, optional or OR clause into a hard gate.
+- Read-only actual `job-extract` CLI against verified saved jobs, explicit and
+  current revisions, missing/tampered/path-traversal input, second-read mutation,
+  output bounds and absence of network or source execution. Analysis must not
+  mutate job revisions, read career profiles or persist approvals.
+- Rule/lexical limits are disclosed: no canonical aliases, priority/groups,
+  matching, LLM/provider, new dependency, URL fetching, storage framework or CV
+  change. README's captures-dir example only aligns with an existing required flag.
 
-Check hosted CI and review for the final PR head before merging through the
-normal GitHub workflow. Then resume TASK-009 with the actual current private
-canonical profile and exact artifacts. The applicant alone approves document
-content and final bytes. Do not replace current records with an older starter
-profile, infer profile revision from artifact r0009, or treat saved postings as
-application submissions. Later task and milestone dependencies remain in force.
+## Verification
+
+Run `uv run pytest tests/test_requirement_spans.py tests/test_ingestion.py -ra`,
+Ruff check/format, mypy and whitespace/link checks. Inspect hosted complete
+macOS CI for the exact published candidate; Linux cannot qualify the existing
+production renderer. Local TASK-011 focused suite passed 57 tests before review.
+Independent review passed 84 extraction/intake tests plus adversarial probes
+and lint/types. Hosted CI on implementation `c72d93a` passed 204 tests; see the
+review for the exact run, logs and matching checkout tree. These are recorded
+results, not a request to repeat completed review after a status-only closure.
+Record actual commands/results, exact heads/trees, findings and independent
+verdict in `docs/reviews/TASK-011.md`. Do not modify implementation while giving
+that verdict. No private profile or final CV inspection is needed for this
+source-only task. Do not merge or impersonate applicant approval.
+
+The faithful status/report-only closure requires a short scoped check, retaining
+all source/approval/milestone gates. Inspect final-head CI before integration.
+After PR #4 is merged, TASK-012 is next on its reviewed dependency: interpret
+priority/negation/alternatives from the same source, retaining uncertainty and
+draft review state. No career matching, tailoring or export gate is waived.

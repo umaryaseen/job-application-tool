@@ -2,9 +2,9 @@
 
 A local Python tool for preparing truthful job applications and retaining the exact documents reviewed and exported.
 
-**Implemented:** profile/evidence validation, deterministic document plans, RenderCV/Typst PDF rendering, PDF/text QA, immutable snapshot/approval/export, and private draft JD intake. See [current progress](docs/PROGRESS.md) for integration/review states. A genuine applicant-approved baseline has not been accepted in the inspected repository.
+**Implemented:** profile/evidence validation, deterministic document plans, RenderCV/Typst PDF rendering, PDF/text QA, immutable snapshot/approval/export, private draft JD intake and draft source-candidate extraction. See [current progress](docs/PROGRESS.md) for integration/review states. Personal baseline content/final approval remains pending.
 
-**User workflow:** paste a JD → compare Applied AI and Full Stack base CVs → tailor a CV and cover letter → save JD/interview preparation → track company, submission, interviews and outcomes → analyze recurring skills. Intake is implemented; the remaining application steps are planned. See [workflow roadmap](docs/APPLICATION_WORKFLOW.md) and [repository audit](docs/REPOSITORY_AUDIT.md).
+**User workflow:** paste a JD → compare Applied AI and Full Stack base CVs → tailor a CV and cover letter → save JD/interview preparation → track company, submission, interviews and outcomes → analyze recurring skills. Intake and draft source annotations are implemented; reviewed classification, matching and the remaining application steps are planned. See [workflow roadmap](docs/APPLICATION_WORKFLOW.md) and [repository audit](docs/REPOSITORY_AUDIT.md).
 
 ## Start here
 
@@ -41,13 +41,14 @@ The explicit setup command downloads only checksum-pinned public Typst package f
 | `jae config-check` | Validate the private data root |
 | `jae job-ingest` | Save bounded UTF-8 file/stdin, source metadata and immutable JD revisions |
 | `jae job-show` | Verify and show a saved JD revision and its supplied metadata |
+| `jae job-extract` | Read-only draft source candidates with exact raw quotes/offsets; priority remains unspecified |
 | `jae build-cv` | Render an explicitly reviewed profile and document plan into a PDF |
 | `jae snapshot-build` | Create an immutable private PDF/TXT/QA/source snapshot |
 | `jae snapshot-approve` | Record explicit review of that exact snapshot |
 | `jae snapshot-export` | Revalidate current eligibility and export approved PDF/TXT bytes |
 | `python -m job_application_engine.ats_qa` | Measure a PDF against independently supplied expectations |
 
-Use `--help` for actual command arguments. Base comparison, requirement extraction, tailoring, letters, DOCX, interviews, tracking and skill analytics are not implemented commands yet. No application LLM, browser or submission integration is active.
+Use `--help` for actual command arguments. Base comparison, reviewed requirement classification, tailoring, letters, DOCX, interviews, tracking and skill analytics are not implemented commands yet. No application LLM, browser or submission integration is active.
 
 ## Save a vacancy
 
@@ -59,6 +60,15 @@ uv run jae job-show --job-id example-ai-role
 
 Use `--text -` for pasted stdin, ending input with EOF. Reuse the job ID when a posting changes. The original UTF-8 bytes and normalized Markdown are kept separately; identical current input is deduplicated. All records remain draft. See [the intake guide](docs/JOB_INTAKE.md) for revision and metadata behavior.
 
+Inspect source candidates without changing the saved revision:
+
+```bash
+uv run jae job-extract --job-id example-ai-role
+```
+
+All candidates remain draft and need review; required/preferred and negative
+wording is preserved without assigning priority. See [the extraction guide](docs/JOB_EXTRACTION.md).
+
 ## Baseline example
 
 Set `JAE_DATA_DIR` to an existing absolute private directory outside the checkout. Inputs must already be curated and reviewed; this command does not invent or approve facts.
@@ -69,6 +79,7 @@ uv run jae build-cv \
   --profile /private/path/to/profile.json \
   --plan /private/path/to/document-plan.json \
   --reviews /private/path/to/reviews.json \
+  --captures-dir /private/path/to/support-captures \
   --output-name baseline.pdf
 ```
 

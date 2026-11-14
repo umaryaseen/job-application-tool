@@ -10,6 +10,12 @@ Milestones progress in order: M1 genuine baseline → M2 requirement matrix → 
 
 ADR-020 permits TASK-010 private draft JD intake after the reviewed technical foundation, while TASK-009 personal acceptance remains pending. This is a narrow independent-work exception, not an M1/M2 release or general waiver of later dependencies.
 
+ADR-021 additionally permits implementation/review of source-only TASK-011–014
+on their existing technical dependencies while personal acceptance is open.
+Only TASK-011 is the current implementation task. M1/M2 release and
+TASK-015 onward retain their existing gates; no career matching or artifact
+approval is authorized by draft JD analysis.
+
 ## Milestones
 
 | Milestone | Tasks | Exit |

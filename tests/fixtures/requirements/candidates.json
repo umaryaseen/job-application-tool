@@ -1,0 +1,512 @@
+[
+  {
+    "id": "en-01",
+    "locale": "en",
+    "text": "Python is required.",
+    "expected": [
+      {
+        "quote": "Python is required.",
+        "kind": "technology",
+        "section": "unknown",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-02",
+    "locale": "en",
+    "text": "# Qualifications\nA bachelor's degree or equivalent experience.",
+    "expected": [
+      {
+        "quote": "A bachelor's degree or equivalent experience.",
+        "kind": "education",
+        "section": "qualifications",
+        "signal_kinds": [
+          "education"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-03",
+    "locale": "en",
+    "text": "Requirements\nFluent English is preferred.",
+    "expected": [
+      {
+        "quote": "Fluent English is preferred.",
+        "kind": "language",
+        "section": "qualifications",
+        "signal_kinds": [
+          "language"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-04",
+    "locale": "en",
+    "text": "What you bring\nAt least 3 years of experience.",
+    "expected": [
+      {
+        "quote": "At least 3 years of experience.",
+        "kind": "experience",
+        "section": "qualifications",
+        "signal_kinds": [
+          "years"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-05",
+    "locale": "en",
+    "text": "Responsibilities\nBuild Python APIs.",
+    "expected": [
+      {
+        "quote": "Build Python APIs.",
+        "kind": "responsibility",
+        "section": "responsibilities",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-06",
+    "locale": "en",
+    "text": "Benefits\nWe offer Python training and free meals.",
+    "expected": [
+      {
+        "quote": "We offer Python training and free meals.",
+        "kind": "context",
+        "section": "benefits",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-07",
+    "locale": "en",
+    "text": "About us\nGerman is our team language.",
+    "expected": [
+      {
+        "quote": "German is our team language.",
+        "kind": "context",
+        "section": "context",
+        "signal_kinds": [
+          "language"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-08",
+    "locale": "en",
+    "text": "Requirements\nPython or Java is sufficient.",
+    "expected": [
+      {
+        "quote": "Python or Java is sufficient.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-09",
+    "locale": "en",
+    "text": "Requirements\nNo German is required.",
+    "expected": [
+      {
+        "quote": "No German is required.",
+        "kind": "language",
+        "section": "qualifications",
+        "signal_kinds": [
+          "language"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-10",
+    "locale": "en",
+    "text": "Requirements\nExperience with Node.js and C++.",
+    "expected": [
+      {
+        "quote": "Experience with Node.js and C++.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-11",
+    "locale": "en",
+    "text": "Requirements\nPython is required. Python is required.",
+    "expected": [
+      {
+        "quote": "Python is required.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      },
+      {
+        "quote": "Python is required.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-12",
+    "locale": "en",
+    "text": "## Requirements\r\n- Work with PostgreSQL.\r\n- Fluent English.",
+    "expected": [
+      {
+        "quote": "Work with PostgreSQL.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      },
+      {
+        "quote": "Fluent English.",
+        "kind": "language",
+        "section": "qualifications",
+        "signal_kinds": [
+          "language"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-13",
+    "locale": "en",
+    "text": "Requirements\nA degree and 5 years of experience.",
+    "expected": [
+      {
+        "quote": "A degree and 5 years of experience.",
+        "kind": "ambiguous",
+        "section": "qualifications",
+        "signal_kinds": [
+          "education",
+          "years"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-14",
+    "locale": "en",
+    "text": "## Other details\nBring curiosity.",
+    "expected": [
+      {
+        "quote": "Bring curiosity.",
+        "kind": "ambiguous",
+        "section": "unknown",
+        "signal_kinds": []
+      }
+    ]
+  },
+  {
+    "id": "en-15",
+    "locale": "en",
+    "text": "Requirements\nUse e.g. Python and Docker.",
+    "expected": [
+      {
+        "quote": "Use e.g. Python and Docker.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "en-16",
+    "locale": "en",
+    "text": "Requirements\nExperience in\nPython services.",
+    "expected": [
+      {
+        "quote": "Experience in\nPython services.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-01",
+    "locale": "de",
+    "text": "Python ist erforderlich.",
+    "expected": [
+      {
+        "quote": "Python ist erforderlich.",
+        "kind": "technology",
+        "section": "unknown",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-02",
+    "locale": "de",
+    "text": "Qualifikationen\nEin abgeschlossenes Studium oder gleichwertige Erfahrung.",
+    "expected": [
+      {
+        "quote": "Ein abgeschlossenes Studium oder gleichwertige Erfahrung.",
+        "kind": "education",
+        "section": "qualifications",
+        "signal_kinds": [
+          "education"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-03",
+    "locale": "de",
+    "text": "Dein Profil\nSehr gute Englischkenntnisse sind wünschenswert.",
+    "expected": [
+      {
+        "quote": "Sehr gute Englischkenntnisse sind wünschenswert.",
+        "kind": "language",
+        "section": "qualifications",
+        "signal_kinds": [
+          "language"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-04",
+    "locale": "de",
+    "text": "Was du mitbringst\nMindestens 3 Jahre Berufserfahrung.",
+    "expected": [
+      {
+        "quote": "Mindestens 3 Jahre Berufserfahrung.",
+        "kind": "experience",
+        "section": "qualifications",
+        "signal_kinds": [
+          "years"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-05",
+    "locale": "de",
+    "text": "Deine Aufgaben\nEntwickle Python-APIs.",
+    "expected": [
+      {
+        "quote": "Entwickle Python-APIs.",
+        "kind": "responsibility",
+        "section": "responsibilities",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-06",
+    "locale": "de",
+    "text": "Wir bieten\nWir bieten Schulungen in Python und kostenlose Getränke.",
+    "expected": [
+      {
+        "quote": "Wir bieten Schulungen in Python und kostenlose Getränke.",
+        "kind": "context",
+        "section": "benefits",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-07",
+    "locale": "de",
+    "text": "Über uns\nDeutsch ist unsere Teamsprache.",
+    "expected": [
+      {
+        "quote": "Deutsch ist unsere Teamsprache.",
+        "kind": "context",
+        "section": "context",
+        "signal_kinds": [
+          "language"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-08",
+    "locale": "de",
+    "text": "Anforderungen\nPython oder Java genügt.",
+    "expected": [
+      {
+        "quote": "Python oder Java genügt.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-09",
+    "locale": "de",
+    "text": "Anforderungen\nDeutschkenntnisse sind nicht erforderlich.",
+    "expected": [
+      {
+        "quote": "Deutschkenntnisse sind nicht erforderlich.",
+        "kind": "language",
+        "section": "qualifications",
+        "signal_kinds": [
+          "language"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-10",
+    "locale": "de",
+    "text": "Anforderungen\nErfahrung mit Node.js und C++.",
+    "expected": [
+      {
+        "quote": "Erfahrung mit Node.js und C++.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-11",
+    "locale": "de",
+    "text": "Anforderungen\nPython ist erforderlich. Python ist erforderlich.",
+    "expected": [
+      {
+        "quote": "Python ist erforderlich.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      },
+      {
+        "quote": "Python ist erforderlich.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-12",
+    "locale": "de",
+    "text": "## Anforderungen\r\n- Erfahrung mit PostgreSQL.\r\n- Fließendes Englisch.",
+    "expected": [
+      {
+        "quote": "Erfahrung mit PostgreSQL.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      },
+      {
+        "quote": "Fließendes Englisch.",
+        "kind": "language",
+        "section": "qualifications",
+        "signal_kinds": [
+          "language"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-13",
+    "locale": "de",
+    "text": "Anforderungen\nEin Studium und 5 Jahre Erfahrung.",
+    "expected": [
+      {
+        "quote": "Ein Studium und 5 Jahre Erfahrung.",
+        "kind": "ambiguous",
+        "section": "qualifications",
+        "signal_kinds": [
+          "education",
+          "years"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-14",
+    "locale": "de",
+    "text": "## Weitere Angaben\nBring Neugier mit.",
+    "expected": [
+      {
+        "quote": "Bring Neugier mit.",
+        "kind": "ambiguous",
+        "section": "unknown",
+        "signal_kinds": []
+      }
+    ]
+  },
+  {
+    "id": "de-15",
+    "locale": "de",
+    "text": "Anforderungen\nKenntnisse z. B. in Python und Docker.",
+    "expected": [
+      {
+        "quote": "Kenntnisse z. B. in Python und Docker.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "de-16",
+    "locale": "de",
+    "text": "Anforderungen\nErfahrung in\nPython-Diensten.",
+    "expected": [
+      {
+        "quote": "Erfahrung in\nPython-Diensten.",
+        "kind": "technology",
+        "section": "qualifications",
+        "signal_kinds": [
+          "technology"
+        ]
+      }
+    ]
+  }
+]
