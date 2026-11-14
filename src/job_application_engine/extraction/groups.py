@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import bisect
 import re
+import unicodedata
 from dataclasses import dataclass, field
 from typing import Literal, cast
 
@@ -142,12 +143,53 @@ OPERATOR_WORD = re.compile(
     r"unter|oder\s+(?:mehr|länger|höher|besser))(?!\w)",
     re.I,
 )
-# Signs and comparison symbols are not supported operators: next to an amount
-# they reject the threshold ("−3 years", "~3 years", "English ≤C2"); anywhere
-# else outside an accepted threshold they withhold the clause's thresholds.
-_COMPARISON = "~∼≈≃≅≤≥⩽⩾<>±∓=≠"
-SYMBOL_PREFIX = re.compile(r"[-−–—" + re.escape(_COMPARISON) + r"]\s*$")
-SYMBOL_POSTFIX = re.compile(r"\s*[+" + re.escape(_COMPARISON) + r"]")
+# Signs and comparison symbols are not supported operators. A "sign" is any
+# Unicode math symbol (Sm: + < = > ~ ± ≤ ≥ ≈ −, fullwidth ＋ ～ …) or dash (Pd:
+# hyphen-minus, en/em dashes, fullwidth/small forms). Next to an amount or CEFR
+# level it rejects the threshold; elsewhere it withholds the clause's thresholds.
+_SIGN_CATEGORIES = frozenset({"Sm", "Pd"})
+
+
+def _is_sign(char: str) -> bool:
+    return unicodedata.category(char) in _SIGN_CATEGORIES
+
+
+def _sign_before(source: str, floor: int, start: int) -> bool:
+    position = start
+    while position > floor and source[position - 1].isspace():
+        position -= 1
+    return position > floor and _is_sign(source[position - 1])
+
+
+def _sign_after(source: str, end: int, limit: int, *, compound: bool = False) -> bool:
+    """A sign right after an amount; a CEFR level may join a word ("C1-Niveau")."""
+    position = end
+    while position < limit and source[position].isspace():
+        position += 1
+    if position >= limit or not _is_sign(source[position]):
+        return False
+    joined = (
+        compound
+        and position == end
+        and unicodedata.category(source[position]) == "Pd"
+        and position + 1 < limit
+        and source[position + 1].isalpha()
+    )
+    return not joined
+
+
+def _stray_sign(source: str, index: int) -> bool:
+    """Math symbols always count; a dash only when it does not join two word characters."""
+    char = source[index]
+    if unicodedata.category(char) == "Sm":
+        return True
+    if unicodedata.category(char) != "Pd":
+        return False
+    before = source[index - 1] if index > 0 else " "
+    after = source[index + 1] if index + 1 < len(source) else " "
+    return not (before.isalnum() and after.isalnum())
+
+
 UNIT_WORD = re.compile(r"(?<!\w)(?:years?|yrs?|jahre?n?|months?|monate?n?|monat)(?!\w)", re.I)
 
 
@@ -546,9 +588,9 @@ def _duration(source: str, clause: SourceSpan, signal: LexicalSignal) -> Thresho
     gt = _prefix(PREFIX_GT, source, clause.start, signal.span.start)
     if (
         _prefix(UNSUPPORTED_PREFIX, source, clause.start, signal.span.start)
-        or _prefix(SYMBOL_PREFIX, source, clause.start, signal.span.start)
+        or _sign_before(source, clause.start, signal.span.start)
         or UNSUPPORTED_POSTFIX.match(source, signal.span.end, clause.end)
-        or SYMBOL_POSTFIX.match(source, signal.span.end, clause.end)
+        or _sign_after(source, signal.span.end, clause.end)
     ):
         return "unsupported_number"
     folded = " ".join(number.split()).casefold()
@@ -595,9 +637,9 @@ def _cefr(source: str, clause: SourceSpan, match: re.Match[str]) -> Threshold | 
     gt = _prefix(PREFIX_GT, source, clause.start, start)
     if (
         _prefix(UNSUPPORTED_PREFIX, source, clause.start, start)
-        or _prefix(SYMBOL_PREFIX, source, clause.start, start)
+        or _sign_before(source, clause.start, start)
         or UNSUPPORTED_POSTFIX.match(source, end, clause.end)
-        or SYMBOL_POSTFIX.match(source, end, clause.end)
+        or _sign_after(source, end, clause.end, compound=True)
     ):
         return "unsupported_number"
     raised = bool(match["plus"] or match["suffix"] or gte)
@@ -759,10 +801,11 @@ def analyze_structure(
         result.thresholds.append(item.model_copy(update={"scope": scope}))
     result.thresholds.sort(key=lambda item: (item.span.start, item.span.end))
     accepted = SpanCover(item.span for item in result.thresholds)
+    term_spans = SpanCover(signal.span for signal in signals)
     stray_symbols = (
-        span_of(source, clause.start + i, clause.start + i + 1)
-        for i, char in enumerate(clause.quote)
-        if char in _COMPARISON
+        mark
+        for i in range(clause.start, clause.end)
+        if _stray_sign(source, i) and not term_spans.contains(mark := span_of(source, i, i + 1))
     )
     if result.thresholds and (
         any(

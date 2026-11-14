@@ -6,7 +6,15 @@ The TASK-012 fixture labels are already independently
 [approved](reviews/TASK-012-FIXTURES.md); do not re-derive or change them to fit
 output. Review the implementation commit supplied with this handoff.
 
-## Round 9: corrective re-review
+## Round 10: corrective re-review
+
+Round 9 on `1722e32` returned CHANGES REQUIRED for F-18. Re-review
+`1722e32..<candidate>`: sign detection by Unicode category (Sm/Pd) on both
+sides of amounts and CEFR levels, the CEFR word-joining hyphen exception, and
+stray math-symbol/standalone-dash withholding. Confirm F-01–F-17 stay as
+recorded. Append a "Round 10" section.
+
+## Round 9 (completed)
 
 Round 8 on `f5d65ee` returned CHANGES REQUIRED for F-17 (F-16 non-blocking).
 Re-review `f5d65ee..<candidate>`: adjacent signs/comparison symbols reject
@@ -123,7 +131,7 @@ the repository is rejected by design), `uv run ruff check .`,
 your own adversarial inputs. The full suite needs macOS `sandbox-exec`, Poppler
 and the pinned Typst assets; inspect hosted CI for the exact published head
 rather than repeating renderer tests in a sandbox that cannot nest them.
-Implementer results are in PROGRESS (434 passed locally); they are not a
+Implementer results are in PROGRESS (448 passed locally); they are not a
 substitute for your checks.
 
 Record actual commands/results, exact head/tree, findings and one verdict in

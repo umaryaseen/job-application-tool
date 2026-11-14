@@ -129,9 +129,14 @@ Each candidate row keeps its literal quote and adds:
   minimum", "or more", etwa, bis zu) create no threshold and need review. Any
   operator word elsewhere in the clause outside an accepted threshold ("3 years
   of Python experience minimum", "About at least 3 years") withholds all of the
-  clause's thresholds. Signs and comparison symbols are not operators: next to
-  an amount ("−3 years", "~3 years", "English ≤C2") they reject the threshold,
-  and elsewhere in the clause they withhold its thresholds.
+  clause's thresholds. Signs are not operators: any Unicode math symbol
+  (category Sm, e.g. + < > = ~ ± ≤ ≥ ≈ − and fullwidth forms) or dash (Pd) on
+  either side of an amount or CEFR level rejects the threshold ("−3 years",
+  "3 years − Python", "English C2−", "＋3 years"); only a hyphen joining a CEFR
+  level to a word ("C1-Niveau") and ranges inside the amount are accepted.
+  Elsewhere in the clause, a math symbol outside a recognized term or a
+  standalone dash withholds its thresholds; hyphens inside words ("hands-on")
+  do not.
 - `review_reasons` / `needs_review`: why a person must look at the row.
   `review_state` stays `draft` for every row.
 

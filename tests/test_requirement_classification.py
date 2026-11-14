@@ -876,3 +876,39 @@ def test_f17_controls_keep_supported_thresholds(line, found, tmp_path: Path) -> 
         item.level,
         item.scope.quote if item.scope else None,
     ) == found
+
+
+# Regressions for independent review round 9 (docs/reviews/TASK-012.md).
+@pytest.mark.parametrize(
+    "line",
+    [
+        "3 years − Python experience.",
+        "3 years - Python experience.",
+        "3 years – Python experience.",
+        "3 years — Python experience.",
+        "English C2−.",
+        "English C2-.",
+        "English －B2.",
+        "＋3 years of Python experience.",
+        "﹣3 years of Python experience.",
+        "3 years ～ Python experience.",
+        "3 years＋ of Python experience.",
+        "3 years of Python experience | 2 projects.",
+    ],
+)
+def test_f18_unicode_signs_on_either_side_create_no_threshold(line, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert row.thresholds == []
+    assert row.needs_review
+
+
+@pytest.mark.parametrize(
+    ("line", "scope"),
+    [
+        ("3 years of hands-on Python experience.", "hands-on Python experience"),
+        ("At least 2 years of full-stack experience.", "full-stack experience"),
+    ],
+)
+def test_f18_word_joining_hyphens_are_not_signs(line, scope, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert [t.scope.quote if t.scope else None for t in row.thresholds] == [scope]
