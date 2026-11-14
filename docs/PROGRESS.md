@@ -6,8 +6,8 @@ tests with lint/types and its checkout tree matched the reviewed tree. TASK-009
 personal acceptance remains open. Accepted ADR-021 permits source-only analysis
 on reviewed dependencies; TASK-012 is on draft
 [PR #5](https://github.com/umaryaseen/job-application-tool/pull/5): round-1
-to round-4 reviews found blocking defects, now corrected and awaiting
-round-5 re-review.
+to round-5 reviews found blocking defects, now corrected and awaiting
+round-6 re-review.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ round-5 re-review.
 | Sanitized publication | PR #3 MERGED | [Publication note](reviews/TASK-009-PUBLICATION.md); main `83497777`, final published CI `43541161616` |
 | Publication state correction | APPROVED, documentation only | [Scoped review](reviews/TASK-009-PUBLICATION-STATE.md); no runtime or approval-policy changes |
 | TASK-011 | Reviewed and merged into main through PR #4 | [Implementation review](reviews/TASK-011.md), [guide](JOB_EXTRACTION.md), merge `f6a3bf0` |
-| TASK-012 | CORRECTED — AWAITING RE-REVIEW | [Fixture review](reviews/TASK-012-FIXTURES.md) APPROVED; [implementation review](reviews/TASK-012.md) rounds 1–4 CHANGES REQUIRED (F-01–F-11), corrections pending round 5, see [handoff](REVIEW_HANDOFF.md) |
+| TASK-012 | CORRECTED — AWAITING RE-REVIEW | [Fixture review](reviews/TASK-012-FIXTURES.md) APPROVED; [implementation review](reviews/TASK-012.md) rounds 1–5 CHANGES REQUIRED (F-01–F-12), corrections pending round 6, see [handoff](REVIEW_HANDOFF.md) |
 | TASK-013–020 | NOT IMPLEMENTED | Skill aliases, review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -139,13 +139,21 @@ coverage counts only leaf terms and connectives, never a whole group span. A
 CEFR-dense clause now fails early instead of building thousands of models.
 All eight F-11 cases fail on `b91ead6`.
 
+Round 5 on `d30ecc7` confirmed F-11 and an 80-case operand matrix, and returned
+**CHANGES REQUIRED** for F-12: a degree field made of filler words ("A degree
+in formal language") was dropped because field parsing stopped at filler and
+coverage excused those words. Field parsing now stops only at function words
+and connectives, and content-bearing descriptors left the global filler list;
+they are exempt only as adjacent degree modifiers or as "language" after a
+recognized language. The four F-12 reproductions fail on `d30ecc7`.
+
 Implementer verification of the correction on macOS (Python 3.12, locked
 environment, `JAE_TYPST_PACKAGE_ROOT` assets verified offline):
 
 | Command | Result |
 | --- | --- |
-| `uv run pytest tests/test_requirement_classification.py tests/test_requirement_spans.py tests/test_ingestion.py` | Exit 0; 270 passed |
-| `uv run pytest -ra` | Exit 0; **390 passed** in 138.46s, no skips |
+| `uv run pytest tests/test_requirement_classification.py tests/test_requirement_spans.py tests/test_ingestion.py` | Exit 0; 281 passed |
+| `uv run pytest -ra` | Exit 0; **401 passed** in 100.37s, no skips |
 | `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 77 files formatted |
 | `uv run mypy src` | Exit 0; 47 source files |
 | `git diff --check` | Exit 0 |
@@ -159,7 +167,7 @@ pending.
 
 ## Next action
 
-Obtain the independent round-5 re-review of the TASK-012 corrective delta, verify
+Obtain the independent round-6 re-review of the TASK-012 corrective delta, verify
 final-head hosted CI, then mark PR #5 ready and merge. Then TASK-013
 (reviewed skill aliases, separate from lexical extraction) and TASK-014
 (source-bound correction/review versions). Separately, TASK-009 waits on

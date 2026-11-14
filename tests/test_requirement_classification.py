@@ -716,3 +716,52 @@ def test_f11_controls_keep_explicit_degree_terms(line, expected, tmp_path: Path)
     row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
     assert condition(row.condition) == expected
     assert row.review_reasons == []
+
+
+# Regressions for independent review round 5 (docs/reviews/TASK-012.md).
+@pytest.mark.parametrize(
+    ("line", "expected"),
+    [
+        (
+            "A degree in formal language or equivalent experience.",
+            {"any": ["degree in formal language", "equivalent experience"]},
+        ),
+        ("A degree in formal language.", "degree in formal language"),
+        ("A degree in technical language.", "degree in technical language"),
+        ("Studium der technischen Informatik.", "Studium der technischen Informatik"),
+    ],
+)
+def test_f12_descriptive_field_words_stay_in_the_degree_term(
+    line, expected, tmp_path: Path
+) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert condition(row.condition) == expected
+    assert row.review_reasons == []
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "A degree in the field of formal language.",
+        "Python with formal language skills.",
+        "Python with a technical background.",
+        "Python and written communication.",
+        "Technical degree QuuxML.",
+    ],
+)
+def test_f12_content_descriptors_are_not_global_filler(line, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert row.condition is None and row.needs_review
+
+
+@pytest.mark.parametrize(
+    ("line", "expected"),
+    [
+        ("Fluent German language skills.", "German"),
+        ("A completed technical degree in Physics.", "degree in Physics"),
+    ],
+)
+def test_f12_adjacent_modifiers_remain_covered(line, expected, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert condition(row.condition) == expected
+    assert row.review_reasons == []

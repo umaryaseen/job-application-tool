@@ -97,7 +97,8 @@ Each candidate row keeps its literal quote and adds:
   and `<degree> or equivalent experience/qualification` (oder vergleichbare …)
   as one `any` group. A degree term is explicit grammar only: consecutive
   education words, optionally `in/of/der/des/im` plus a field of at most four
-  words (stopping at filler words, connectives or punctuation), optionally
+  words (stopping only at function words, connectives or punctuation, so
+  "formal language" stays in the field), optionally
   "or a related field" directly after. The field is taken literally, so words
   appended to it without any separator count as part of the field name; any
   other text after the term is outside it. If any OR/AND in the clause is outside that
@@ -106,7 +107,10 @@ Each candidate row keeps its literal quote and adds:
   — the condition is `null` and the row needs review: an OR is never split or
   partially kept. Coverage rule: every word outside the interpreted spans
   (leaf terms, connectives, cues, negation, thresholds) must be on a small EN/DE filler
-  list (experience, with, strong, Kenntnisse, sehr gute, …). Any other word
+  list (experience, with, strong, Kenntnisse, sehr gute, …). Content-bearing
+  descriptors (technical, formal, academic, university, language, written, …)
+  are exempt only as modifiers directly before a degree or "language" directly
+  after a recognized language ("German language skills"). Any other word
   could be an unrecognized operand ("Python with QuuxDB"), so the condition is
   withheld with `uninterpreted_text`, and the clause's thresholds are withheld
   too, since unplaced words may qualify them. This deliberately sends many real

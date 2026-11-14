@@ -6,7 +6,16 @@ The TASK-012 fixture labels are already independently
 [approved](reviews/TASK-012-FIXTURES.md); do not re-derive or change them to fit
 output. Review the implementation commit supplied with this handoff.
 
-## Round 5: corrective re-review
+## Round 6: corrective re-review
+
+Round 5 on `d30ecc7` returned CHANGES REQUIRED for F-12 only. Re-review
+`d30ecc7..<candidate>`: degree fields stop only at function words/connectives;
+content descriptors are no longer global filler and are exempt only as
+adjacent degree modifiers or "language" after a recognized language. Probe
+whether any remaining FILLER word can form a meaningful operand on its own, and
+confirm F-01–F-11 stay as recorded. Append a "Round 6" section.
+
+## Round 5 (completed)
 
 Round 4 on `b91ead6` returned CHANGES REQUIRED for F-11 only. Re-review
 `b91ead6..<candidate>`: explicit degree-term grammar, leaf-only coverage and
@@ -89,7 +98,7 @@ the repository is rejected by design), `uv run ruff check .`,
 your own adversarial inputs. The full suite needs macOS `sandbox-exec`, Poppler
 and the pinned Typst assets; inspect hosted CI for the exact published head
 rather than repeating renderer tests in a sandbox that cannot nest them.
-Implementer results are in PROGRESS (390 passed locally); they are not a
+Implementer results are in PROGRESS (401 passed locally); they are not a
 substitute for your checks.
 
 Record actual commands/results, exact head/tree, findings and one verdict in

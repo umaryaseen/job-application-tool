@@ -87,6 +87,7 @@ _FIELD_LINK = re.compile(r"\s+(?:in\s+der|in\s+den|im\s+bereich|in|of|der|des|im
 _FIELD_WORD = re.compile(r"[^\W\d_][\w\-]*")
 _FIELD_SPACE = re.compile(r"[ \t]+")
 _FIELD_GAP = re.compile(r",?\s*")
+_NEXT_WORD = re.compile(r"[ \t-]+(?P<word>[^\W\d_]+)")
 MAX_FIELD_WORDS = 4
 
 _NUMBER = re.compile(r"(?P<value>\d{1,3})(?:\s*[-–]\s*(?P<upper>\d{1,3}))?(?P<plus>\+)?")
@@ -152,37 +153,39 @@ FILLER = frozenset(
     also but knowledge experience experienced experiences skill skills skilled strong
     good solid excellent very deep basic advanced fluent fluency proficiency proficient
     working hands practical professional level levels understanding familiarity familiar
-    background expertise ability written spoken language languages s ll re ve d
+    background expertise ability s ll re ve d
     ein eine einer einen einem eines der die das den dem des ist sind wird werden sein
     mit im von vom auf für zu zum zur bei sehr gute guter gutes gut guten fundierte
     fundierter fundiertes fundierten solide soliden sichere sicherer sicheren fließend
     fließende fließenden verhandlungssicher verhandlungssichere verhandlungssicheren
     kenntnis kenntnisse erfahrung erfahrungen berufserfahrung praxiserfahrung aber auch
-    sie du ihr haben hast habt bringst bringen bringt niveau abgeschlossen
-    abgeschlossene abgeschlossener abgeschlossenes abgeschlossenen completed relevant
-    university academic technical formal einschlägige einschlägiges einschlägigen
-    universitäres technisches technischen
+    sie du ihr haben hast habt bringst bringen bringt niveau
+    """.split()
+)
+# Content-bearing descriptors are exempt only where they modify an adjacent term:
+# directly before a degree ("completed degree", "Abgeschlossenes Studium") ...
+EDUCATION_MODIFIERS = frozenset(
+    """
+    completed relevant university academic technical formal accredited recognized
+    abgeschlossen abgeschlossene abgeschlossener abgeschlossenes abgeschlossenen
+    einschlägige einschlägiger einschlägiges einschlägigen universitäre universitäres
+    technische technischer technisches technischen akademische akademischer
+    akademisches anerkannte anerkannter anerkanntes
+    """.split()
+)
+# ... and directly after a recognized language ("German language skills").
+LANGUAGE_SUFFIXES = frozenset({"language", "languages"})
+# A degree field stops only at function words and connectives, never at
+# descriptive words, so "A degree in formal language" keeps its whole field.
+_FIELD_STOP = frozenset(
+    """
+    with mit and or und oder sowie plus including inkl etc both either entweder sowohl
+    bzw is are be will would should ist sind wird werden sein from for by using via as
+    to at on von vom für bei zu zum zur the a an der die das den dem des ein eine einer
+    einen einem eines e z
     """.split()
 )
 _WORDS = re.compile(r"[^\W\d_]+|\d+")
-_FIELD_STOP = FILLER | {
-    "plus",
-    "and",
-    "or",
-    "und",
-    "oder",
-    "sowie",
-    "including",
-    "inkl",
-    "etc",
-    "both",
-    "either",
-    "entweder",
-    "sowohl",
-    "bzw",
-    "e",
-    "z",
-}
 CEFR = re.compile(
     r"(?<!\w)(?P<level>[ABC][12])(?P<plus>\+)?(?:\s*[-–]\s*(?P<upper>[ABC][12]))?"
     r"(?P<suffix>(?i:(?:\s*-?\s*(?:level|niveau))?\s+(?:or\s+(?:higher|above|better)|"
@@ -403,6 +406,40 @@ def _close_run(source: str, clause: SourceSpan, run: list[_Token], runs: list[li
     return end
 
 
+def _adjacent_words(
+    source: str, floor: int, start: int, allowed: frozenset[str]
+) -> list[SourceSpan]:
+    """Contiguous allowed modifier words immediately before ``start``."""
+    found: list[SourceSpan] = []
+    position = start
+    while True:
+        cut = position
+        while cut > floor and source[cut - 1].isspace():
+            cut -= 1
+        word_start = cut
+        while word_start > floor and source[word_start - 1].isalpha():
+            word_start -= 1
+        if cut == position or word_start == cut:
+            return found
+        if source[word_start:cut].casefold() not in allowed:
+            return found
+        found.append(span_of(source, word_start, cut))
+        position = word_start
+
+
+def _language_suffixes(
+    source: str, clause: SourceSpan, signals: list[LexicalSignal]
+) -> list[SourceSpan]:
+    found = []
+    for signal in signals:
+        if signal.kind != "language":
+            continue
+        match = _NEXT_WORD.match(source, signal.span.end, clause.end)
+        if match and match.group("word").casefold() in LANGUAGE_SUFFIXES:
+            found.append(span_of(source, match.start("word"), match.end("word")))
+    return found
+
+
 def _education_term_end(
     source: str, education: list[LexicalSignal], limit: int
 ) -> tuple[int, list[SourceSpan]]:
@@ -450,6 +487,7 @@ def _education(
     limit = semicolon if semicolon != -1 else limit
     term_end, fields = _education_term_end(source, education, limit)
     term = ConditionTerm(term_kind="education", span=span_of(source, start, term_end))
+    fields = [*_adjacent_words(source, clause.start, start, EDUCATION_MODIFIERS), *fields]
     for match in EQUIVALENT.finditer(source, term_end, limit):
         conn = span_of(source, match.start("conn"), match.end("conn"))
         right = span_of(source, match.start("term"), match.end("term"))
@@ -743,7 +781,11 @@ def analyze_structure(
         result.reasons.add(
             "unparsed_alternative" if word in _ALTERNATIVES else "unparsed_conjunction"
         )
-    interpreted = [*consumed, *(signal.span for signal in signals)]
+    interpreted = [
+        *consumed,
+        *(signal.span for signal in signals),
+        *_language_suffixes(source, clause, signals),
+    ]
     if condition is not None:
         interpreted.extend(_leaf_spans(condition))
     else:
