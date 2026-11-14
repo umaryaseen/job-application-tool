@@ -399,3 +399,70 @@ PDF renderer tests were not run, as instructed.
 | F-14 | non-blocking | `src/job_application_engine/extraction/groups.py:146-180,636-643` | The new conservative coverage rule produces false alarms for reasonable prose involving content descriptors that are no longer global filler. | `Requirements\nSpoken German.` and `Written German.` return no condition with `uninterpreted_text`; no meaning is hidden. |
 
 F-13 violates the requirement that unsupported operands and grammar remain review-required. Add missing function/connective boundaries and regression tests for English and German variants, then repeat the focused checks and probes.
+
+---
+
+## Round 7 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `faee434` plus a
+  dedicated temporary directory, no network, session
+  `01a1dafe-8d5a-7053-8c37-062dd97dac63`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-7 report follows verbatim.
+
+## Round 7
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation review session
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Candidate: `faee434c498789f964c189393ef6ceefc3595f7e`
+- Candidate tree: `bf154850fb18763c55b109af83c485505341b61a`
+- Corrective delta: `12221f7..faee434`
+- Working tree: clean; probes and scratch data stayed under the designated temporary directory.
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Detached candidate checkout, clean |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate and tree matched handoff |
+| `git diff --stat/name-status 12221f7..faee434` | 0 | 6 paths; 152 insertions, 21 deletions |
+| Full `git diff 12221f7..faee434` inspection | 0 | Corrective code, tests and documentation inspected |
+| Focused pytest command from handoff | 0 | **291 passed** in 39.07s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir=.../mypy` | 0 | No issues in 47 source files |
+| `git diff --check 12221f7..faee434` | 0 | Clean |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| `probe_round7.py` | 0 | 96 semantic cases, 4 duplicate probes and 3 dense probes; no exceptions |
+| `probe_filler.py` | 0 | 852 filler cases, 0 exceptions; 8 unreviewed degree-field outputs |
+| `probe_matrix.py` | 0 | 960 unknown-operand/separator cases, 0 exceptions; unsafe outputs reduced to the same filler/link patterns |
+| `probe_threshold_suspicious.py` | 0 | 36 threshold/value/scope cases, 0 exceptions; malformed operators reviewed |
+| `probe_dense_exact.py` | 0 | Five exactly 200,000-byte inputs; 3 bounded `ExtractionError`s, 2 successful classifications, 0 raw exceptions; 0.108–0.281s |
+| Direct F-13/F-14/F-15 reproduction probe | 0 | 8 cases; F-13/F-14 expected outcomes confirmed and F-15 reproduced |
+| Final status, diff-check and fixture hash | 0 | Clean tree; digest unchanged |
+
+PDF renderer tests were not run, as instructed; they require nested `sandbox-exec` and hosted CI.
+
+### Probe outcomes
+
+- F-13’s four reproductions and 15 nearby degree/connective variants all returned `condition=null` with review.
+- F-14’s direct modifiers (`Spoken German`, `Written German`, `Verhandlungssicheres Deutsch`) now retain the language condition without review.
+- F-01–F-12 remain as recorded. The focused regression suite passed, and the alternative/unknown-operand matrix found no new technology-only partial conditions.
+- Duplicate grouping respected heading and marker scope. Same-scope duplicates grouped; identical text across headings did not.
+- Valid duration and CEFR controls retained typed thresholds. Out-of-range, malformed and unsupported operator forms required review. Reviewed rows may retain a literal source scope, but no unreviewed malformed threshold was found.
+- Dense 200,000-byte inputs remained bounded or completed quickly without raw exceptions.
+- The TASK-009 progress note is generic and contains no applicant-specific facts. The documentation describes the intended filler-stop and modifier rules.
+- No dependency, network, persistence, profile access or out-of-scope feature was added.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-15 | blocking | `src/job_application_engine/extraction/groups.py:149-163, 181-185, 469-478, 649-655` | `FILLER` entries containing `ß` are stored uncasefolded, while degree-field parsing compares `word.group().casefold()` against `_FIELD_STOP`. Thus `fließend`, `fließende` and `fließenden` do not stop a degree field. The field absorbs a following unrecognized operand, and coverage sees it as interpreted. This violates the rule that every filler word ends a degree field and allows an unsupported operand without review. | `Requirements\nA degree in Computer Science fließend QuuxDB.` returns `condition="degree in Computer Science fließend QuuxDB"`, `needs_review=false`, `review_reasons=[]`. The inflected forms behave the same. |
+| F-16 | non-blocking | `src/job_application_engine/extraction/groups.py:187-191, 649-655, 797-806` | Modifier coverage remains conservative for some reasonable language prose. No meaning is hidden, but common forms remain review-required because the modifier grammar is narrow. | `Native-level German.` and `Written and spoken German.` return no condition with review. This is a false alarm only; the rows do not produce partial conditions. |
+
+F-15 requires a narrow correction that normalizes filler comparisons consistently and adds regressions for all three `ß` forms. Then rerun the focused suite, static checks, fixture digest, and adversarial probes.
