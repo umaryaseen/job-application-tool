@@ -154,3 +154,64 @@ PDF/renderer tests were not run, as instructed.
 | F-08 | blocking | `docs/PROGRESS.md:40-52` | The corrective documentation adds applicant-specific private revision details to the tracked TASK-009 state note. This conflicts with the required sanitized note and the repository privacy policy. | The note includes applicant CV revision metadata, a payload count, and a profile degree/date defect. Replace with a generic pending-review state without applicant-specific facts. |
 
 The corrective code remains source-only, deterministic, revision-bound, dependency-neutral and bounded on dense inputs. The fixture oracle is byte-identical. F-05–F-08 remain unresolved correctness/privacy defects, so the candidate requires another narrow corrective commit and independent re-review.
+
+---
+
+## Round 3 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `2f43f4f` plus a
+  dedicated temporary directory, no network, session
+  `01a1daac-aee9-7e32-a0a1-569cf6a223aa`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-3 report follows verbatim, except that five header lines ending in
+Markdown hard-break spaces were turned into list items for whitespace checks.
+
+## Round 3
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Corrective base: `fbc4c970854e77a9b3957439da7d1a600bb0f69c`
+- Candidate: `2f43f4f2aa370f4e8b1c20ea358d01aab5fa3ba7`
+Candidate tree: `4d59b1a5fcf27b5ab0ce1060d254dfe60df9ef60`
+
+VERDICT: CHANGES REQUIRED
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Clean detached checkout |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate/tree matched handoff |
+| Full corrective `git diff fbc4c97..2f43f4f` | 0 | 7 paths, 481 patch lines, 271 additions/35 deletions; fully inspected |
+| Focused pytest command | 0 | 249 passed, no skips |
+| `.venv/bin/ruff check --no-cache .` | 0 | No violations |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir ...` | 0 | 47 source files, no issues |
+| `git diff --check fbc4c97..2f43f4f` | 0 | Clean |
+| `sha256sum ...classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 ...classification.json` | 0 | Expected digest `16b05e8f...5b18d1` |
+| Final `git status --short --branch` | 0 | Clean; no tracked files modified |
+
+PDF renderer tests were not run, as instructed.
+
+### Probe outcomes
+
+- Round-1 F-01/F-02/F-03/F-04 reproductions passed: unsupported alternatives remained `condition=null` with review; malformed durations produced no threshold; duplicate groups respected heading/marker scope.
+- `probe_semantics.py`: 74 cases, zero exceptions.
+- Unknown-operand matrix: 126 variants, zero unreviewed partial conditions.
+- Filler matrix: 14 generic descriptor words; none hid a named operand.
+- Education probes: 32 cases, zero exceptions.
+- Dense probes: exact 200,000-byte inputs completed in 0.18–0.36s or raised bounded `ExtractionError`.
+- CLI probe: one reviewed out-of-range result and four sanitized exit-2 failures; no traceback, Pydantic diagnostics or private paths.
+- `docs/PROGRESS.md` now has a generic TASK-009 pending note.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-09 | blocking | `src/job_application_engine/extraction/groups.py:420-426,465-472,671-687` | Unsupported threshold operators appearing after the scoped phrase, or outside the operator lexicon, can leave a structured `unqualified` threshold. Coverage adds review but does not remove the invalid threshold, contradicting the documented rule that unsupported operators create no threshold. | `3 years of Python experience minimum.` → threshold `unqualified`, value `3`, scope `Python experience minimum`, `condition=null`, review only `uninterpreted_text`. `English B2 level minimum.` similarly emits an unqualified B2 threshold. `About at least 3 years of Python experience.` emits `gte=3` despite contradictory unsupported text. |
+| F-10 | non-blocking | `src/job_application_engine/extraction/groups.py:532-539` | The conservative coverage rule flags reasonable prose such as `Experience building REST APIs with Python.` as `uninterpreted_text`, withholding the condition for review. This is documented and does not create a partial condition. | Result is `condition=null`, `needs_review=true`; intended false alarm, with no hidden named operand. |
+
+F-01–F-08 are otherwise fixed, and the implementation remains deterministic, local, revision-bound, dependency-neutral and bounded. F-09 must be corrected and independently re-reviewed before approval.
