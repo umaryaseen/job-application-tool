@@ -215,3 +215,69 @@ PDF renderer tests were not run, as instructed.
 | F-10 | non-blocking | `src/job_application_engine/extraction/groups.py:532-539` | The conservative coverage rule flags reasonable prose such as `Experience building REST APIs with Python.` as `uninterpreted_text`, withholding the condition for review. This is documented and does not create a partial condition. | Result is `condition=null`, `needs_review=true`; intended false alarm, with no hidden named operand. |
 
 F-01–F-08 are otherwise fixed, and the implementation remains deterministic, local, revision-bound, dependency-neutral and bounded. F-09 must be corrected and independently re-reviewed before approval.
+
+---
+
+## Round 4 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `b91ead6` plus a
+  dedicated temporary directory, no network, session
+  `01a1dabd-6d4c-7272-9c8f-fd8f93d3131b`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-4 report follows verbatim.
+
+## Round 4
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Corrective base: `2f43f4f2aa370f4e8b1c20ea358d01aab5fa3ba7`
+- Candidate: `b91ead615a465bae32b7ff17880f10c13303401c`
+- Candidate tree: `0acd2740cd63a2329bb382b9674d52c351fa5ac1`
+- Full corrective delta inspected: 6 paths, 146 insertions, 10 deletions.
+- Artifacts read: `AGENTS.md`, `docs/REVIEW_HANDOFF.md`, rounds 1–3 of `docs/reviews/TASK-012.md`, `docs/REVIEW_PROTOCOL.md`, `docs/PROGRESS.md`, `docs/JOB_EXTRACTION.md`, TASK-012, A17–A19, ADR-007/011/021, architecture/security guidance, and the fixture README.
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Clean detached checkout |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate and tree matched handoff |
+| `git diff 2f43f4f..b91ead6` | 0 | Full corrective delta inspected |
+| Focused pytest command from handoff | 0 | 258 passed, no skips, 32.99s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files already formatted |
+| `.venv/bin/mypy src --cache-dir .../mypy` | 0 | No issues in 47 source files |
+| `git diff --check 2f43f4f..b91ead6` | 0 | Clean |
+| `sha256sum tests/fixtures/requirements/classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest `16b05e8f...5b18d1` |
+| `probe_round4.py` | 0 | 768 unknown-operand variants; 0 false negatives. 11 education cases; 8 unreviewed conditions. 151 FILLER entries tested: 0 hidden after Python, 151 hidden after education. 23 threshold cases, 6 duplicate-scope cases, 6 large-input cases; no raw exceptions. |
+| `probe_f11.py` | 0 | 8 direct reproductions of the new education-span defect |
+| `probe_numeric_scope.py` | 0 | 18 numeric/scope variants, no exceptions |
+| `probe_cli_round4.py` | 0 | 3 CLI cases: reviewed `999`-year input, reviewed stray operator, sanitized tamper failure |
+| Final `git status --short --branch` | 0 | Clean; no tracked files modified |
+
+PDF renderer tests were not run, as instructed.
+
+### Probe outcomes
+
+- F-01–F-08 reproductions and nearby variants remain fixed.
+- F-09 reproductions and nearby unsupported operators produce no thresholds and require review; accepted operators retain thresholds.
+- Duplicate grouping respects heading and marker scope.
+- Reasonable FILLER controls such as `Strong Python skills`, `Solid knowledge of SQL`, and `Hands-on experience with Docker` remain accepted. The documented conservative F-10 case still requires review.
+- Large inputs completed in 0.117–0.454s or raised bounded `ExtractionError`; the 150,021-byte CEFR-limit case raised a bounded error in 2.665s.
+- `docs/PROGRESS.md` contains a generic TASK-009 pending note without applicant-specific facts. Documentation matches the F-09 behavior.
+- No new dependency, network, persistence, profile access, or out-of-scope feature was introduced.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-11 | blocking | `src/job_application_engine/extraction/groups.py:379-421, 649-708` | The education shortcut makes the `education` condition span from the first education signal through nearly the entire clause. Because `_uninterpreted` treats the complete condition span as interpreted, arbitrary trailing words, unsupported separators, and unknown operands bypass the coverage rule. This violates A19’s requirement that unsupported grammar remain review-required and permits a partial education condition with `needs_review: false`. | `Requirements\nA degree in Computer Science with Rust experience.` returns condition `education("degree in Computer Science with Rust experience")`, no review. `A degree in Computer Science plus QuuxML.`, `A degree, QuuxML.`, and `A degree or a related field plus QuuxML.` behave likewise. The equivalent branch also hides text: `A degree in Computer Science with Rust experience or equivalent practical experience.` returns an unreviewed `ANY` group. |
+
+The FILLER matrix confirms that this is not limited to one word: every tested FILLER token placed before an unknown operand after `A degree` remained inside the unreviewed education span. The same coverage rule works for ordinary technology conditions, so the defect is localized to education span construction.
+
+Required follow-up: constrain education, field-alternative, and degree/equivalent spans to the explicitly interpreted grammar; leave trailing or unsupported words outside those spans so they trigger review. Add regressions for the reproductions above, then rerun the focused suite, static checks, fixture digest, and adversarial probes.
