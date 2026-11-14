@@ -19,7 +19,7 @@ ADR-020 permits TASK-010 private draft JD intake after the reviewed technical fo
 | M2 | 010–016 | Reviewed EN/DE requirements and evidence matrix |
 | M3 | 017–020 | Tested tailoring MVP with strict claim and export gates |
 | M4 | 021–023 | Cover letter and SQLite tracker |
-| Requested DOCX | 024, after M3 | Application deliverable under ADR-009/017; not yet implemented |
+| Requested DOCX | 024, after M3 | Application deliverable under ADR-009/019; not yet implemented |
 | M5 | 025–034 | Separate optional decisions/features, each reviewed |
 | Later | 035 | Policy/handoff design only; no implemented portal integration |
 

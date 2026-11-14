@@ -1,10 +1,13 @@
 # Current implementation state
 
-Last reconciled: 2026-11-14, combining local TASK-009 head `d0f1436` with main
-`0cc9119df20a2be974f8db41ed9869663493f800` (merged PR #2).
-The combined code tree `2794c6af04df5beb982561c0115eadde58196500` received
-independent **APPROVED WITH FOLLOW-UP** review. This documentation follow-up
-is awaiting scoped independent review; the merge is not yet committed.
+Last reconciled: 2026-11-14 against published snapshot `58f0c183` and its
+review records. Local merge `266e5ef3` is complete: the combined code received
+independent **APPROVED WITH FOLLOW-UP** review and the documentation follow-up
+received **APPROVED** review. The sanitized publication is open in
+[PR #3](https://github.com/umaryaseen/job-application-tool/pull/3), not yet
+merged into main. The operating-document correction received
+[APPROVED scoped review](reviews/TASK-009-PUBLICATION-STATE.md); hosted CI
+must still be checked on the latest PR head.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -15,7 +18,9 @@ is awaiting scoped independent review; the merge is not yet committed.
 | TASK-009 / M1 | Technical QA pass and applicant appearance approval recorded for baseline-r0009 | Exact PDF/TXT content, final artifact acceptance and export remain pending |
 | CLEANUP-001 | Reviewed and merged into main through PR #1 | [Review](reviews/CLEANUP-001.md), merge `0d81aa1` |
 | TASK-010 | Reviewed and merged into main through PR #2 | [Review](reviews/TASK-010.md), [intake guide](JOB_INTAKE.md), merge `0cc9119` |
-| Current local integration | CODE APPROVED WITH FOLLOW-UP; DOCUMENTATION DELTA AWAITING REVIEW | [Independent review](reviews/MERGE-TASK-009-MAIN.md), [scoped handoff](REVIEW_HANDOFF.md) |
+| Local integration | MERGE COMMITTED; CODE AND DOCUMENTATION REVIEWED | [Code review](reviews/MERGE-TASK-009-MAIN.md), [documentation review](reviews/MERGE-TASK-009-MAIN-DOCS.md); local merge `266e5ef3` |
+| Sanitized publication | PR #3 OPEN; NOT MERGED | [Publication note](reviews/TASK-009-PUBLICATION.md); CI and review gates apply to the latest PR head |
+| Publication state correction | APPROVED, documentation only | [Scoped review](reviews/TASK-009-PUBLICATION-STATE.md); no runtime or approval-policy changes |
 | TASK-011–020 | NOT IMPLEMENTED | Requirements, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -31,13 +36,17 @@ That is not PDF/TXT content approval, final artifact approval or permission to
 export. Those gates remain pending. This reconciliation does not read, replace,
 approve or regenerate private profiles, receipts, plans or artifacts.
 
-Complete pre-sync local progress and handoffs are archived under `history/`;
-their old task gates describe their historical candidates. The original bytes
-remain in local HEAD and the external merge backup. Earlier baseline iterations
-and failed QA remain historical. Do not replace current private records with
-an older profile or infer that artifact r0009 means profile revision 9.
+Pre-sync local progress and handoffs are archived under `history/`; their old
+task gates describe their historical candidates. Published documentation uses
+portable path references. The original bytes and full local commit history
+remain in the retained workstation branch and external merge backup. The
+unpublished TASK-009 branch and merge commits were not imported as publication
+ancestors; shared main ancestry remains. Earlier baseline
+iterations and failed QA remain historical. Do not replace current private
+records with an older profile or infer that artifact r0009 means profile
+revision 9.
 
-## Main integration
+## Reviewed implementation and publication
 
 CLEANUP-001 adds supported macOS CI, stage-local Typst package resolution and
 checksum-pinned public assets installed explicitly. TASK-010 adds private,
@@ -49,7 +58,16 @@ skips or xfails. Locked sync, Typst asset verification, Ruff, format, mypy,
 installed CLI help and Git whitespace checks exited 0. The reviewer also
 exercised synthetic intake and real rendering; see the [review](reviews/MERGE-TASK-009-MAIN.md)
 for commands, environment and limits. This was a local run, not combined-tree CI.
-No dependency changes are introduced by this documentation follow-up.
+Published snapshot `58f0c183` starts from main `0cc9119` and preserves the
+reviewed non-documentation files. Its independent publication review and
+outgoing-history audit were reported as approved before push. That does not
+qualify hosted CI; inspect the latest head and check results on PR #3.
+
+Hosted [CI 43539855170](https://github.com/umaryaseen/job-application-tool/actions/runs/43539855170)
+verified published snapshot `58f0c183`: **147 passed in 80.68s**, Ruff and
+format passed (68 files), and mypy passed (40 source files). The separate
+reviewer fetched the actual run and job logs. This records that exact snapshot;
+check the final PR head separately after the documentation-only correction.
 
 Local ADR-017/018 retain their original meanings and template identities.
 Main's conflicting decision IDs are now [ADR-019](adr/ADR-019.md) (cleanup) and
@@ -60,10 +78,12 @@ acceptance. Later task and milestone gates remain in force.
 
 ## Next action
 
-Obtain scoped independent review of the documentation delta from the reviewed
-tree before completing the merge. Resume TASK-009's exact content and artifact
-acceptance with the applicant; appearance-only approval retains its original
-scope. Before any downstream feature makes `source_url` clickable or fetchable,
-that feature's implementer must validate allowed URL schemes (F-02). TASK-010
-continues to store the value as metadata only. Personal records remain outside
-Git and CI. No export or application is created.
+Verify hosted CI on PR #3's latest head before merging the reviewed publication
+into main. Do not repeat the completed local merge, its original documentation
+review or the publication state review. Then
+resume TASK-009's exact content and artifact acceptance with the applicant;
+appearance-only approval retains its original scope. Before any downstream
+feature makes `source_url` clickable or fetchable, that feature's implementer
+must validate allowed URL schemes (F-02). TASK-010 continues to store the value
+as metadata only. Personal records remain outside Git and CI. No export or
+application is created.

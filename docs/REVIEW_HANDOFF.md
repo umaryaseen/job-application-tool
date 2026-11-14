@@ -1,41 +1,55 @@
-# Scoped review handoff: TASK-009 / main merge documentation follow-up
+# Publication handoff: reviewed TASK-009 baseline fixes
 
-State: IMPLEMENTED — AWAITING SCOPED INDEPENDENT REVIEW. The merge remains
-uncommitted. Review the complete staged delta from the independently reviewed
-code tree `2794c6af04df5beb982561c0115eadde58196500` to the staged tree
-reported by `git write-tree`. The merge parents remain local HEAD
-`d0f1436d20fb8cc959feca3e9d355856f17c76ff` and main
-`0cc9119df20a2be974f8db41ed9869663493f800`.
+Scope: current operating documents only. The original local merge and its
+documentation follow-up are complete. Do not restart those review targets.
+The publication status correction also received
+[APPROVED scoped review](reviews/TASK-009-PUBLICATION-STATE.md). Check CI on
+the final PR head before integration; do not restart the completed review below.
 
-The [independent merge review](reviews/MERGE-TASK-009-MAIN.md) returned
-**APPROVED WITH FOLLOW-UP** for the reviewed tree, including 147 tests passed
-on macOS. It records the commands, findings and limitations. This follow-up
-includes that review record and addresses its documentation findings; it does
-not extend the verdict to the new staged tree without a scoped review.
+- Published base: `58f0c183e3c4ce76be5c7ea72c5f082cbd91c71d`.
+- PR: [#3](https://github.com/umaryaseen/job-application-tool/pull/3), targeting
+  main `0cc9119df20a2be974f8db41ed9869663493f800`.
+- Local source merge: `266e5ef3`, retained on the workstation. The unpublished
+  local merge/TASK-009 commits are not publication-branch ancestors; common
+  main ancestry is retained.
+- Code review: [APPROVED WITH FOLLOW-UP](reviews/MERGE-TASK-009-MAIN.md),
+  including 147 tests passed on macOS against the recorded source tree.
+- Original documentation review:
+  [APPROVED](reviews/MERGE-TASK-009-MAIN-DOCS.md).
+- Sanitization and source identity: [publication note](reviews/TASK-009-PUBLICATION.md).
 
-## Review scope
+## Completed scoped review
 
-Using [REVIEW_PROTOCOL.md](REVIEW_PROTOCOL.md), inspect the entire staged delta
-from the reviewed tree and confirm it contains documentation only:
+The following scope defined the completed review and is retained for audit.
 
-- F-01: the current template identity is
-  `baseline-v3-presentation-m1-fix005-hyphen-compounds`. Runtime identities and
-  historical records are unchanged.
-- F-03: the ADR-017 index status matches ADR-017 itself, without a new decision
-  or approval.
-- PROGRESS and MERGE_RECONCILIATION accurately attribute the verification and
-  code verdict to the independent reviewer. The applicant's PDF/TXT content and
-  final artifact approval, and export, remain pending; the earlier appearance
-  approval retains its original scope.
-- F-02 remains a future gate: the implementer of the first downstream feature
-  making `source_url` clickable or fetchable must validate allowed URL schemes
-  before doing so. TASK-010 continues to treat it as metadata only.
-- The original independent merge review is included unchanged, with no source,
-  test, dependency or private applicant data changes in the follow-up.
+Read AGENTS and [REVIEW_PROTOCOL](REVIEW_PROTOCOL.md). Inspect the exact
+base-to-head correction and record the candidate commit/tree. Confirm:
 
-Confirm the staged tree and parents, check the staged diff for whitespace,
-secrets and personal information, and record the scoped verdict and exact tree
-identity. No private artifacts need to be read or regenerated. The original
-review was a local macOS run, not combined-tree CI; its test results are not a
-fresh run of this documentation delta. After scoped approval, merge completion
-is a separate action. Do not commit or push as part of this handoff.
+1. Only PROGRESS, this handoff, MERGE_RECONCILIATION and the composite DOCX ADR
+   reference in IMPLEMENTATION_PLAN change. Source, tests, schemas, scripts,
+   dependencies, fixtures, CI and runtime/template identities remain unchanged.
+2. Current documents distinguish the completed local merge, approved prior
+   reviews, published sanitized snapshot and PR #3's pending main integration.
+   Historical review records retain their recorded identities and limitations.
+3. Local 147-test verification is not described as hosted publication CI.
+   Verify the actual latest PR head, workflow result and logs separately; an
+   earlier green run must not qualify changed source without review.
+4. TASK-009 exact PDF/TXT content, final artifact acceptance and export remain
+   pending. Appearance-only approval retains its original scope. No private
+   data is read, changed, imported or approved by this correction.
+5. F-02 remains a future gate: validate allowed URL schemes before a downstream
+   feature makes `source_url` clickable or fetchable. TASK-010 stays metadata-only.
+
+Check whitespace, relative links and added content for private material. A
+documentation-only correction can receive scoped review without rerunning the
+macOS suite locally. Record the independent verdict under `docs/reviews/`;
+do not modify implementation or merge the PR as part of review.
+
+## Next action
+
+Check hosted CI and review for the final PR head before merging through the
+normal GitHub workflow. Then resume TASK-009 with the actual current private
+canonical profile and exact artifacts. The applicant alone approves document
+content and final bytes. Do not replace current records with an older starter
+profile, infer profile revision from artifact r0009, or treat saved postings as
+application submissions. Later task and milestone dependencies remain in force.

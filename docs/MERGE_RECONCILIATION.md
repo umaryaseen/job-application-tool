@@ -1,8 +1,11 @@
 # TASK-009 and main reconciliation
 
-Date: 2026-11-13; follow-up recorded 2026-11-14. State: code tree
-**APPROVED WITH FOLLOW-UP**; documentation delta awaiting scoped review.
-The merge remains uncommitted.
+Date: 2026-11-13; publication state reconciled 2026-11-14. The code received
+**APPROVED WITH FOLLOW-UP** review and the documentation follow-up received
+**APPROVED** review. Local merge `266e5ef3` is committed. Sanitized snapshot
+`58f0c183` is published in [PR #3](https://github.com/umaryaseen/job-application-tool/pull/3),
+which is not yet merged into main. See [current progress](PROGRESS.md) for the
+remaining publication gates; the merge procedure below is historical.
 
 The report identifies local head `d0f1436` and incoming main `0cc9119`. Git
 reported seven conflicted paths. The original branch and incoming commits are
@@ -22,12 +25,14 @@ transfer approvals to new code. Local proposed/architecture-review statuses are
 preserved without inventing later acceptance. Existing implementation reviews
 remain separate records.
 
-The active progress/handoff documents are reconciled and shortened. The full
-local versions are archived with relative Markdown links adjusted for their
-new directory. Their original exact bytes remain in local HEAD and in the
-external backup created before any working file is replaced. The original
-remote versions remain in incoming main. The backup contains only affected
-repository files and merge metadata, not the external personal data directory.
+The active progress/handoff documents are reconciled and shortened. The local
+versions are archived with relative Markdown links adjusted for their new
+directory and portable paths in the publication snapshot. Original exact bytes
+remain in the retained local branch and external merge backup. The original
+remote versions remain in the historical main commits. The backup contains
+only affected repository files and merge metadata, not the external personal
+data directory. The publication branch starts at main `0cc9119`; it does not
+contain the unpublished local commits as ancestors.
 
 The PDF import conflict keeps EvidenceKey and present_plan as well as
 PackageAssetsError and prepare_typst_packages. All local PDF behavior remains;
@@ -51,8 +56,9 @@ synthetic intake and renderer checks, findings and limitations. It is a local
 run, not combined-tree CI, and does not approve personal CV content or final
 artifacts. Those gates and export remain pending.
 
-F-01 and F-03 are addressed in this documentation delta, which requires scoped
-independent review. F-02 remains a future gate: the implementer of the first
+F-01 and F-03 were addressed and independently approved in the
+[documentation follow-up](reviews/MERGE-TASK-009-MAIN-DOCS.md). F-02 remains a
+future gate: the implementer of the first
 downstream feature that makes `source_url` clickable or fetchable must validate
 allowed URL schemes before doing so. TASK-010 remains metadata-only; its
 behavior is unchanged. No dependency changes are part of this follow-up.
