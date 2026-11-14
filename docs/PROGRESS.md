@@ -6,8 +6,8 @@ tests with lint/types and its checkout tree matched the reviewed tree. TASK-009
 personal acceptance remains open. Accepted ADR-021 permits source-only analysis
 on reviewed dependencies; TASK-012 is on draft
 [PR #5](https://github.com/umaryaseen/job-application-tool/pull/5): round-1
-and round-2 reviews found blocking defects, now corrected and awaiting
-round-3 re-review.
+to round-3 reviews found blocking defects, now corrected and awaiting
+round-4 re-review.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ round-3 re-review.
 | Sanitized publication | PR #3 MERGED | [Publication note](reviews/TASK-009-PUBLICATION.md); main `83497777`, final published CI `43541161616` |
 | Publication state correction | APPROVED, documentation only | [Scoped review](reviews/TASK-009-PUBLICATION-STATE.md); no runtime or approval-policy changes |
 | TASK-011 | Reviewed and merged into main through PR #4 | [Implementation review](reviews/TASK-011.md), [guide](JOB_EXTRACTION.md), merge `f6a3bf0` |
-| TASK-012 | CORRECTED — AWAITING RE-REVIEW | [Fixture review](reviews/TASK-012-FIXTURES.md) APPROVED; [implementation review](reviews/TASK-012.md) rounds 1–2 CHANGES REQUIRED (F-01–F-08), corrections pending round 3, see [handoff](REVIEW_HANDOFF.md) |
+| TASK-012 | CORRECTED — AWAITING RE-REVIEW | [Fixture review](reviews/TASK-012-FIXTURES.md) APPROVED; [implementation review](reviews/TASK-012.md) rounds 1–3 CHANGES REQUIRED (F-01–F-09), corrections pending round 4, see [handoff](REVIEW_HANDOFF.md) |
 | TASK-013–020 | NOT IMPLEMENTED | Skill aliases, review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -119,13 +119,23 @@ note to a generic pending state. 19 of the 20 new finding cases fail on
 `fbc4c97` (the remaining one is a guard case); controls with only filler keep
 their conditions.
 
+Round 3 on `2f43f4f` confirmed F-01–F-08 fixed (126 unknown-operand variants,
+no unreviewed partial condition) and returned **CHANGES REQUIRED** for F-09: an
+operator word away from the number or a contradictory pair still left a
+structured threshold, only flagged. Now any operator word outside an accepted
+threshold span drops the clause's thresholds with `unsupported_number`, and
+`uninterpreted_text` withholds thresholds as well as the condition. All six
+F-09 cases fail on `2f43f4f`. Non-blocking F-10 (reasonable prose such as
+"Experience building REST APIs with Python" goes to review) is the documented
+conservative trade-off.
+
 Implementer verification of the correction on macOS (Python 3.12, locked
 environment, `JAE_TYPST_PACKAGE_ROOT` assets verified offline):
 
 | Command | Result |
 | --- | --- |
-| `uv run pytest tests/test_requirement_classification.py tests/test_requirement_spans.py tests/test_ingestion.py` | Exit 0; 249 passed |
-| `uv run pytest -ra` | Exit 0; **369 passed** in 109.12s, no skips |
+| `uv run pytest tests/test_requirement_classification.py tests/test_requirement_spans.py tests/test_ingestion.py` | Exit 0; 258 passed |
+| `uv run pytest -ra` | Exit 0; **378 passed** in 108.66s, no skips |
 | `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 77 files formatted |
 | `uv run mypy src` | Exit 0; 47 source files |
 | `git diff --check` | Exit 0 |
@@ -139,7 +149,7 @@ pending.
 
 ## Next action
 
-Obtain the independent round-3 re-review of the TASK-012 corrective delta, verify
+Obtain the independent round-4 re-review of the TASK-012 corrective delta, verify
 final-head hosted CI, then mark PR #5 ready and merge. Then TASK-013
 (reviewed skill aliases, separate from lexical extraction) and TASK-014
 (source-bound correction/review versions). Separately, TASK-009 waits on

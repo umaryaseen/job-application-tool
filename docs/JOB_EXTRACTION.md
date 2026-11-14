@@ -104,7 +104,8 @@ Each candidate row keeps its literal quote and adds:
   (terms, groups, cues, negation, thresholds) must be on a small EN/DE filler
   list (experience, with, strong, Kenntnisse, sehr gute, …). Any other word
   could be an unrecognized operand ("Python with QuuxDB"), so the condition is
-  withheld with `uninterpreted_text`. This deliberately sends many real
+  withheld with `uninterpreted_text`, and the clause's thresholds are withheld
+  too, since unplaced words may qualify them. This deliberately sends many real
   clauses ("Experience building REST APIs with Python") to review rather than
   risk a partial condition.
 - `thresholds`: integer year/month durations up to 99 (`gte`, `gt`, `range`,
@@ -113,7 +114,10 @@ Each candidate row keeps its literal quote and adds:
   literal scope is the threshold's interpretation. Vague, decimal, leading-zero,
   larger or otherwise uncaptured amounts ("1000 years", "3yrs", "six years",
   "3-year") and unsupported operator words (up to, about, maximum, "3 years
-  minimum", "or more", etwa, bis zu) create no threshold and need review.
+  minimum", "or more", etwa, bis zu) create no threshold and need review. Any
+  operator word elsewhere in the clause outside an accepted threshold ("3 years
+  of Python experience minimum", "About at least 3 years") withholds all of the
+  clause's thresholds.
 - `review_reasons` / `needs_review`: why a person must look at the row.
   `review_state` stays `draft` for every row.
 

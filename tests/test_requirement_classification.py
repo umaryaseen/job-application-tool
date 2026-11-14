@@ -641,3 +641,35 @@ def test_threshold_only_scope_counts_as_interpretation(tmp_path: Path) -> None:
     first = row.candidates[0]
     assert [t.scope.quote if t.scope else None for t in first.thresholds] == ["QuuxDB experience"]
     assert first.review_reasons == []
+
+
+# Regressions for independent review round 3 (docs/reviews/TASK-012.md).
+@pytest.mark.parametrize(
+    "line",
+    [
+        "3 years of Python experience minimum.",
+        "English B2 level minimum.",
+        "About at least 3 years of Python experience.",
+        "3 years of Python or Java minimum.",
+        "QuuxDB with at least 3 years of experience.",
+        "Mindestens 3 Jahre Erfahrung mit Python, etwa im Backend.",
+    ],
+)
+def test_f09_stray_operators_or_unplaced_words_withhold_thresholds(line, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert row.thresholds == []
+    assert row.needs_review
+
+
+@pytest.mark.parametrize(
+    ("line", "operator"),
+    [
+        ("At least 3 years of experience with Python is required.", "gte"),
+        ("German at C1 level or higher is required.", "gte"),
+        ("More than 2 years of SQL experience.", "gt"),
+    ],
+)
+def test_f09_controls_keep_accepted_operator_thresholds(line, operator, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert [t.operator for t in row.thresholds] == [operator]
+    assert row.review_reasons == []

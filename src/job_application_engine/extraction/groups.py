@@ -123,6 +123,17 @@ UNSUPPORTED_POSTFIX = re.compile(
     r"höchstens)(?!\w)",
     re.I,
 )
+# Every operator word, supported or not. One outside an accepted threshold span
+# ("3 years of Python minimum", "About at least 3 years") makes the clause's
+# numeric interpretation unreliable, so its thresholds are withheld.
+OPERATOR_WORD = re.compile(
+    r"(?<!\w)(?:at\s+least|at\s+most|minimum|minimal|min\.?|maximum|maximal|max\.?|"
+    r"up\s+to|more\s+than|less\s+than|fewer\s+than|over|under|approximately|approx\.?|"
+    r"about|around|roughly|ca\.?|circa|or\s+(?:more|longer|above|higher|better)|mindestens|"
+    r"wenigstens|höchstens|etwa|rund|ungefähr|bis\s+zu|mehr\s+als|weniger\s+als|über|"
+    r"unter|oder\s+(?:mehr|länger|höher|besser))(?!\w)",
+    re.I,
+)
 UNIT_WORD = re.compile(r"(?<!\w)(?:years?|yrs?|jahre?n?|months?|monate?n?|monat)(?!\w)", re.I)
 # Words that may surround interpreted spans without changing their meaning. Any
 # other uncovered word may be an unrecognized operand, so the condition is
@@ -620,6 +631,13 @@ def analyze_structure(
             scope = languages[0].span if len(languages) == 1 else None
         result.thresholds.append(item.model_copy(update={"scope": scope}))
     result.thresholds.sort(key=lambda item: (item.span.start, item.span.end))
+    accepted = SpanCover(item.span for item in result.thresholds)
+    if result.thresholds and any(
+        not accepted.contains(span_of(source, clause.start + m.start(), clause.start + m.end()))
+        for m in OPERATOR_WORD.finditer(clause.quote)
+    ):
+        result.reasons.add("unsupported_number")
+        result.thresholds = []
     for threshold in result.thresholds:
         consumed.append(threshold.span)
         if threshold.scope is None:
@@ -683,6 +701,9 @@ def analyze_structure(
         and _uninterpreted(source, clause, interpreted)
     ):
         result.reasons.add("uninterpreted_text")
+        # Unplaced words may qualify the numbers too: withhold thresholds as well.
+        result.thresholds = []
+        result.reasons -= {"threshold_scope_unclear", "multiple_thresholds"}
     if result.reasons & (withheld | {"uninterpreted_text"}):
         condition = None  # never emit a partial condition or split an OR
     result.condition = condition
