@@ -132,8 +132,10 @@ Each candidate row keeps its literal quote and adds:
   clause's thresholds. Signs are not operators: any Unicode math symbol
   (category Sm, e.g. + < > = ~ ± ≤ ≥ ≈ − and fullwidth forms) or dash (Pd) on
   either side of an amount or CEFR level rejects the threshold ("−3 years",
-  "3 years − Python", "English C2−", "＋3 years"); only a hyphen joining a CEFR
-  level to a word ("C1-Niveau") and ranges inside the amount are accepted.
+  "3 years − Python", "English C2−", "＋3 years"); only a true hyphen (`-`,
+  U+2010, U+2011) joining a CEFR level to a word ("C1-Niveau") and ranges
+  inside the amount are accepted, and a sign inside a recognized term
+  ("C++ 3 years") does not count.
   Elsewhere in the clause, a math symbol outside a recognized term or a
   standalone dash withholds its thresholds; hyphens inside words ("hands-on")
   do not.

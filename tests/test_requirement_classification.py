@@ -912,3 +912,22 @@ def test_f18_unicode_signs_on_either_side_create_no_threshold(line, tmp_path: Pa
 def test_f18_word_joining_hyphens_are_not_signs(line, scope, tmp_path: Path) -> None:
     row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
     assert [t.scope.quote if t.scope else None for t in row.thresholds] == [scope]
+
+
+# Regressions for independent review round 10 (docs/reviews/TASK-012.md).
+@pytest.mark.parametrize("dash", ["—", "–", "‒", "⸺", "〜", "―"])
+def test_f19_only_true_hyphens_join_a_cefr_level_to_a_word(dash, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\nEnglish C2{dash}Niveau.", tmp_path)[2].candidates[0]
+    assert row.thresholds == [] and row.needs_review
+
+
+@pytest.mark.parametrize("hyphen", ["-", "‐", "‑"])
+def test_f19_true_hyphens_still_join(hyphen, tmp_path: Path) -> None:
+    row = analyze(f"Anforderungen\nDeutsch auf mindestens C1{hyphen}Niveau.", tmp_path)[2]
+    assert [t.level for t in row.candidates[0].thresholds] == ["C1"]
+
+
+def test_f20_sign_inside_recognized_term_is_not_a_sign(tmp_path: Path) -> None:
+    row = analyze("Requirements\nC++ 3 years of experience.", tmp_path)[2].candidates[0]
+    assert [t.value for t in row.thresholds] == [3]
+    assert "unsupported_number" not in row.review_reasons

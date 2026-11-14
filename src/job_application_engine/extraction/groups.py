@@ -154,11 +154,19 @@ def _is_sign(char: str) -> bool:
     return unicodedata.category(char) in _SIGN_CATEGORIES
 
 
-def _sign_before(source: str, floor: int, start: int) -> bool:
+# Only true hyphens may join a CEFR level to a word ("C1-Niveau"); other dashes may not.
+_HYPHENS = frozenset("-\u2010\u2011")
+
+
+def _sign_before(source: str, floor: int, start: int, terms: SpanCover | None = None) -> bool:
+    """A sign right before an amount; a sign inside a recognized term ("C++") is not one."""
     position = start
     while position > floor and source[position - 1].isspace():
         position -= 1
-    return position > floor and _is_sign(source[position - 1])
+    if position <= floor or not _is_sign(source[position - 1]):
+        return False
+    mark = SourceSpan(start=position - 1, end=position, quote=source[position - 1])
+    return terms is None or not terms.contains(mark)
 
 
 def _sign_after(source: str, end: int, limit: int, *, compound: bool = False) -> bool:
@@ -171,7 +179,7 @@ def _sign_after(source: str, end: int, limit: int, *, compound: bool = False) ->
     joined = (
         compound
         and position == end
-        and unicodedata.category(source[position]) == "Pd"
+        and source[position] in _HYPHENS
         and position + 1 < limit
         and source[position + 1].isalpha()
     )
@@ -576,7 +584,9 @@ def _education(
     return term, fields
 
 
-def _duration(source: str, clause: SourceSpan, signal: LexicalSignal) -> Threshold | ReviewReason:
+def _duration(
+    source: str, clause: SourceSpan, signal: LexicalSignal, terms: SpanCover
+) -> Threshold | ReviewReason:
     parts = _AMOUNT.fullmatch(signal.span.quote)
     if parts is None:
         return "unsupported_number"
@@ -588,7 +598,7 @@ def _duration(source: str, clause: SourceSpan, signal: LexicalSignal) -> Thresho
     gt = _prefix(PREFIX_GT, source, clause.start, signal.span.start)
     if (
         _prefix(UNSUPPORTED_PREFIX, source, clause.start, signal.span.start)
-        or _sign_before(source, clause.start, signal.span.start)
+        or _sign_before(source, clause.start, signal.span.start, terms)
         or UNSUPPORTED_POSTFIX.match(source, signal.span.end, clause.end)
         or _sign_after(source, signal.span.end, clause.end)
     ):
@@ -631,13 +641,15 @@ def _duration(source: str, clause: SourceSpan, signal: LexicalSignal) -> Thresho
     )
 
 
-def _cefr(source: str, clause: SourceSpan, match: re.Match[str]) -> Threshold | ReviewReason:
+def _cefr(
+    source: str, clause: SourceSpan, match: re.Match[str], terms: SpanCover
+) -> Threshold | ReviewReason:
     start, end = clause.start + match.start(), clause.start + match.end()
     gte = _prefix(PREFIX_GTE, source, clause.start, start)
     gt = _prefix(PREFIX_GT, source, clause.start, start)
     if (
         _prefix(UNSUPPORTED_PREFIX, source, clause.start, start)
-        or _sign_before(source, clause.start, start)
+        or _sign_before(source, clause.start, start, terms)
         or UNSUPPORTED_POSTFIX.match(source, end, clause.end)
         or _sign_after(source, end, clause.end, compound=True)
     ):
@@ -775,6 +787,7 @@ def analyze_structure(
     consumed: list[SourceSpan] = list(protected)
     languages = [signal for signal in signals if signal.kind == "language"]
     found_all: list[Threshold] = []
+    recognized = SpanCover(s.span for s in signals if s.kind in {"technology", "language"})
     years, partial = _captured_durations(source, clause, signals)
     kept = SpanCover(signal.span for signal in years)
     if partial or any(
@@ -783,8 +796,8 @@ def analyze_structure(
     ):
         result.reasons.add("unsupported_number")  # e.g. "six years", "3-year"
     for item in [
-        *(_duration(source, clause, s) for s in years),
-        *(_cefr(source, clause, match) for match in cefr_matches),
+        *(_duration(source, clause, s, recognized) for s in years),
+        *(_cefr(source, clause, match, recognized) for match in cefr_matches),
     ]:
         if isinstance(item, str):
             result.reasons.add(item)
