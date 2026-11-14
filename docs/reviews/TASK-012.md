@@ -533,3 +533,67 @@ Coverage false alarms remain nonblocking and meaning-preserving: `Native-level G
 | F-16 | non-blocking | `src/job_application_engine/extraction/groups.py:194-199, 804-813` | Coverage remains conservative for some reasonable modifier prose. No condition is hidden. | `Native-level German.` and `Written and spoken German.` remain review-required. |
 
 F-17 requires rejecting unsupported symbolic operators/signs or explicitly parsing them into typed operators, with regression coverage for prefix, postfix, negative and Unicode variants.
+
+---
+
+## Round 9 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `1722e32` plus a
+  dedicated temporary directory, no network, session
+  `01a1db2d-6f76-7c20-9c73-ecc36796ab58`. Checkout tracked files unchanged; exit 0.
+
+The reviewer's round-9 report follows verbatim.
+
+## Round 9
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Candidate: `1722e32b10fb2685369cd55cf71916133c5188aa`
+- Candidate tree: `6dfdc90926d91dcb279231e33fb0f50bef8bb570`
+- Delta: `f5d65eea7edf397eafb4f753088dcd35f1d30056..1722e32`
+- Working tree remained clean. Probe scripts and data were kept under the permitted temporary directory.
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch`; `git rev-parse HEAD`; `git rev-parse HEAD^{tree}` | 0 | Detached candidate; head/tree matched handoff |
+| Full corrective diff inspection | 0 | 6 paths; 306 diff lines / 18,176 bytes; no dependency or lockfile change |
+| Focused pytest command from handoff | 0 | **314 passed** in 45.24s |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files already formatted |
+| `.venv/bin/mypy src --cache-dir=.../mypy` | 0 | No issues in 47 source files |
+| `git diff --check f5d65ee..1722e32` | 0 | Clean |
+| `sha256sum tests/fixtures/requirements/classification.json` | 127 | Utility unavailable |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | Expected digest `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| `probe_regressions_r9.py` | 0 | 73 F-01–F-17/control probes; 0 failures |
+| `probe_groups_small.py` | 0 | 623 alternative/unknown-operand cases; 0 exceptions or unsupported partial conditions |
+| `probe_filler_r9.py` | 0 | All 142 FILLER entries tested around unknown operands; 0 unsafe cases; 23 reasonable controls |
+| `probe_duplicates_r9.py` | 0 | 13 duplicate-scope cases; grouping matched heading/marker boundaries |
+| Corrected threshold matrix | 0 | 57 value/scope/operator cases; 0 implementation exceptions |
+| Unicode sign matrix | 0 | 305 prefix/postfix/CEFR sign variants; exposed the finding below |
+| Exact 200,000-byte dense probe | 0 | 5 cases; bounded `ExtractionError` outcomes in 0.103–0.121s; no raw exceptions |
+| CLI F-18 reproductions through `jae job-classify` | 0 | 2 jobs classified successfully and returned unreviewed thresholds |
+| PDF renderer tests | — | Not run as instructed; nested `sandbox-exec` is unavailable here |
+
+An initial exploratory threshold script had one harness-side indexing error for a line treated as an explicit heading; the corrected matrix had zero exceptions.
+
+### Probe outcomes
+
+F-01–F-15 reproductions remain fixed. The 623-case matrix found no unsupported OR/alternative or unknown operand that produced an unreviewed partial or single-term condition. The 142-entry FILLER audit found no hidden operand. Conservative false alarms remain, including `Python using Docker`, `Native-level German`, `Written and spoken German`, and `Python for backend development`; these preserve review and hide no meaning, so F-16 remains non-blocking.
+
+Valid threshold controls remained typed and review-free: `2–4 years of SQL experience`, `German B1-B2`, `Deutsch auf mindestens C1-Niveau`, and `Experience (3+ years) in Python`. Out-of-range, vague, malformed, contradictory, and unsupported operator forms were reviewed or withheld. Duplicate grouping stayed within one heading/marker scope.
+
+The TASK-009 note in `docs/PROGRESS.md` is generic and contains no applicant-specific facts. The new sign description in `docs/JOB_EXTRACTION.md` is broader than the implementation shown below.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-18 | blocking | `src/job_application_engine/extraction/groups.py:145-151, 547-600, 762-775`; `docs/JOB_EXTRACTION.md:132-135` | Sign/comparison detection is incomplete and asymmetric. `SYMBOL_POSTFIX` does not recognize dash/minus variants; `_COMPARISON` omits them and fullwidth/small sign forms; stray-symbol clearing scans only `_COMPARISON`. Consequently, adjacent signs can remain inside a literal scope or be ignored entirely, yielding an unreviewed threshold. | `Requirements` / `3 years − Python experience.` returns `condition=Python`, an unqualified duration of `3`, scope `− Python experience`, and no review. `Requirements` / `English C2−.` returns `condition=English`, an unqualified C2 threshold, and no review. `Requirements` / `＋3 years of Python experience.` returns `condition=Python`, duration `3`, and no review. ASCII `-`, en dash, em dash, fullwidth plus, and several Unicode dash variants reproduce the same class of failure. |
+
+Required correction: reject or otherwise withhold thresholds for sign/comparison variants on either side of amounts and CEFR levels, and clear all thresholds when such symbols occur outside an accepted threshold. Preserve valid numeric/CEFR ranges and `C1-Niveau` through explicit span handling, with regression tests for prefix, postfix, Unicode, and fullwidth variants.
