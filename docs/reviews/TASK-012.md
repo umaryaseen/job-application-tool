@@ -91,3 +91,66 @@ The four blocking findings violate core A18/A19 acceptance and the handoff’s e
 - Fix F-04 by incorporating heading/section context into duplicate equivalence or deriving duplicate groups from the extraction’s section identity; preserve each source span.
 
 The corrective commit should rerun the focused suite, Ruff, format, mypy, diff-check and these adversarial probes before returning for independent review.
+
+---
+
+## Round 2 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `fbc4c97` plus a
+  dedicated temporary directory, no network, session
+  `01a1da93-7347-7e43-b38f-0c2461886496`. Checkout tracked files unchanged; exit 0.
+- Pytest used a temporary directory outside the checkout (no policy workaround).
+
+The reviewer's round-2 report follows verbatim.
+
+## Round 2
+
+VERDICT: CHANGES REQUIRED
+
+- Reviewer: Codex, independent implementation reviewer
+- Date: 2026-11-14
+- Base: `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`
+- Round-1 head: `f41df6b83fa0d48e5cd86b5675d9d155a4446429`
+- Candidate: `fbc4c970854e77a9b3957439da7d1a600bb0f69c`
+- Candidate tree: `22baf8e8a58c58e79ef22b2bde663e06a3c20518`
+- Corrective delta inspected in full: 8 paths, 678 diff lines. Working tree remained clean.
+
+### Commands
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Clean detached checkout |
+| `git rev-parse HEAD && git rev-parse HEAD^{tree}` | 0 | Candidate/tree matched handoff |
+| `git diff f41df6b..fbc4c97` | 0 | Full corrective delta inspected |
+| Focused pytest command from handoff | 0 | **221 passed** |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 77 files formatted |
+| `.venv/bin/mypy src --cache-dir ...` | 0 | No issues in 47 source files |
+| `git diff --check f41df6b..fbc4c97` | 0 | Clean |
+| `shasum -a 256 tests/fixtures/requirements/classification.json` | 0 | `16b05e8f0f6f1a8d274de6b06e9eacf08fc3af47d6a802fd564537d4be5b18d1` |
+| `probe_round2.py` | 0 | 49 cases, no exceptions |
+| Numeric, education, connector, cue, CEFR and scope probes | 0 | 94 cases total, no raw exceptions |
+| 200,000-byte dense probe | 0 | 4 bounded `ExtractionError` results; one classified in 0.547s |
+| CLI sanitization probe | 0 | 4 cases; no raw Pydantic diagnostics |
+
+PDF/renderer tests were not run, as instructed.
+
+### Probe outcomes
+
+- F-01 reproductions and nearby slash, pipe, ampersand, plus, comma and semicolon variants now produce `condition=null` with review.
+- F-02 trailing related-field alternatives now remain review-required.
+- F-03 round-1 values (`999`, `1000`, `10,000`, `3yrs`, leading zeros and decimals) produce no threshold and require review; CLI output is sanitized.
+- F-04 duplicate groups now respect heading and marker scope. Same-scope duplicates still group correctly.
+- Controls for `CI/CD`, `C++`, `Ideally, Python`, `Python, preferably`, and supported conjunctions passed without false review.
+
+### Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-05 | blocking | `src/job_application_engine/extraction/groups.py:376-482,443-456,520-565` | Unsupported or uncaptured threshold text can be omitted or interpreted without review, and malformed scopes can be emitted as valid. | `six years of Python experience.` → `condition=Python`, no threshold, no review. `1000-year Python experience.` and `3-year Python experience.` behave the same. `3 years minimum of Python experience.` → unqualified threshold with no review. `English C2 minimum.` → unqualified C2 with no review. `3 years of.` → scope `of`, no review. |
+| F-06 | blocking | `src/job_application_engine/extraction/groups.py:332-373,569-581` | The education shortcut still bypasses comma/semicolon continuation checks, allowing trailing unknown operands to be dropped. | `A degree; QuuxDB is required.` → `condition=degree`, no review. `A degree or a related field; QuuxDB is required.` and `Bachelor's degree or equivalent experience; QuuxDB is required.` also return supported conditions without review. |
+| F-07 | blocking | `src/job_application_engine/extraction/groups.py:575-612` | Unknown operands after a recognized term can remain a single-term condition when separated by unsupported filler or punctuation. | `Python plus QuuxDB is required.`, `Python with QuuxDB is required.`, `Python but QuuxDB is required.`, `Python: QuuxDB is required.`, and `Python, preferably; QuuxDB.` all return `condition=Python` without review. |
+| F-08 | blocking | `docs/PROGRESS.md:40-52` | The corrective documentation adds applicant-specific private revision details to the tracked TASK-009 state note. This conflicts with the required sanitized note and the repository privacy policy. | The note includes applicant CV revision metadata, a payload count, and a profile degree/date defect. Replace with a generic pending-review state without applicant-specific facts. |
+
+The corrective code remains source-only, deterministic, revision-bound, dependency-neutral and bounded on dense inputs. The fixture oracle is byte-identical. F-05–F-08 remain unresolved correctness/privacy defects, so the candidate requires another narrow corrective commit and independent re-review.
