@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import bisect
+import itertools
 import re
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 
 from ..domain.requirement import SectionKind, SourceSpan
@@ -108,6 +110,19 @@ def source_span(source: str, start: int, end: int) -> SourceSpan:
     while end > start and source[end - 1].isspace():
         end -= 1
     return SourceSpan(start=start, end=end, quote=source[start:end])
+
+
+class SpanCover:
+    """Logarithmic containment checks against fixed, possibly overlapping spans."""
+
+    def __init__(self, spans: Iterable[SourceSpan]) -> None:
+        ordered = sorted((span.start, span.end) for span in spans)
+        self._starts = [start for start, _ in ordered]
+        self._max_end = list(itertools.accumulate((end for _, end in ordered), max))
+
+    def contains(self, span: SourceSpan) -> bool:
+        index = bisect.bisect_right(self._starts, span.start)
+        return index > 0 and self._max_end[index - 1] >= span.end
 
 
 def verify_span(source: str, span: SourceSpan) -> None:

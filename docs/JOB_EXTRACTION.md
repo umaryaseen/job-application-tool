@@ -59,3 +59,58 @@ general language accuracy.
 CV acceptance is open. Full M1/M2 release, career matching, tailoring and export
 retain their gates. Employer text never becomes career evidence. Stored source
 URLs remain metadata; later link/fetch features must validate allowed schemes.
+
+## Classify priority, negation and alternatives
+
+TASK-012 interprets the same candidates with a second deterministic layer:
+
+```bash
+uv run jae job-classify --job-id example-ai-role
+uv run jae job-classify --job-id example-ai-role --revision 1
+```
+
+The command re-verifies the saved revision, rebuilds the TASK-011 extraction
+and prints JSON bound to its job record, raw hash and `extraction_digest`. It is
+read-only like `job-extract` and uses no profile, model, network or new
+dependency. Oversized annotation counts fail with exit 2 instead of truncating.
+
+Each candidate row keeps its literal quote and adds:
+
+- `role`: `requirement`, `priority_marker` (a standalone line such as
+  `Nice to have` that scopes later lines) or `non_requirement`
+  (responsibility/benefit/company-context text, never prioritized).
+- `priority` (`mandatory`, `preferred`, `unspecified`) with a fixed `basis`
+  code and every `cues` span used. Only explicit EN/DE cue words decide
+  priority. General headings such as Requirements or Ihr Profil supply none;
+  headings or marker lines containing a cue apply only to clauses without
+  their own cue. Disagreement between clause and heading, or mandatory plus
+  preferred/not-required cues in one clause, yields `unspecified` and review.
+  A preferred section never becomes mandatory.
+- `negation`: `requirement_negated` for recognized forms such as
+  "German not required", "kein Muss" or "Keine Deutschkenntnisse erforderlich"
+  (the condition then names what is *not* required); any other negation word
+  is `unsupported` and needs review.
+- `condition`: a literal term or `any`/`all` tree. Supported grammar is
+  recognized technology/language terms joined by commas and one consistent
+  conjunction (or/oder/and/or/und/oder → `any`; and/und/sowie → `all`),
+  explicit either…or / both…and / sowohl…als auch / parentheses for nesting,
+  and `<degree> or equivalent experience/qualification` (oder vergleichbare …)
+  as one `any` group. "or a related field" stays inside the degree term. If
+  any OR/AND in the clause is outside that grammar, the condition is `null`
+  and the row needs review: an OR is never split or partially kept.
+- `thresholds`: integer year/month durations (`gte`, `gt`, `range`,
+  `unqualified`) and CEFR levels with operator, unit and literal scope. Vague
+  or decimal quantities create no threshold and need review.
+- `review_reasons` / `needs_review`: why a person must look at the row.
+  `review_state` stays `draft` for every row.
+
+`duplicates` groups repeated requirements only when the case-folded quote and
+every qualifier are identical; the same text under different headings is not
+merged. Every member keeps its own span.
+
+Structural validation rejects relabelled, split or invented content even when
+checksums are recomputed: each label must equal the deterministic rule output
+for the exact source. That proves reproducibility, not that the posting was
+understood. An independently reviewed 30 EN / 29 DE synthetic oracle covers the
+documented grammar only. Requirement correction/review versions are TASK-014;
+nothing here approves a requirement, matches a career fact or authorizes export.

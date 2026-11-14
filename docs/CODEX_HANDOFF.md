@@ -17,8 +17,9 @@ obtain actual baseline document acceptance. Existing files do not establish it.
 
 ADR-020 separately permits TASK-010 draft JD intake before that personal gate.
 ADR-021 permits source-only TASK-011–014 implementation on reviewed dependencies;
-only TASK-011 is the current implementation. It never authorizes matching,
-tailoring or personal approval. Read JOB_EXTRACTION for the draft-only behavior.
+TASK-011 is integrated and TASK-012 is the current implementation. It never
+authorizes matching, tailoring or personal approval. Read JOB_EXTRACTION for
+the draft-only behavior.
 Check PROGRESS before choosing work: do not restart already implemented intake
 or interpret a stored posting as personal baseline acceptance.
 
@@ -38,3 +39,31 @@ a separate reviewer using REVIEW_HANDOFF. Do not merge your own unreviewed work.
 ```
 
 When handing off due to limits, record task, branch/base/head, changed files, measured test results, findings, private input references without their contents, and the single next action. Git and PROGRESS remain the implementation record.
+
+## Implementer and reviewer roles
+
+Default: Claude Code implements and Codex independently reviews; the reverse is
+equally valid. Record the actual roles in each review file. The reviewer is a
+separate session that inspects the exact candidate; it never edits the
+implementation while giving a verdict, and nobody self-approves.
+
+On the maintainer's Mac the Codex CLI ships inside the VS Code extension
+(`$HOME/.vscode/extensions/openai.chatgpt-<version>/bin/macos-x86_64/codex`).
+Review a fixed commit in a detached, read-only checkout so concurrent work stays
+invisible to the reviewer:
+
+```bash
+git worktree add --detach "$TMPDIR/review-NNN" <candidate-commit>
+"$CODEX" exec --sandbox read-only -C "$TMPDIR/review-NNN" --color never \
+  -o "$TMPDIR/review-NNN.md" - < reviewer-prompt.md
+git worktree remove "$TMPDIR/review-NNN"
+```
+
+The prompt names the base/candidate commits, the documents to read, the exact
+scope, forbids access outside the checkout (no `$JAE_DATA_DIR`, no network)
+and requires one `VERDICT:` line. Commit the report verbatim under
+`docs/reviews/` with a short provenance header (CLI version, model, sandbox,
+session id). A read-only sandbox cannot run `uv`; when runtime verification is
+required, the reviewer prompt must say so and the implementer records which
+checks the reviewer could not run. Unapproved orchestration branches
+(WORKFLOW-001, TASK-036, TASK-039 worktrees) are not part of this workflow.

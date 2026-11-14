@@ -254,12 +254,20 @@ def extract_requirements(source: str, *, job: JobRevision) -> RequirementExtract
     return result
 
 
-def extract_saved_job(
+def load_saved_source(
     job_id: str, *, revision: int | None = None, data_root: str | Path | None = None
-) -> RequirementExtraction:
+) -> tuple[str, JobRevision]:
+    """Load a verified saved revision's raw quote source (re-checked by the caller)."""
     root = private_data_root(data_root)
     saved = load_job_revision(job_id, revision=revision, data_root=root)
     path = safe_private_path((saved.path / "job_description.raw.txt").relative_to(root), root)
     with path.open("rb") as stream:
         raw = stream.read(MAX_INPUT_BYTES + 1)
-    return extract_requirements(decode_source(raw), job=saved.record)
+    return decode_source(raw), saved.record
+
+
+def extract_saved_job(
+    job_id: str, *, revision: int | None = None, data_root: str | Path | None = None
+) -> RequirementExtraction:
+    source, job = load_saved_source(job_id, revision=revision, data_root=data_root)
+    return extract_requirements(source, job=job)
