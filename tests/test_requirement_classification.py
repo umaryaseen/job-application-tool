@@ -673,3 +673,46 @@ def test_f09_controls_keep_accepted_operator_thresholds(line, operator, tmp_path
     row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
     assert [t.operator for t in row.thresholds] == [operator]
     assert row.review_reasons == []
+
+
+# Regressions for independent review round 4 (docs/reviews/TASK-012.md).
+@pytest.mark.parametrize(
+    "line",
+    [
+        "A degree in Computer Science with Rust experience.",
+        "A degree in Computer Science plus QuuxML.",
+        "A degree, QuuxML.",
+        "A degree or a related field plus QuuxML.",
+        "A degree in Computer Science with Rust experience or equivalent practical experience.",
+        "A degree with QuuxML or equivalent experience.",
+        "Studium der Informatik mit Schwerpunkt QuuxML.",
+        "Abgeschlossenes Studium der Informatik, QuuxML.",
+    ],
+)
+def test_f11_text_after_degree_term_is_not_hidden(line, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert row.condition is None and row.needs_review
+
+
+@pytest.mark.parametrize(
+    ("line", "expected"),
+    [
+        ("A completed degree in Computer Science is required.", "degree in Computer Science"),
+        (
+            "University degree in Business Information Systems.",
+            "degree in Business Information Systems",
+        ),
+        (
+            "Hochschulabschluss in Wirtschaftsinformatik.",
+            "Hochschulabschluss in Wirtschaftsinformatik",
+        ),
+        (
+            "Master's degree in Data Science or a related field.",
+            "Master's degree in Data Science or a related field",
+        ),
+    ],
+)
+def test_f11_controls_keep_explicit_degree_terms(line, expected, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert condition(row.condition) == expected
+    assert row.review_reasons == []

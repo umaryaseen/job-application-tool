@@ -95,13 +95,17 @@ Each candidate row keeps its literal quote and adds:
   conjunction (or/oder/and/or/und/oder → `any`; and/und/sowie → `all`),
   explicit either…or / both…and / sowohl…als auch / parentheses for nesting,
   and `<degree> or equivalent experience/qualification` (oder vergleichbare …)
-  as one `any` group. "or a related field" stays inside the degree term only
-  before the equivalent branch. If any OR/AND in the clause is outside that
+  as one `any` group. A degree term is explicit grammar only: consecutive
+  education words, optionally `in/of/der/des/im` plus a field of at most four
+  words (stopping at filler words, connectives or punctuation), optionally
+  "or a related field" directly after. The field is taken literally, so words
+  appended to it without any separator count as part of the field name; any
+  other text after the term is outside it. If any OR/AND in the clause is outside that
   grammar — or a `/`, `|`, `&`, `+` outside a recognized term, or a comma or
   semicolon joining the terms to further unrecognized text ("Python, QuuxDB")
   — the condition is `null` and the row needs review: an OR is never split or
   partially kept. Coverage rule: every word outside the interpreted spans
-  (terms, groups, cues, negation, thresholds) must be on a small EN/DE filler
+  (leaf terms, connectives, cues, negation, thresholds) must be on a small EN/DE filler
   list (experience, with, strong, Kenntnisse, sehr gute, …). Any other word
   could be an unrecognized operand ("Python with QuuxDB"), so the condition is
   withheld with `uninterpreted_text`, and the clause's thresholds are withheld

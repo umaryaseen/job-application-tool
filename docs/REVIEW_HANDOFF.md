@@ -6,7 +6,15 @@ The TASK-012 fixture labels are already independently
 [approved](reviews/TASK-012-FIXTURES.md); do not re-derive or change them to fit
 output. Review the implementation commit supplied with this handoff.
 
-## Round 4: corrective re-review
+## Round 5: corrective re-review
+
+Round 4 on `b91ead6` returned CHANGES REQUIRED for F-11 only. Re-review
+`b91ead6..<candidate>`: explicit degree-term grammar, leaf-only coverage and
+the early CEFR bound. Confirm F-01–F-10 stay as recorded. The literal field
+rule (up to four words, words appended without a separator join the field) is
+documented; judge whether it is acceptable. Append a "Round 5" section.
+
+## Round 4 (completed)
 
 Round 3 on `2f43f4f` returned CHANGES REQUIRED for F-09 only (F-10
 non-blocking). Re-review `2f43f4f..<candidate>`: stray/contradictory operator
@@ -81,7 +89,7 @@ the repository is rejected by design), `uv run ruff check .`,
 your own adversarial inputs. The full suite needs macOS `sandbox-exec`, Poppler
 and the pinned Typst assets; inspect hosted CI for the exact published head
 rather than repeating renderer tests in a sandbox that cannot nest them.
-Implementer results are in PROGRESS (378 passed locally); they are not a
+Implementer results are in PROGRESS (390 passed locally); they are not a
 substitute for your checks.
 
 Record actual commands/results, exact head/tree, findings and one verdict in

@@ -24,7 +24,9 @@ from ..domain.requirement import (
     TermKind,
     Threshold,
 )
-from .spans import SpanCover
+from .spans import ExtractionError, SpanCover
+
+MAX_CLAUSE_LEVELS = 4096
 
 CONNECTIVE = re.compile(
     r"and/or|und/oder|as\s+well\s+as|als\s+auch|(?<!\w)bzw\.|(?<!\w)(?:or|oder|either|entweder|"
@@ -81,6 +83,11 @@ FIELD_ALTERNATIVE = re.compile(
     re.I,
 )
 _EXPERIENCE_WORDS = ("experience", "erfahrung")
+_FIELD_LINK = re.compile(r"\s+(?:in\s+der|in\s+den|im\s+bereich|in|of|der|des|im)\s+", re.I)
+_FIELD_WORD = re.compile(r"[^\W\d_][\w\-]*")
+_FIELD_SPACE = re.compile(r"[ \t]+")
+_FIELD_GAP = re.compile(r",?\s*")
+MAX_FIELD_WORDS = 4
 
 _NUMBER = re.compile(r"(?P<value>\d{1,3})(?:\s*[-–]\s*(?P<upper>\d{1,3}))?(?P<plus>\+)?")
 _WORD_NUMBERS = {
@@ -152,10 +159,30 @@ FILLER = frozenset(
     fließende fließenden verhandlungssicher verhandlungssichere verhandlungssicheren
     kenntnis kenntnisse erfahrung erfahrungen berufserfahrung praxiserfahrung aber auch
     sie du ihr haben hast habt bringst bringen bringt niveau abgeschlossen
-    abgeschlossene abgeschlossener abgeschlossenes abgeschlossenen
+    abgeschlossene abgeschlossener abgeschlossenes abgeschlossenen completed relevant
+    university academic technical formal einschlägige einschlägiges einschlägigen
+    universitäres technisches technischen
     """.split()
 )
 _WORDS = re.compile(r"[^\W\d_]+|\d+")
+_FIELD_STOP = FILLER | {
+    "plus",
+    "and",
+    "or",
+    "und",
+    "oder",
+    "sowie",
+    "including",
+    "inkl",
+    "etc",
+    "both",
+    "either",
+    "entweder",
+    "sowohl",
+    "bzw",
+    "e",
+    "z",
+}
 CEFR = re.compile(
     r"(?<!\w)(?P<level>[ABC][12])(?P<plus>\+)?(?:\s*[-–]\s*(?P<upper>[ABC][12]))?"
     r"(?P<suffix>(?i:(?:\s*-?\s*(?:level|niveau))?\s+(?:or\s+(?:higher|above|better)|"
@@ -376,6 +403,41 @@ def _close_run(source: str, clause: SourceSpan, run: list[_Token], runs: list[li
     return end
 
 
+def _education_term_end(
+    source: str, education: list[LexicalSignal], limit: int
+) -> tuple[int, list[SourceSpan]]:
+    """End of the explicitly interpreted degree term and any related-field span.
+
+    Grammar: consecutive education words; optionally ``in/of/der/des/im`` plus a
+    field of at most four words that stops at filler, connectives or punctuation;
+    optionally "or a related field" directly after. Anything later stays outside
+    the term, so the coverage rule can send it to review.
+    """
+    end = education[0].span.end
+    for signal in education[1:]:
+        if signal.span.start >= limit or source[end : signal.span.start].strip():
+            break
+        end = signal.span.end
+    link = _FIELD_LINK.match(source, end, limit)
+    if link is not None:
+        position, words = link.end(), 0
+        while words < MAX_FIELD_WORDS:
+            word = _FIELD_WORD.match(source, position, limit)
+            if word is None or word.group().casefold() in _FIELD_STOP:
+                break
+            end, words = word.end(), words + 1
+            space = _FIELD_SPACE.match(source, end, limit)
+            if space is None:
+                break
+            position = space.end()
+    gap = _FIELD_GAP.match(source, end, limit)
+    alternative = FIELD_ALTERNATIVE.match(source, gap.end() if gap else end, limit)
+    if alternative is not None:
+        field = span_of(source, alternative.start(), alternative.end())
+        return field.end, [field]
+    return end, []
+
+
 def _education(
     source: str, clause: SourceSpan, signals: list[LexicalSignal], stops: list[int]
 ) -> tuple[Condition | None, list[SourceSpan]]:
@@ -386,20 +448,11 @@ def _education(
     limit = min([clause.end, *[stop for stop in stops if stop > start]])
     semicolon = source.find(";", start, limit)
     limit = semicolon if semicolon != -1 else limit
-    region = source[start:limit]
-    fields = [
-        span_of(source, start + m.start(), start + m.end())
-        for m in FIELD_ALTERNATIVE.finditer(region)
-    ]
-    field_cover = SpanCover(fields)
-    for match in EQUIVALENT.finditer(region):
-        conn = span_of(source, start + match.start("conn"), start + match.end("conn"))
-        if field_cover.contains(conn):
-            continue
-        left_end = trim_end(source, start, start + match.start())
-        right = span_of(source, start + match.start("term"), start + match.end("term"))
-        if left_end <= start:
-            return None, fields
+    term_end, fields = _education_term_end(source, education, limit)
+    term = ConditionTerm(term_kind="education", span=span_of(source, start, term_end))
+    for match in EQUIVALENT.finditer(source, term_end, limit):
+        conn = span_of(source, match.start("conn"), match.end("conn"))
+        right = span_of(source, match.start("term"), match.end("term"))
         kind: TermKind = (
             "equivalent_experience"
             if right.quote.casefold().endswith(_EXPERIENCE_WORDS)
@@ -409,16 +462,12 @@ def _education(
             node="any",
             span=span_of(source, start, right.end),
             connectives=[conn],
-            children=[
-                ConditionTerm(term_kind="education", span=span_of(source, start, left_end)),
-                ConditionTerm(term_kind=kind, span=right),
-            ],
+            children=[term, ConditionTerm(term_kind=kind, span=right)],
         )
-        # A "related field" after the equivalent branch is a further alternative,
-        # not part of the degree term; leaving it unconsumed sends it to review.
-        return group, [*[f for f in fields if f.end <= conn.start], conn]
-    end = trim_end(source, start, limit)
-    return ConditionTerm(term_kind="education", span=span_of(source, start, end)), fields
+        # Words between the degree term and "or equivalent …" are not part of
+        # either term; coverage sends them to review.
+        return group, [*fields, conn]
+    return term, fields
 
 
 def _duration(source: str, clause: SourceSpan, signal: LexicalSignal) -> Threshold | ReviewReason:
@@ -540,6 +589,12 @@ def _captured_durations(
     return [signal for index, signal in enumerate(years) if index not in dropped], partial
 
 
+def _leaf_spans(node: Condition) -> list[SourceSpan]:
+    if isinstance(node, ConditionGroup):
+        return [*node.connectives, *(s for child in node.children for s in _leaf_spans(child))]
+    return [node.span]
+
+
 def _uninterpreted(source: str, clause: SourceSpan, interpreted: list[SourceSpan]) -> bool:
     """True when a word outside every interpreted span is not a known filler word."""
     cover = SpanCover(interpreted)
@@ -599,6 +654,8 @@ def analyze_structure(
     result = Structure()
     cue_starts = sorted(span.start for span in protected)
     cefr_matches = list(CEFR.finditer(clause.quote))
+    if len(cefr_matches) > MAX_CLAUSE_LEVELS:
+        raise ExtractionError("a JD clause exceeds 4096 annotations; review the source")
     anchors = sorted(
         [signal.span.start for signal in signals if signal.kind == "years"]
         + [clause.start + match.start() for match in cefr_matches]
@@ -688,7 +745,7 @@ def analyze_structure(
         )
     interpreted = [*consumed, *(signal.span for signal in signals)]
     if condition is not None:
-        interpreted.append(condition.span)
+        interpreted.extend(_leaf_spans(condition))
     else:
         # Without a condition, a threshold's literal scope is its interpretation.
         interpreted.extend(t.scope for t in result.thresholds if t.scope is not None)
