@@ -110,13 +110,50 @@ PREFIX_GTE = re.compile(
     re.I,
 )
 PREFIX_GT = re.compile(r"(?<!\w)(?:more\s+than|over|mehr\s+als|über)\s*$", re.I)
+# Operator words outside the supported grammar: never silently reduced to "unqualified".
+UNSUPPORTED_PREFIX = re.compile(
+    r"(?<!\w)(?:up\s+to|max(?:imum)?\.?|at\s+most|less\s+than|fewer\s+than|under|"
+    r"approximately|approx\.?|about|around|roughly|ca\.?|circa|etwa|rund|ungefähr|"
+    r"bis\s+zu|höchstens|maximal|weniger\s+als|unter)\s*$",
+    re.I,
+)
+UNSUPPORTED_POSTFIX = re.compile(
+    r"\s*(?:minimum|min\.?|minimal|at\s+least|or\s+(?:more|longer|above|higher|better)|plus|"
+    r"maximum|max\.?|at\s+most|mindestens|oder\s+(?:mehr|länger|höher|besser)|maximal|"
+    r"höchstens)(?!\w)",
+    re.I,
+)
+UNIT_WORD = re.compile(r"(?<!\w)(?:years?|yrs?|jahre?n?|months?|monate?n?|monat)(?!\w)", re.I)
+# Words that may surround interpreted spans without changing their meaning. Any
+# other uncovered word may be an unrecognized operand, so the condition is
+# withheld for review instead of being kept partially.
+FILLER = frozenset(
+    """
+    a an the is are be been will would should can could may you your we our us they
+    have has having had with within in of on for to at as by from using use used via
+    also but knowledge experience experienced experiences skill skills skilled strong
+    good solid excellent very deep basic advanced fluent fluency proficiency proficient
+    working hands practical professional level levels understanding familiarity familiar
+    background expertise ability written spoken language languages s ll re ve d
+    ein eine einer einen einem eines der die das den dem des ist sind wird werden sein
+    mit im von vom auf für zu zum zur bei sehr gute guter gutes gut guten fundierte
+    fundierter fundiertes fundierten solide soliden sichere sicherer sicheren fließend
+    fließende fließenden verhandlungssicher verhandlungssichere verhandlungssicheren
+    kenntnis kenntnisse erfahrung erfahrungen berufserfahrung praxiserfahrung aber auch
+    sie du ihr haben hast habt bringst bringen bringt niveau abgeschlossen
+    abgeschlossene abgeschlossener abgeschlossenes abgeschlossenen
+    """.split()
+)
+_WORDS = re.compile(r"[^\W\d_]+|\d+")
 CEFR = re.compile(
     r"(?<!\w)(?P<level>[ABC][12])(?P<plus>\+)?(?:\s*[-–]\s*(?P<upper>[ABC][12]))?"
     r"(?P<suffix>(?i:(?:\s*-?\s*(?:level|niveau))?\s+(?:or\s+(?:higher|above|better)|"
     r"oder\s+(?:höher|besser))))?(?!\w)"
 )
 _SCOPE_LEAD = re.compile(
-    r"\s*['’]?\s*(?:(?:in\s+der|in\s+einem|in\s+einer|of|in|with|im|mit)\s+)?", re.I
+    r"\s*['’]?\s*(?:(?:in\s+der|in\s+einem|in\s+einer|of|in|with|im|mit)"
+    r"(?:\s+|(?=[.,;:!?)]|$)))?",
+    re.I,
 )
 _TRAILING_WORD = re.compile(
     r"(?:^|\s)(?:is|are|be|would|will|ist|sind|wäre|wären|wird|werden|and|or|und|oder|sowie)$",
@@ -383,6 +420,10 @@ def _duration(source: str, clause: SourceSpan, signal: LexicalSignal) -> Thresho
     )
     gte = _prefix(PREFIX_GTE, source, clause.start, signal.span.start)
     gt = _prefix(PREFIX_GT, source, clause.start, signal.span.start)
+    if _prefix(UNSUPPORTED_PREFIX, source, clause.start, signal.span.start) or (
+        UNSUPPORTED_POSTFIX.match(source, signal.span.end, clause.end)
+    ):
+        return "unsupported_number"
     folded = " ".join(number.split()).casefold()
     if folded in _VAGUE:
         return "vague_quantity"
@@ -425,6 +466,10 @@ def _cefr(source: str, clause: SourceSpan, match: re.Match[str]) -> Threshold | 
     start, end = clause.start + match.start(), clause.start + match.end()
     gte = _prefix(PREFIX_GTE, source, clause.start, start)
     gt = _prefix(PREFIX_GT, source, clause.start, start)
+    if _prefix(UNSUPPORTED_PREFIX, source, clause.start, start) or (
+        UNSUPPORTED_POSTFIX.match(source, end, clause.end)
+    ):
+        return "unsupported_number"
     raised = bool(match["plus"] or match["suffix"] or gte)
     if gt or (match["upper"] and (raised or match["upper"] <= match["level"])):
         return "unsupported_number"
@@ -453,7 +498,9 @@ def _scope(
     lead = _SCOPE_LEAD.match(source, after, limit)
     start = lead.end() if lead else after
     end = trim_end(source, start, limit)
-    return span_of(source, start, end) if end > start else None
+    if end <= start or not any(char.isalpha() for char in source[start:end]):
+        return None  # e.g. "3 years of." has no scope, not the scope "of"
+    return span_of(source, start, end)
 
 
 def _captured_durations(
@@ -480,6 +527,16 @@ def _captured_durations(
             dropped.add(index)
             index += 1
     return [signal for index, signal in enumerate(years) if index not in dropped], partial
+
+
+def _uninterpreted(source: str, clause: SourceSpan, interpreted: list[SourceSpan]) -> bool:
+    """True when a word outside every interpreted span is not a known filler word."""
+    cover = SpanCover(interpreted)
+    for match in _WORDS.finditer(clause.quote):
+        word = span_of(source, clause.start + match.start(), clause.start + match.end())
+        if not cover.contains(word) and word.quote.casefold() not in FILLER:
+            return True
+    return False
 
 
 def _symbols(clause: SourceSpan) -> list[tuple[int, str]]:
@@ -539,8 +596,12 @@ def analyze_structure(
     languages = [signal for signal in signals if signal.kind == "language"]
     found_all: list[Threshold] = []
     years, partial = _captured_durations(source, clause, signals)
-    if partial:
-        result.reasons.add("unsupported_number")
+    kept = SpanCover(signal.span for signal in years)
+    if partial or any(
+        not kept.contains(span_of(source, clause.start + m.start(), clause.start + m.end()))
+        for m in UNIT_WORD.finditer(clause.quote)
+    ):
+        result.reasons.add("unsupported_number")  # e.g. "six years", "3-year"
     for item in [
         *(_duration(source, clause, s) for s in years),
         *(_cefr(source, clause, match) for match in cefr_matches),
@@ -607,7 +668,22 @@ def analyze_structure(
         result.reasons.add(
             "unparsed_alternative" if word in _ALTERNATIVES else "unparsed_conjunction"
         )
-    if result.reasons & {"unparsed_alternative", "unparsed_conjunction", "unsupported_grouping"}:
+    interpreted = [*consumed, *(signal.span for signal in signals)]
+    if condition is not None:
+        interpreted.append(condition.span)
+    else:
+        # Without a condition, a threshold's literal scope is its interpretation.
+        interpreted.extend(t.scope for t in result.thresholds if t.scope is not None)
+    withheld = {"unparsed_alternative", "unparsed_conjunction", "unsupported_grouping"}
+    # Only when no other rule already withholds the condition: then any uncovered
+    # non-filler word could be an unrecognized operand ("Python with QuuxDB").
+    if (
+        not result.reasons & withheld
+        and (condition is not None or result.thresholds)
+        and _uninterpreted(source, clause, interpreted)
+    ):
+        result.reasons.add("uninterpreted_text")
+    if result.reasons & (withheld | {"uninterpreted_text"}):
         condition = None  # never emit a partial condition or split an OR
     result.condition = condition
     if condition is None and not result.thresholds:

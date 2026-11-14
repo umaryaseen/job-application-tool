@@ -6,7 +6,16 @@ The TASK-012 fixture labels are already independently
 [approved](reviews/TASK-012-FIXTURES.md); do not re-derive or change them to fit
 output. Review the implementation commit supplied with this handoff.
 
-## Round 2: corrective re-review
+## Round 3: corrective re-review
+
+Round 2 on `fbc4c97` returned CHANGES REQUIRED (F-05–F-08). Re-review
+`fbc4c97..<candidate>`: the coverage rule (`uninterpreted_text`, filler list),
+unit-word and unsupported-operator detection, the scope-word requirement and
+the sanitized PROGRESS note. Probe for remaining partial conditions and for
+filler-list entries that could themselves hide an operand. Append a "Round 3"
+section; do not rewrite earlier rounds.
+
+## Round 2 (completed)
 
 Round 1 on `f41df6b` returned CHANGES REQUIRED (F-01–F-04; see
 [the review](reviews/TASK-012.md)). Re-review the corrective delta
@@ -64,7 +73,7 @@ the repository is rejected by design), `uv run ruff check .`,
 your own adversarial inputs. The full suite needs macOS `sandbox-exec`, Poppler
 and the pinned Typst assets; inspect hosted CI for the exact published head
 rather than repeating renderer tests in a sandbox that cannot nest them.
-Implementer results are in PROGRESS (341 passed locally); they are not a
+Implementer results are in PROGRESS (369 passed locally); they are not a
 substitute for your checks.
 
 Record actual commands/results, exact head/tree, findings and one verdict in

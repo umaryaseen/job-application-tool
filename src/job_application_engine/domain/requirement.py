@@ -96,6 +96,7 @@ ReviewReason = Literal[
     "threshold_scope_unclear",
     "multiple_thresholds",
     "cue_outside_requirement_section",
+    "uninterpreted_text",
 ]
 TermKind = Literal[
     "technology", "language", "education", "equivalent_experience", "equivalent_qualification"
@@ -179,7 +180,7 @@ class ClassifiedCandidate(StrictModel):
     negation_spans: list[SourceSpan] = Field(default_factory=list, max_length=4096)
     condition: Condition | None = None
     thresholds: list[Threshold] = Field(default_factory=list, max_length=4096)
-    review_reasons: list[ReviewReason] = Field(default_factory=list, max_length=13)
+    review_reasons: list[ReviewReason] = Field(default_factory=list, max_length=14)
     needs_review: bool
     review_state: Literal["draft"] = "draft"
 

@@ -568,3 +568,76 @@ def test_numeric_amounts_end_scopes_and_leading_zeros_need_review(tmp_path: Path
     assert [t.scope.quote if t.scope else None for t in first.thresholds] == ["Python experience"]
     assert "unsupported_number" in first.review_reasons
     assert second.thresholds == [] and "unsupported_number" in second.review_reasons
+
+
+# Regressions for independent review round 2 (docs/reviews/TASK-012.md).
+@pytest.mark.parametrize(
+    "line",
+    [
+        "six years of Python experience.",
+        "1000-year Python experience.",
+        "3-year Python experience.",
+        "3 years minimum of Python experience.",
+        "Up to 3 years of Python experience.",
+        "About 5 years of Python experience.",
+        "3 years or more of Python experience.",
+        "English C2 minimum.",
+        "Etwa 3 Jahre Erfahrung mit Python.",
+    ],
+)
+def test_f05_uninterpreted_numeric_text_needs_review(line, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert row.thresholds == []
+    assert row.needs_review
+    assert {"unsupported_number", "unparsed_alternative"} & set(row.review_reasons)
+
+
+def test_f05_scope_without_words_is_unclear(tmp_path: Path) -> None:
+    row = analyze("Requirements\n3 years of.", tmp_path)[2].candidates[0]
+    assert [t.scope for t in row.thresholds] == [None]
+    assert "threshold_scope_unclear" in row.review_reasons
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "A degree; QuuxDB is required.",
+        "A degree or a related field; QuuxDB is required.",
+        "Bachelor's degree or equivalent experience; QuuxDB is required.",
+        "Python plus QuuxDB is required.",
+        "Python with QuuxDB is required.",
+        "Python but QuuxDB is required.",
+        "Python: QuuxDB is required.",
+        "Python, preferably; QuuxDB.",
+        "QuuxDB with at least 3 years of experience.",
+        "Erfahrung mit Python und QuuxDB.",
+    ],
+)
+def test_f06_f07_unrecognized_operands_never_leave_partial_conditions(line, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert row.condition is None and row.needs_review
+
+
+@pytest.mark.parametrize(
+    ("line", "expected"),
+    [
+        ("Strong Python skills.", "Python"),
+        ("Solid knowledge of SQL is required.", "SQL"),
+        ("Hands-on experience with Docker.", "Docker"),
+        ("Fluent German.", "German"),
+        ("Sehr gute Englischkenntnisse.", "Englischkenntnisse"),
+        ("Fundierte Kenntnisse in Python sind erforderlich.", "Python"),
+        ("You have good experience with Kubernetes.", "Kubernetes"),
+    ],
+)
+def test_coverage_rule_keeps_conditions_with_only_filler(line, expected, tmp_path: Path) -> None:
+    row = analyze(f"Requirements\n{line}", tmp_path)[2].candidates[0]
+    assert condition(row.condition) == expected
+    assert "uninterpreted_text" not in row.review_reasons
+
+
+def test_threshold_only_scope_counts_as_interpretation(tmp_path: Path) -> None:
+    row = analyze("Requirements\nAt least 3 years of QuuxDB experience.", tmp_path)[2]
+    first = row.candidates[0]
+    assert [t.scope.quote if t.scope else None for t in first.thresholds] == ["QuuxDB experience"]
+    assert first.review_reasons == []

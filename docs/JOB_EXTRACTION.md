@@ -100,13 +100,20 @@ Each candidate row keeps its literal quote and adds:
   grammar — or a `/`, `|`, `&`, `+` outside a recognized term, or a comma or
   semicolon joining the terms to further unrecognized text ("Python, QuuxDB")
   — the condition is `null` and the row needs review: an OR is never split or
-  partially kept. Parenthetical qualifiers and filler words around a term are
-  not interpreted; the literal clause stays visible.
+  partially kept. Coverage rule: every word outside the interpreted spans
+  (terms, groups, cues, negation, thresholds) must be on a small EN/DE filler
+  list (experience, with, strong, Kenntnisse, sehr gute, …). Any other word
+  could be an unrecognized operand ("Python with QuuxDB"), so the condition is
+  withheld with `uninterpreted_text`. This deliberately sends many real
+  clauses ("Experience building REST APIs with Python") to review rather than
+  risk a partial condition.
 - `thresholds`: integer year/month durations up to 99 (`gte`, `gt`, `range`,
   `unqualified`) and CEFR levels with operator, unit and literal scope. A scope
-  ends at the next cue, negation or numeric amount. Vague, decimal, leading-zero,
-  larger or otherwise uncaptured amounts ("1000 years", "3yrs") create no
-  threshold and need review.
+  ends at the next cue, negation or numeric amount; without a condition the
+  literal scope is the threshold's interpretation. Vague, decimal, leading-zero,
+  larger or otherwise uncaptured amounts ("1000 years", "3yrs", "six years",
+  "3-year") and unsupported operator words (up to, about, maximum, "3 years
+  minimum", "or more", etwa, bis zu) create no threshold and need review.
 - `review_reasons` / `needs_review`: why a person must look at the row.
   `review_state` stays `draft` for every row.
 
