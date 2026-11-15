@@ -2,8 +2,8 @@
 
 Last reconciled: 2026-11-15 against main `01f3a40` (merged PR #8). TASK-011,
 TASK-012, M1-FIX-006, TASK-013 and M1-FIX-007 are integrated. M1-FIX-008
-(LinkedIn contact label, compact and extended skill groups) is implemented and
-awaits independent review. TASK-009 personal acceptance remains open: the
+(LinkedIn contact label, compact and extended skill groups, QA heading checks)
+is independently approved with follow-up and awaits merge. TASK-009 personal acceptance remains open: the
 applicant's latest decisions are applied privately and the next baseline
 candidate waits on M1-FIX-008; details stay in the private data root.
 
@@ -24,7 +24,7 @@ candidate waits on M1-FIX-008; details stay in the private data root.
 | M1-FIX-006 | Reviewed and merged into main through PR #6 | [Review](reviews/M1-FIX-006.md) round 2 APPROVED on `591b339`; closure scoped review APPROVED; merge `68aa536` |
 | TASK-013 | Reviewed and merged into main through PR #7 | [Review](reviews/TASK-013.md) round 2 APPROVED on `f26da14`; closure scoped review APPROVED; merge `9c1d558` |
 | M1-FIX-007 | Reviewed and merged into main through PR #8 | [Task](tasks/M1-FIX-007.md); [review](reviews/M1-FIX-007.md) round 2 APPROVED WITH FOLLOW-UP on `b906a7f`; follow-ups closed; merge `01f3a40` |
-| M1-FIX-008 | IMPLEMENTED — AWAITING REVIEW | [Task](tasks/M1-FIX-008.md); branch `task/009-m1-fix-008-display-labels` |
+| M1-FIX-008 | APPROVED WITH FOLLOW-UP — AWAITING MERGE | [Task](tasks/M1-FIX-008.md); [review](reviews/M1-FIX-008.md) round 4 on `1f380f7`; F-04 closed by hosted CI `43732274933`; F-03 is the stated limit in task item 5 |
 | TASK-014–020 | NOT IMPLEMENTED | Review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -102,7 +102,7 @@ regressions fail on `ae6c461` and pass now. Full suite: 474 passed. Review
 round 2 on `591b339` returned APPROVED with no unresolved findings; hosted CI
 43666629755 passed on that head.
 
-## M1-FIX-008 implementation (awaiting review)
+## M1-FIX-008 implementation (approved, awaiting merge)
 
 A URL contact on a `linkedin.com` host (or subdomain) is labelled `LinkedIn:`;
 other URLs keep `Url:`, and the contact-URL width guard covers both labels.
@@ -287,10 +287,9 @@ not interpreted.
 
 ## Next action
 
-Independent review of M1-FIX-008 against `docs/REVIEW_PROTOCOL.md`; after
-merge, regenerate the private baseline candidate with QA for applicant review
-(final artifact approval and export stay separate). TASK-014 (source-bound
-requirement review and correction versions) proceeds independently. Before any
-downstream feature makes `source_url` clickable or fetchable, validate allowed
-URL schemes (F-02). Personal records stay outside Git and CI; no matching,
-tailoring, export or application occurs.
+Merge reviewed M1-FIX-008 (PR #9) after its scoped closure check and final-head
+CI, then regenerate the private baseline candidate with QA for applicant review
+(final artifact approval and export stay separate). TASK-014 continues in its
+own review. Before any downstream feature makes `source_url` clickable or
+fetchable, validate allowed URL schemes (F-02). Personal records stay outside
+Git and CI; no matching, tailoring, export or application occurs.
