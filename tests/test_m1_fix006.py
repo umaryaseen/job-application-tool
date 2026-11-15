@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import subprocess
 from datetime import date
 from pathlib import Path
@@ -197,3 +198,72 @@ def test_real_pdf_extracts_expected_completion_specialization_and_headings(tmp_p
         normalized = normalize_extracted_text(text)
         assert all(normalize_extracted_text(item) in normalized for item in expected)
         assert "ongoing" not in normalized.split("Education", 1)[1].split("Skills", 1)[0]
+
+
+# Regression for independent review round 1 (docs/reviews/M1-FIX-006.md, F-01).
+@pytest.mark.parametrize(
+    "update",
+    [
+        {"completion_date": {"precision": "month", "year": 2027, "month": 3}},
+        {"expected_completion_date": {"precision": "month", "year": 2022, "month": 1}},
+        {
+            "period": {
+                "start": {"precision": "month", "year": 2023, "month": 4},
+                "start_state": "known",
+                "end": {"precision": "month", "year": 2025, "month": 9},
+                "end_state": "known",
+            },
+            "expected_completion_date": None,
+            "completion_date": {"precision": "month", "year": 2025, "month": 9},
+        },
+    ],
+)
+def test_model_copy_cannot_bypass_education_invariants(update) -> None:
+    from job_application_engine.domain.common import DateRange, MonthDate
+    from job_application_engine.profile.review import fact_approval_from_review, record_human_review
+    from job_application_engine.profile.validation import (
+        ProvenanceValidationError,
+        validate_profile,
+    )
+    from job_application_engine.verification.support import canonical_json
+
+    profile, reviews = approved_baseline(ONGOING)
+    education = next(f for f in profile.facts if f.kind == "education")
+    typed = {
+        key: (
+            DateRange.model_validate_json(json.dumps(value))
+            if key == "period"
+            else MonthDate.model_validate_json(json.dumps(value))
+            if isinstance(value, dict)
+            else value
+        )
+        for key, value in update.items()
+    }
+    bad = education.model_copy(update={"degree_status": "ongoing", **typed})
+    binding = next(b for b in profile.support_bindings if b.fact_id == bad.fact_id)
+    bindings = [
+        b.model_copy(update={"fact_sha256": fact_digest(bad)}) if b is binding else b
+        for b in profile.support_bindings
+    ]
+    staged = profile.model_copy(
+        update={
+            "facts": [bad if f.fact_id == bad.fact_id else f for f in profile.facts],
+            "support_bindings": bindings,
+        }
+    )
+    with pytest.raises(ProvenanceValidationError, match="invalid_fact_content"):
+        record_human_review(
+            staged,
+            target_type="fact",
+            target_id=bad.fact_id,
+            target_revision=bad.revision,
+            displayed_content=canonical_json(canonical_fact_payload(bad)),
+            review_id="review-bad",
+            reviewer_id="synthetic-reviewer",
+            reviewed_at=education.approval.approved_at,
+        )
+    with pytest.raises(ProvenanceValidationError, match="invalid_fact_content"):
+        validate_profile(staged, reviews=reviews)
+    with pytest.raises(ProvenanceValidationError, match="invalid_fact_content"):
+        compile_baseline(staged, as_of=date(2026, 11, 15), reviews=reviews)
+    assert fact_approval_from_review  # imported API stays available

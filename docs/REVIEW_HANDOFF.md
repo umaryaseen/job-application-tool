@@ -6,6 +6,14 @@ Base: main `ee590699b49077a1cd61161caa679f104b99b659`. Branch:
 handoff. TASK-012 is merged; its reviews are complete (see
 [the review](reviews/TASK-012.md)).
 
+## Round 2: corrective re-review
+
+Round 1 on `ae6c461` returned CHANGES REQUIRED for F-01 (model_copy bypass of
+education invariants). Re-review `ae6c461..<candidate>`: content-invariant
+re-validation in `validate_profile` and `record_human_review`, the three
+regressions, and that status/approval issue codes are unchanged. Append a
+"Round 2" section to `docs/reviews/M1-FIX-006.md`.
+
 ## Read first
 
 AGENTS, PROGRESS, [the task](tasks/M1-FIX-006.md), ADR-011/012/013/014/015 and
@@ -35,6 +43,6 @@ Focused: `uv run pytest tests/test_m1_fix006.py tests/test_m1_fix003.py
 tests/test_document_plan.py tests/test_profile_schema.py -ra`, plus Ruff,
 format, mypy and `git diff --check`. Renderer tests need macOS
 `sandbox-exec`, Poppler and pinned Typst assets: inspect hosted CI for the
-exact published head. Implementer full suite: 471 passed. Record commands,
+exact published head. Implementer full suite: 474 passed. Record commands,
 findings and one verdict in `docs/reviews/M1-FIX-006.md` without modifying
 implementation. Do not approve applicant facts or artifacts.
