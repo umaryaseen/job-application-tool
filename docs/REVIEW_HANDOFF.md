@@ -1,13 +1,20 @@
-# Review handoff: TASK-015 scoped constraints and experience intervals
+# Review handoff: TASK-016 matrix fixture oracle (before implementation)
 
-**Status: APPROVED — AWAITING MERGE** (round 2 on `223eeff`). See
-[the review](reviews/TASK-015.md) and the
-[fixture review](reviews/TASK-015-FIXTURES.md).
+Implementer: Claude Code. Independent reviewer: a separate Codex session.
+Base: main `deee9aa`. Branch: `task/016-evidence-matrix`. TASK-012 to TASK-015
+are merged.
 
-## Scoped closure check (pending)
-
-After `223eeff` the branch only adds a documentation closure: the verbatim
-round-2 report with provenance (including hosted CI run `43747494384` on
-`223eeff`), the PROGRESS status and next action, and this handoff. Confirm the
-delta introduces no code and the records are accurate; do not repeat runtime
-reviews.
+Review only the synthetic oracle `tests/fixtures/matrix/matrix.json` and its
+rules `tests/fixtures/matrix/README.md`, written before any matrix code. Check
+them against TASK-016, A22, A24, ADR-005/006/007/011, ARCHITECTURE ("Matching
+and tailoring"), the merged TASK-012 classifier, TASK-013 aliases and relations,
+TASK-014 review gates and TASK-015 constraints (run them to confirm the draft
+structures the cases depend on): that every expected row state, reason,
+priority, fact list, duplicate link, exclusion and coverage count follows from
+the written rules; that unrelated, adjacent, exposure, self-study and
+responsibility evidence never satisfies a requirement; that unknown and
+explicitly unmet stay distinct; that mandatory gaps stay visible and preferred
+results cannot hide them; that groups and duplicates count once and empty
+classes are N/A; and that rule gaps or ambiguities are named. Record findings
+and one verdict in `docs/reviews/TASK-016-FIXTURES.md` without editing the
+fixture.

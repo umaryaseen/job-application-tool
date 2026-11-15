@@ -1,0 +1,487 @@
+{
+  "subject": "synthetic-person",
+  "profile_facts": [
+    {
+      "fact_id": "skill-python",
+      "kind": "skill",
+      "status": "approved",
+      "name": "Python",
+      "context": "used"
+    },
+    {
+      "fact_id": "skill-k8s",
+      "kind": "skill",
+      "status": "approved",
+      "name": "Kubernetes",
+      "context": "study"
+    },
+    {
+      "fact_id": "skill-docker",
+      "kind": "skill",
+      "status": "approved",
+      "name": "Docker",
+      "context": "exposure"
+    },
+    {
+      "fact_id": "skill-pg",
+      "kind": "skill",
+      "status": "approved",
+      "name": "Postgres",
+      "context": "used"
+    },
+    {
+      "fact_id": "skill-react",
+      "kind": "skill",
+      "status": "approved",
+      "name": "React",
+      "context": "used"
+    },
+    {
+      "fact_id": "skill-js",
+      "kind": "skill",
+      "status": "approved",
+      "name": "JavaScript",
+      "context": "used"
+    },
+    {
+      "fact_id": "skill-ec2",
+      "kind": "skill",
+      "status": "approved",
+      "name": "Amazon EC2",
+      "context": "used"
+    },
+    {
+      "fact_id": "lang-de",
+      "kind": "language",
+      "status": "approved",
+      "language": "German",
+      "assessment": {
+        "assessment": "cefr",
+        "level": "B1"
+      }
+    },
+    {
+      "fact_id": "proj-py",
+      "kind": "project",
+      "status": "approved",
+      "project_entity_id": "synthetic-project",
+      "project_name": "Synthetic Pipeline",
+      "role": "Contributor",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2019,
+          "month": 1
+        },
+        "start_state": "known",
+        "end": {
+          "precision": "month",
+          "year": 2021,
+          "month": 12
+        },
+        "end_state": "known"
+      },
+      "technologies": [
+        "Python"
+      ]
+    },
+    {
+      "fact_id": "emp-a",
+      "kind": "employment",
+      "status": "approved",
+      "employer_id": "synthetic-employer",
+      "title": "Synthetic Developer",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2016,
+          "month": 1
+        },
+        "start_state": "known",
+        "end": {
+          "precision": "month",
+          "year": 2019,
+          "month": 12
+        },
+        "end_state": "known"
+      }
+    },
+    {
+      "fact_id": "emp-b",
+      "kind": "employment",
+      "status": "approved",
+      "employer_id": "synthetic-employer",
+      "title": "Synthetic Engineer",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2019,
+          "month": 6
+        },
+        "start_state": "known",
+        "end": {
+          "precision": "month",
+          "year": 2023,
+          "month": 12
+        },
+        "end_state": "known"
+      }
+    },
+    {
+      "fact_id": "resp-java",
+      "kind": "responsibility",
+      "status": "approved",
+      "employment_ref": {
+        "fact_id": "emp-a",
+        "revision": 1
+      },
+      "text": "Maintained Java services."
+    }
+  ],
+  "cases": [
+    {
+      "id": "main-matrix",
+      "source": "Requirements\n- Python or Java is required.\n- 2+ years of experience with Python.\n- Experience with Kubernetes is required.\n- German at B2 level is required.\n- Deutsch at B1 level is required.\n- Knowledge of QuuxDB is required.\n- Java is required.\n- PostgreSQL is required.\n- React is required.\n- A degree in Computer Science or equivalent experience is required.\n- Strong knowledge of Spark, Flink and similar tools.\n- German is not required.\n- Python or Java is required.\n- 5+ years of professional experience.\nNice to have\n- Docker experience.\n- Experience with AWS.\n- Terraform experience.\n",
+      "as_of": "2026-11-15",
+      "review": {
+        "unreviewed": [
+          "React is required.",
+          "Terraform experience."
+        ],
+        "corrections": {
+          "Knowledge of QuuxDB is required.": [
+            {
+              "op": "set_condition",
+              "term_kind": "technology",
+              "quote": "QuuxDB"
+            }
+          ],
+          "5+ years of professional experience.": [
+            {
+              "op": "set_priority",
+              "priority": "mandatory"
+            },
+            {
+              "op": "set_thresholds",
+              "thresholds": [
+                {
+                  "operator": "gte",
+                  "value": 5,
+                  "unit": "years",
+                  "quote": "5+ years"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "expected": {
+        "rows": [
+          {
+            "quote": "Python or Java is required.",
+            "state": "direct",
+            "reason": "exact_match",
+            "priority": "mandatory",
+            "fact_ids": [
+              "proj-py",
+              "skill-python"
+            ]
+          },
+          {
+            "quote": "2+ years of experience with Python.",
+            "state": "direct",
+            "reason": "exact_match",
+            "priority": "unspecified",
+            "fact_ids": [
+              "proj-py",
+              "skill-python"
+            ]
+          },
+          {
+            "quote": "Experience with Kubernetes is required.",
+            "state": "adjacent",
+            "reason": "self_study_only",
+            "priority": "mandatory",
+            "fact_ids": [
+              "skill-k8s"
+            ]
+          },
+          {
+            "quote": "German at B2 level is required.",
+            "state": "explicitly_unmet",
+            "reason": "cefr_below",
+            "priority": "mandatory",
+            "fact_ids": [
+              "lang-de"
+            ]
+          },
+          {
+            "quote": "Deutsch at B1 level is required.",
+            "state": "equivalent",
+            "reason": "cefr_meets",
+            "priority": "mandatory",
+            "fact_ids": [
+              "lang-de"
+            ]
+          },
+          {
+            "quote": "Knowledge of QuuxDB is required.",
+            "state": "no_evidence",
+            "reason": "no_matching_fact",
+            "priority": "mandatory",
+            "fact_ids": []
+          },
+          {
+            "quote": "Java is required.",
+            "state": "no_evidence",
+            "reason": "no_matching_fact",
+            "priority": "mandatory",
+            "fact_ids": []
+          },
+          {
+            "quote": "PostgreSQL is required.",
+            "state": "equivalent",
+            "reason": "alias_match",
+            "priority": "mandatory",
+            "fact_ids": [
+              "skill-pg"
+            ]
+          },
+          {
+            "quote": "React is required.",
+            "state": "unknown",
+            "reason": "requirement_unreviewed",
+            "priority": "mandatory",
+            "fact_ids": []
+          },
+          {
+            "quote": "A degree in Computer Science or equivalent experience is required.",
+            "state": "unknown",
+            "reason": "education_not_evaluated",
+            "priority": "mandatory",
+            "fact_ids": []
+          },
+          {
+            "quote": "Strong knowledge of Spark, Flink and similar tools.",
+            "state": "unknown",
+            "reason": "manual_check_required",
+            "priority": "unspecified",
+            "fact_ids": []
+          },
+          {
+            "quote": "Python or Java is required.",
+            "state": "direct",
+            "reason": "exact_match",
+            "priority": "mandatory",
+            "fact_ids": [
+              "proj-py",
+              "skill-python"
+            ],
+            "duplicate_of_index": 0
+          },
+          {
+            "quote": "5+ years of professional experience.",
+            "state": "direct",
+            "reason": "duration_meets",
+            "priority": "mandatory",
+            "fact_ids": [
+              "emp-a",
+              "emp-b"
+            ]
+          },
+          {
+            "quote": "Docker experience.",
+            "state": "adjacent",
+            "reason": "exposure_only",
+            "priority": "preferred",
+            "fact_ids": [
+              "skill-docker"
+            ]
+          },
+          {
+            "quote": "Experience with AWS.",
+            "state": "adjacent",
+            "reason": "related_concept",
+            "priority": "preferred",
+            "fact_ids": [
+              "skill-ec2"
+            ]
+          },
+          {
+            "quote": "Terraform experience.",
+            "state": "unknown",
+            "reason": "requirement_unreviewed",
+            "priority": "preferred",
+            "fact_ids": []
+          }
+        ],
+        "excluded": {
+          "German is not required.": "requirement_negated",
+          "Nice to have": "not_a_requirement"
+        },
+        "coverage": {
+          "mandatory": {
+            "total": 10,
+            "met": 4,
+            "direct": 2,
+            "equivalent": 2,
+            "adjacent": 1,
+            "no_evidence": 2,
+            "explicitly_unmet": 1,
+            "unknown": 2,
+            "coverage": "4/10"
+          },
+          "preferred": {
+            "total": 3,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 2,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 1,
+            "coverage": "0/3"
+          },
+          "unspecified": {
+            "total": 2,
+            "met": 1,
+            "direct": 1,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 1,
+            "coverage": "1/2"
+          }
+        }
+      }
+    },
+    {
+      "id": "empty-classes-are-not-applicable",
+      "source": "Requirements\n- Python is required.\n",
+      "as_of": "2026-11-15",
+      "review": {
+        "unreviewed": [],
+        "corrections": {}
+      },
+      "expected": {
+        "rows": [
+          {
+            "quote": "Python is required.",
+            "state": "direct",
+            "reason": "exact_match",
+            "priority": "mandatory",
+            "fact_ids": [
+              "proj-py",
+              "skill-python"
+            ]
+          }
+        ],
+        "excluded": {},
+        "coverage": {
+          "mandatory": {
+            "total": 1,
+            "met": 1,
+            "direct": 1,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 0,
+            "coverage": "1/1"
+          },
+          "preferred": {
+            "total": 0,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 0,
+            "coverage": "N/A"
+          },
+          "unspecified": {
+            "total": 0,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 0,
+            "coverage": "N/A"
+          }
+        }
+      }
+    },
+    {
+      "id": "nothing-reviewed-stays-visible-and-unknown",
+      "source": "Requirements\n- Python is required.\nNice to have\n- Docker experience.\n",
+      "as_of": "2026-11-15",
+      "review": {
+        "unreviewed": [
+          "Python is required.",
+          "Docker experience."
+        ],
+        "corrections": {}
+      },
+      "expected": {
+        "rows": [
+          {
+            "quote": "Python is required.",
+            "state": "unknown",
+            "reason": "requirement_unreviewed",
+            "priority": "mandatory",
+            "fact_ids": []
+          },
+          {
+            "quote": "Docker experience.",
+            "state": "unknown",
+            "reason": "requirement_unreviewed",
+            "priority": "preferred",
+            "fact_ids": []
+          }
+        ],
+        "excluded": {
+          "Nice to have": "not_a_requirement"
+        },
+        "coverage": {
+          "mandatory": {
+            "total": 1,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 1,
+            "coverage": "0/1"
+          },
+          "preferred": {
+            "total": 1,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 1,
+            "coverage": "0/1"
+          },
+          "unspecified": {
+            "total": 0,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 0,
+            "coverage": "N/A"
+          }
+        }
+      }
+    }
+  ]
+}
