@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pytest
 
+from job_application_engine.ats_qa.expected import ExpectedDocument, ExpectedEntry, ExpectedSection
+from job_application_engine.ats_qa.pdf import _text_checks
 from job_application_engine.domain.fact import (
     ContactEmail,
     ContactLocation,
@@ -239,3 +241,67 @@ def test_real_pdf_compact_groups_and_linkedin_extract_exactly(tmp_path: Path) ->
     lead = "Data Engineering & Analytics"
     with pytest.raises(AssertionError):
         _assert_complete_extraction(pdf, expected.replace(f"{lead}: ", f"{lead}\n"))
+
+
+# QA heading detection: a group heading ending in a section label is not a heading.
+def _oracle() -> ExpectedDocument:
+    return ExpectedDocument(
+        required_identity="Synthetic Example",
+        sections=[
+            ExpectedSection(
+                label="Contact",
+                heading_visible=False,
+                entries=[ExpectedEntry(entry_id="name", text="Synthetic Example")],
+            ),
+            ExpectedSection(
+                label="Skills",
+                entries=[
+                    ExpectedEntry(entry_id="g1", text="Programming Languages: Alpha | Zeta"),
+                    ExpectedEntry(entry_id="g2", text="Quality & Development: pre-commit"),
+                ],
+            ),
+            ExpectedSection(
+                label="Languages",
+                entries=[ExpectedEntry(entry_id="l1", text="German (A1-A2)")],
+            ),
+        ],
+        expected_pages=1,
+    )
+
+
+GOOD = (
+    "Synthetic Example\nSkills\nProgramming Languages: Alpha | Zeta\n"
+    "Quality & Development: pre-commit\nLanguages\nGerman (A1-A2)\n"
+)
+
+
+def _status(text: str) -> dict[str, bool]:
+    return {key: value[0] for key, value in _text_checks(text, _oracle()).items()}
+
+
+def test_group_heading_containing_a_label_does_not_split_its_section() -> None:
+    result = _status(GOOD)
+    assert result["standard_headings"] and result["entry_claim_sequence"]
+    assert result["complete_text"]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        GOOD.replace("\nLanguages\n", "\n"),  # real heading missing
+        GOOD.replace("\nLanguages\n", "\nLanguages German\n"),  # not a whole line
+        GOOD.replace("Skills\n", "Skills\nLanguages\n"),  # duplicate heading line
+        GOOD.replace("Skills\n", "").replace("Languages\n", "Languages\nSkills\n"),  # order
+    ],
+)
+def test_missing_ambiguous_or_misordered_headings_fail(text: str) -> None:
+    assert not _status(text)["standard_headings"]
+    assert not _status(text)["entry_claim_sequence"]
+
+
+def test_entry_outside_its_section_is_not_found() -> None:
+    moved = GOOD.replace("Quality & Development: pre-commit\n", "").replace(
+        "German (A1-A2)\n", "German (A1-A2)\nQuality & Development: pre-commit\n"
+    )
+    result = _status(moved)
+    assert result["standard_headings"] and not result["entry_claim_sequence"]

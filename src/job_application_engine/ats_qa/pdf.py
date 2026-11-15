@@ -99,30 +99,47 @@ def _coverage(found: int, total: int) -> dict[str, int | float | None]:
     return {"found": found, "total": total, "fraction": found / total if total else None}
 
 
+def _heading_lines(lines: Sequence[str], expected: ExpectedDocument) -> list[int] | None:
+    """Line index of each visible heading, or None when any is absent or ambiguous.
+
+    A heading is a whole extracted line equal to its label, occurring exactly
+    once and after the previous heading. A label inside other text (such as a
+    skill-group heading ending in "Languages") is not a section heading.
+    """
+
+    normalized = [normalize_extracted_text(line) for line in lines]
+    found: list[int] = []
+    for section in expected.sections:
+        if not section.heading_visible:
+            continue
+        label = normalize_extracted_text(section.label)
+        matches = [index for index, line in enumerate(normalized) if line == label]
+        if len(matches) != 1 or (found and matches[0] <= found[-1]):
+            return None
+        found.append(matches[0])
+    return found
+
+
 def _text_checks(text: str, expected: ExpectedDocument) -> dict[str, tuple[bool, Any, Any]]:
     actual = normalize_extracted_text(text)
     wanted = normalize_extracted_text(expected.ordered_text)
-    positions: list[int] = []
-    for section in expected.sections:
-        if section.label == "Contact" and not section.heading_visible:
-            positions.append(0)
-        else:
-            positions.append(actual.find(section.label))
-    visible_positions = [
-        position
-        for position, section in zip(positions, expected.sections, strict=True)
-        if section.heading_visible
-    ]
-    headings_ok = all(p >= 0 for p in visible_positions) and visible_positions == sorted(
-        set(visible_positions)
-    )
+    lines = text.splitlines()
+    heading_lines = _heading_lines(lines, expected)
+    headings_ok = heading_lines is not None
+    blocks = [""] * len(expected.sections)
+    if heading_lines is not None:
+        # Each section spans from its heading line (or the start, for the hidden
+        # Contact heading) to the next visible heading line.
+        visible = iter(heading_lines)
+        starts = [next(visible) + 1 if s.heading_visible else 0 for s in expected.sections]
+        for index, start in enumerate(starts):
+            end = next((line for line in heading_lines if line >= start), len(lines))
+            blocks[index] = normalize_extracted_text("\n".join(lines[start:end]))
     entry_total = sum(len(section.entries) for section in expected.sections)
     found_entries = 0
     field_total = field_found = 0
     for index, section in enumerate(expected.sections):
-        end = positions[index + 1] if index + 1 < len(positions) else len(actual)
-        start = positions[index] + (len(section.label) if section.heading_visible else 0)
-        block = actual[start:end] if headings_ok else ""
+        block = blocks[index]
         cursor = 0
         for entry in section.entries:
             exact = normalize_extracted_text(entry.text)
@@ -148,8 +165,8 @@ def _text_checks(text: str, expected: ExpectedDocument) -> dict[str, tuple[bool,
         ),
         "standard_headings": (
             headings_ok,
-            positions,
-            [section.label for section in expected.sections],
+            heading_lines,
+            [section.label for section in expected.sections if section.heading_visible],
         ),
         "entry_claim_sequence": (
             found_entries == entry_total,

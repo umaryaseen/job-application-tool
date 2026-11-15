@@ -19,4 +19,4 @@ compact line and do not loosen checks; template identity; no typography,
 selection or provenance change. Record findings and one verdict in
 `docs/reviews/M1-FIX-008.md` without modifying implementation. Renderer tests
 need macOS `sandbox-exec`: inspect hosted CI for the exact head. Implementer
-full suite: 654 passed, no skips.
+full suite: 660 passed, no skips (the QA heading fix is commit 2).
