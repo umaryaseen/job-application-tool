@@ -359,6 +359,70 @@
       ]
     },
     {
+      "id": "en-25",
+      "locale": "en",
+      "text": "DL and GCP experience.",
+      "expected": [
+        {
+          "quote": "DL",
+          "concept": "deep-learning",
+          "status": "matched"
+        },
+        {
+          "quote": "GCP",
+          "concept": "gcp",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-26",
+      "locale": "en",
+      "text": "React apps; we react quickly.",
+      "expected": [
+        {
+          "quote": "React",
+          "concept": "react",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-27",
+      "locale": "en",
+      "text": "AI-assisted tools and AIM goals.",
+      "expected": [
+        {
+          "quote": "AI",
+          "concept": "artificial-intelligence",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-28",
+      "locale": "en",
+      "text": "Javá runtime and éPython code.",
+      "expected": []
+    },
+    {
+      "id": "en-29",
+      "locale": "en",
+      "text": "JAVA_HOME and Python_path.",
+      "expected": [
+        {
+          "quote": "JAVA",
+          "concept": "java",
+          "status": "matched"
+        },
+        {
+          "quote": "Python",
+          "concept": "python",
+          "status": "matched"
+        }
+      ]
+    },
+    {
       "id": "de-01",
       "locale": "de",
       "text": "Kenntnisse in maschinellem Lernen.",
@@ -670,6 +734,31 @@
     {
       "surface": "maschinelles Lernen",
       "concept": "machine-learning",
+      "status": "matched"
+    },
+    {
+      "surface": "DL",
+      "concept": "deep-learning",
+      "status": "matched"
+    },
+    {
+      "surface": "dl",
+      "concept": null,
+      "status": "unmatched"
+    },
+    {
+      "surface": "React",
+      "concept": "react",
+      "status": "matched"
+    },
+    {
+      "surface": "react",
+      "concept": null,
+      "status": "unmatched"
+    },
+    {
+      "surface": "GCP",
+      "concept": "gcp",
       "status": "matched"
     }
   ],

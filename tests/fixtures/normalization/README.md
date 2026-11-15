@@ -12,9 +12,18 @@ applicant data; a separate review must approve them independently of output.
   (`matched`, or `ambiguous` for a context-restricted alias whose concept is
   only a candidate).
 - `surface_cases`: one whole `surface` (for example a skill name) with the
-  expected `concept` and `status`; `unmatched` keeps the literal surface and
-  has no concept.
+  expected `concept` and `status`. Surface semantics: leading/trailing
+  whitespace is trimmed, and the surface matches only when exactly one alias
+  covers the whole trimmed text; otherwise it is `unmatched`, keeps the literal
+  trimmed text and has no concept (scan mode is not applied to surfaces).
 - `relations`: typed links that must never make two concepts equivalent.
+  `from` is the subject: `broader` means `to` is the broader concept
+  (SageMaker → AWS); `related` is informational. Relations are never
+  traversed as aliases or equivalence.
+
+The reviewed alias inventory is `src/job_application_engine/normalization/dictionary.py`.
+Deliberately not aliases: Go, TS, Rust, Swift and Objective-C (they collide
+with ordinary words or are distinct languages); such text yields no mention.
 
 ## Rules
 
@@ -22,11 +31,14 @@ applicant data; a separate review must approve them independently of output.
    longest alias wins; mentions never overlap. Text outside aliases is not a
    skill mention and is not guessed.
 2. Word aliases match case-insensitively at word boundaries: no letter or digit
-   immediately before or after. Words inside a multi-word alias may be
-   separated by any run of whitespace.
+   immediately before or after. "Letter or digit" means a Unicode alphanumeric
+   character; a combining mark (Unicode category M) belongs to the preceding
+   letter, so it is not a boundary. Underscore, punctuation, symbols and
+   whitespace are boundaries. Words inside a multi-word alias may be separated
+   by any run of whitespace.
 3. Abbreviations that collide with ordinary words or units are case-sensitive:
-   C, R, ML, DL, JS, NLP, KI, AWS, GCP, LLM/LLMs and k8s ("ml" or "aws" in
-   lowercase is not a mention).
+   C, R, ML, DL, JS, NLP, AI, KI, AWS, GCP, LLM/LLMs, k8s and React ("ml",
+   "aws" or the verb "react" in lowercase is not a mention).
 4. Single-letter languages (C, R) match only between: start, whitespace, `(`,
    `,`, `/` before and end, whitespace, `)`, `,`, `/`, `;`, `:` or a final `.`
    after. So "R&D", "C-level", "Objective-C", "C++" and "C#" do not produce C
