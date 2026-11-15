@@ -145,35 +145,54 @@
       "as_of": "2026-11-15",
       "review": {
         "unreviewed": [
-          "React is required.",
-          "Terraform experience."
+          {
+            "quote": "React is required.",
+            "occurrence": 1
+          },
+          {
+            "quote": "Terraform experience.",
+            "occurrence": 1
+          },
+          {
+            "quote": "Python or Java is required.",
+            "occurrence": 2
+          }
         ],
-        "corrections": {
-          "Knowledge of QuuxDB is required.": [
-            {
-              "op": "set_condition",
-              "term_kind": "technology",
-              "quote": "QuuxDB"
-            }
-          ],
-          "5+ years of professional experience.": [
-            {
-              "op": "set_priority",
-              "priority": "mandatory"
-            },
-            {
-              "op": "set_thresholds",
-              "thresholds": [
-                {
-                  "operator": "gte",
-                  "value": 5,
-                  "unit": "years",
-                  "quote": "5+ years"
-                }
-              ]
-            }
-          ]
-        }
+        "corrections": [
+          {
+            "quote": "Knowledge of QuuxDB is required.",
+            "occurrence": 1,
+            "ops": [
+              {
+                "op": "set_condition",
+                "term_kind": "technology",
+                "quote": "QuuxDB"
+              }
+            ]
+          },
+          {
+            "quote": "5+ years of professional experience.",
+            "occurrence": 1,
+            "ops": [
+              {
+                "op": "set_priority",
+                "priority": "mandatory"
+              },
+              {
+                "op": "set_thresholds",
+                "thresholds": [
+                  {
+                    "measure": "duration",
+                    "operator": "gte",
+                    "value": 5,
+                    "unit": "years",
+                    "quote": "5+ years"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "expected": {
         "rows": [
@@ -181,138 +200,458 @@
             "quote": "Python or Java is required.",
             "state": "direct",
             "reason": "exact_match",
+            "method": "combined",
             "priority": "mandatory",
-            "fact_ids": [
-              "proj-py",
-              "skill-python"
+            "fact_refs": [
+              [
+                "proj-py",
+                1
+              ],
+              [
+                "skill-python",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "Python",
+                "state": "direct",
+                "reason": "exact_match",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "proj-py",
+                    1
+                  ],
+                  [
+                    "skill-python",
+                    1
+                  ]
+                ]
+              },
+              {
+                "kind": "technology",
+                "quote": "Java",
+                "state": "no_evidence",
+                "reason": "no_matching_fact",
+                "method": "alias_lexicon",
+                "fact_refs": []
+              }
             ]
           },
           {
             "quote": "2+ years of experience with Python.",
             "state": "direct",
             "reason": "exact_match",
+            "method": "combined",
             "priority": "unspecified",
-            "fact_ids": [
-              "proj-py",
-              "skill-python"
+            "fact_refs": [
+              [
+                "proj-py",
+                1
+              ],
+              [
+                "skill-python",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "Python",
+                "state": "direct",
+                "reason": "exact_match",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "proj-py",
+                    1
+                  ],
+                  [
+                    "skill-python",
+                    1
+                  ]
+                ]
+              },
+              {
+                "kind": "duration",
+                "quote": "2+ years",
+                "state": "direct",
+                "reason": "duration_meets",
+                "method": "constraint",
+                "fact_refs": [
+                  [
+                    "proj-py",
+                    1
+                  ]
+                ]
+              }
             ]
           },
           {
             "quote": "Experience with Kubernetes is required.",
             "state": "adjacent",
             "reason": "self_study_only",
+            "method": "alias_lexicon",
             "priority": "mandatory",
-            "fact_ids": [
-              "skill-k8s"
+            "fact_refs": [
+              [
+                "skill-k8s",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "Kubernetes",
+                "state": "adjacent",
+                "reason": "self_study_only",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "skill-k8s",
+                    1
+                  ]
+                ]
+              }
             ]
           },
           {
             "quote": "German at B2 level is required.",
             "state": "explicitly_unmet",
             "reason": "cefr_below",
+            "method": "constraint",
             "priority": "mandatory",
-            "fact_ids": [
-              "lang-de"
+            "fact_refs": [
+              [
+                "lang-de",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "language",
+                "quote": "German",
+                "state": "explicitly_unmet",
+                "reason": "cefr_below",
+                "method": "constraint",
+                "fact_refs": [
+                  [
+                    "lang-de",
+                    1
+                  ]
+                ]
+              }
             ]
           },
           {
             "quote": "Deutsch at B1 level is required.",
             "state": "equivalent",
             "reason": "cefr_meets",
+            "method": "constraint",
             "priority": "mandatory",
-            "fact_ids": [
-              "lang-de"
+            "fact_refs": [
+              [
+                "lang-de",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "language",
+                "quote": "Deutsch",
+                "state": "equivalent",
+                "reason": "cefr_meets",
+                "method": "constraint",
+                "fact_refs": [
+                  [
+                    "lang-de",
+                    1
+                  ]
+                ]
+              }
             ]
           },
           {
             "quote": "Knowledge of QuuxDB is required.",
             "state": "no_evidence",
             "reason": "no_matching_fact",
+            "method": "alias_lexicon",
             "priority": "mandatory",
-            "fact_ids": []
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "QuuxDB",
+                "state": "no_evidence",
+                "reason": "no_matching_fact",
+                "method": "alias_lexicon",
+                "fact_refs": []
+              }
+            ]
           },
           {
             "quote": "Java is required.",
             "state": "no_evidence",
             "reason": "no_matching_fact",
+            "method": "alias_lexicon",
             "priority": "mandatory",
-            "fact_ids": []
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "Java",
+                "state": "no_evidence",
+                "reason": "no_matching_fact",
+                "method": "alias_lexicon",
+                "fact_refs": []
+              }
+            ]
           },
           {
             "quote": "PostgreSQL is required.",
             "state": "equivalent",
             "reason": "alias_match",
+            "method": "alias_lexicon",
             "priority": "mandatory",
-            "fact_ids": [
-              "skill-pg"
+            "fact_refs": [
+              [
+                "skill-pg",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "PostgreSQL",
+                "state": "equivalent",
+                "reason": "alias_match",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "skill-pg",
+                    1
+                  ]
+                ]
+              }
             ]
           },
           {
             "quote": "React is required.",
             "state": "unknown",
             "reason": "requirement_unreviewed",
+            "method": "not_evaluated",
             "priority": "mandatory",
-            "fact_ids": []
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": []
           },
           {
             "quote": "A degree in Computer Science or equivalent experience is required.",
             "state": "unknown",
             "reason": "education_not_evaluated",
+            "method": "combined",
             "priority": "mandatory",
-            "fact_ids": []
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": [
+              {
+                "kind": "education",
+                "quote": "degree in Computer Science",
+                "state": "unknown",
+                "reason": "education_not_evaluated",
+                "method": "not_evaluated",
+                "fact_refs": []
+              },
+              {
+                "kind": "equivalence",
+                "quote": "equivalent experience",
+                "state": "unknown",
+                "reason": "equivalence_requires_review",
+                "method": "not_evaluated",
+                "fact_refs": []
+              }
+            ]
           },
           {
             "quote": "Strong knowledge of Spark, Flink and similar tools.",
             "state": "unknown",
             "reason": "manual_check_required",
+            "method": "not_evaluated",
             "priority": "unspecified",
-            "fact_ids": []
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": []
           },
           {
             "quote": "Python or Java is required.",
-            "state": "direct",
-            "reason": "exact_match",
+            "state": "unknown",
+            "reason": "requirement_unreviewed",
+            "method": "not_evaluated",
             "priority": "mandatory",
-            "fact_ids": [
-              "proj-py",
-              "skill-python"
-            ],
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": [],
             "duplicate_of_index": 0
           },
           {
             "quote": "5+ years of professional experience.",
             "state": "direct",
             "reason": "duration_meets",
+            "method": "constraint",
             "priority": "mandatory",
-            "fact_ids": [
-              "emp-a",
-              "emp-b"
+            "fact_refs": [
+              [
+                "emp-a",
+                1
+              ],
+              [
+                "emp-b",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "duration",
+                "quote": "5+ years",
+                "state": "direct",
+                "reason": "duration_meets",
+                "method": "constraint",
+                "fact_refs": [
+                  [
+                    "emp-a",
+                    1
+                  ],
+                  [
+                    "emp-b",
+                    1
+                  ]
+                ]
+              }
             ]
           },
           {
             "quote": "Docker experience.",
             "state": "adjacent",
             "reason": "exposure_only",
+            "method": "alias_lexicon",
             "priority": "preferred",
-            "fact_ids": [
-              "skill-docker"
+            "fact_refs": [
+              [
+                "skill-docker",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "Docker",
+                "state": "adjacent",
+                "reason": "exposure_only",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "skill-docker",
+                    1
+                  ]
+                ]
+              }
             ]
           },
           {
             "quote": "Experience with AWS.",
             "state": "adjacent",
             "reason": "related_concept",
+            "method": "alias_lexicon",
             "priority": "preferred",
-            "fact_ids": [
-              "skill-ec2"
+            "fact_refs": [
+              [
+                "skill-ec2",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "AWS",
+                "state": "adjacent",
+                "reason": "related_concept",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "skill-ec2",
+                    1
+                  ]
+                ]
+              }
             ]
           },
           {
             "quote": "Terraform experience.",
             "state": "unknown",
             "reason": "requirement_unreviewed",
+            "method": "not_evaluated",
             "priority": "preferred",
-            "fact_ids": []
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": []
           }
         ],
         "excluded": {
@@ -353,6 +692,457 @@
             "unknown": 1,
             "coverage": "1/2"
           }
+        },
+        "snapshot": {
+          "matrix_rules_version": "evidence-matrix-v1",
+          "dictionary_version": "skill-aliases-v1",
+          "extraction_rules_version": "source-candidates-v1",
+          "classification_rules_version": "priority-groups-v1",
+          "as_of": "2026-11-15",
+          "profile_id": "synthetic-profile",
+          "profile_revision": 1,
+          "job_id": "synthetic-match",
+          "job_revision": 1,
+          "review_revision": 1
+        }
+      }
+    },
+    {
+      "id": "all-groups-and-unknown-paths",
+      "source": "Requirements\n- Python and Java are required.\n- 3+ years of experience with Python and SQL.\n- Spark is required.\n- Python skills are required.\n- German at B2 level is required.\n",
+      "as_of": "2026-11-15",
+      "review": {
+        "unreviewed": [],
+        "corrections": [
+          {
+            "quote": "Python skills are required.",
+            "occurrence": 1,
+            "ops": [
+              {
+                "op": "set_condition",
+                "term_kind": "language",
+                "quote": "Python"
+              }
+            ]
+          },
+          {
+            "quote": "German at B2 level is required.",
+            "occurrence": 1,
+            "ops": [
+              {
+                "op": "set_thresholds",
+                "thresholds": [
+                  {
+                    "measure": "language_level",
+                    "operator": "unqualified",
+                    "level": "B2",
+                    "quote": "B2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "rows": [
+          {
+            "quote": "Python and Java are required.",
+            "state": "no_evidence",
+            "reason": "no_matching_fact",
+            "method": "combined",
+            "priority": "mandatory",
+            "fact_refs": [
+              [
+                "proj-py",
+                1
+              ],
+              [
+                "skill-python",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "Python",
+                "state": "direct",
+                "reason": "exact_match",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "proj-py",
+                    1
+                  ],
+                  [
+                    "skill-python",
+                    1
+                  ]
+                ]
+              },
+              {
+                "kind": "technology",
+                "quote": "Java",
+                "state": "no_evidence",
+                "reason": "no_matching_fact",
+                "method": "alias_lexicon",
+                "fact_refs": []
+              }
+            ]
+          },
+          {
+            "quote": "3+ years of experience with Python and SQL.",
+            "state": "no_evidence",
+            "reason": "no_matching_fact",
+            "method": "combined",
+            "priority": "unspecified",
+            "fact_refs": [
+              [
+                "proj-py",
+                1
+              ],
+              [
+                "skill-python",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "Python",
+                "state": "direct",
+                "reason": "exact_match",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "proj-py",
+                    1
+                  ],
+                  [
+                    "skill-python",
+                    1
+                  ]
+                ]
+              },
+              {
+                "kind": "technology",
+                "quote": "SQL",
+                "state": "no_evidence",
+                "reason": "no_matching_fact",
+                "method": "alias_lexicon",
+                "fact_refs": []
+              },
+              {
+                "kind": "duration",
+                "quote": "3+ years",
+                "state": "unknown",
+                "reason": "duration_scope_unrecognized",
+                "method": "constraint",
+                "fact_refs": []
+              }
+            ]
+          },
+          {
+            "quote": "Spark is required.",
+            "state": "unknown",
+            "reason": "ambiguous_term",
+            "method": "alias_lexicon",
+            "priority": "mandatory",
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "Spark",
+                "state": "unknown",
+                "reason": "ambiguous_term",
+                "method": "alias_lexicon",
+                "fact_refs": []
+              }
+            ]
+          },
+          {
+            "quote": "Python skills are required.",
+            "state": "unknown",
+            "reason": "term_not_a_language",
+            "method": "constraint",
+            "priority": "mandatory",
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": [
+              {
+                "kind": "language",
+                "quote": "Python",
+                "state": "unknown",
+                "reason": "term_not_a_language",
+                "method": "constraint",
+                "fact_refs": []
+              }
+            ]
+          },
+          {
+            "quote": "German at B2 level is required.",
+            "state": "unknown",
+            "reason": "required_level_unspecified",
+            "method": "combined",
+            "priority": "mandatory",
+            "fact_refs": [
+              [
+                "lang-de",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "language",
+                "quote": "German",
+                "state": "unknown",
+                "reason": "required_level_unspecified",
+                "method": "constraint",
+                "fact_refs": [
+                  [
+                    "lang-de",
+                    1
+                  ]
+                ]
+              },
+              {
+                "kind": "threshold",
+                "quote": "B2",
+                "state": "unknown",
+                "reason": "threshold_scope_unclear",
+                "method": "not_evaluated",
+                "fact_refs": []
+              }
+            ]
+          }
+        ],
+        "excluded": {},
+        "coverage": {
+          "mandatory": {
+            "total": 4,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 1,
+            "explicitly_unmet": 0,
+            "unknown": 3,
+            "coverage": "0/4"
+          },
+          "preferred": {
+            "total": 0,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 0,
+            "coverage": "N/A"
+          },
+          "unspecified": {
+            "total": 1,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 1,
+            "explicitly_unmet": 0,
+            "unknown": 0,
+            "coverage": "0/1"
+          }
+        },
+        "snapshot": {
+          "matrix_rules_version": "evidence-matrix-v1",
+          "dictionary_version": "skill-aliases-v1",
+          "extraction_rules_version": "source-candidates-v1",
+          "classification_rules_version": "priority-groups-v1",
+          "as_of": "2026-11-15",
+          "profile_id": "synthetic-profile",
+          "profile_revision": 1,
+          "job_id": "synthetic-match",
+          "job_revision": 1,
+          "review_revision": 1
+        }
+      }
+    },
+    {
+      "id": "alias-exposure-and-study-stay-adjacent",
+      "source": "Requirements\n- Kubernetes is required.\n- AWS is required.\n",
+      "as_of": "2026-11-15",
+      "profile_extra_facts": [
+        {
+          "fact_id": "skill-k8s-alias",
+          "kind": "skill",
+          "status": "approved",
+          "name": "k8s",
+          "context": "exposure"
+        },
+        {
+          "fact_id": "skill-aws-study",
+          "kind": "skill",
+          "status": "approved",
+          "name": "Amazon Web Services",
+          "context": "study"
+        }
+      ],
+      "review": {
+        "unreviewed": [],
+        "corrections": []
+      },
+      "expected": {
+        "rows": [
+          {
+            "quote": "Kubernetes is required.",
+            "state": "adjacent",
+            "reason": "exposure_only",
+            "method": "alias_lexicon",
+            "priority": "mandatory",
+            "fact_refs": [
+              [
+                "skill-k8s",
+                1
+              ],
+              [
+                "skill-k8s-alias",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "Kubernetes",
+                "state": "adjacent",
+                "reason": "exposure_only",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "skill-k8s",
+                    1
+                  ],
+                  [
+                    "skill-k8s-alias",
+                    1
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "quote": "AWS is required.",
+            "state": "adjacent",
+            "reason": "self_study_only",
+            "method": "alias_lexicon",
+            "priority": "mandatory",
+            "fact_refs": [
+              [
+                "skill-aws-study",
+                1
+              ],
+              [
+                "skill-ec2",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "AWS",
+                "state": "adjacent",
+                "reason": "self_study_only",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "skill-aws-study",
+                    1
+                  ],
+                  [
+                    "skill-ec2",
+                    1
+                  ]
+                ]
+              }
+            ]
+          }
+        ],
+        "excluded": {},
+        "coverage": {
+          "mandatory": {
+            "total": 2,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 2,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 0,
+            "coverage": "0/2"
+          },
+          "preferred": {
+            "total": 0,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 0,
+            "coverage": "N/A"
+          },
+          "unspecified": {
+            "total": 0,
+            "met": 0,
+            "direct": 0,
+            "equivalent": 0,
+            "adjacent": 0,
+            "no_evidence": 0,
+            "explicitly_unmet": 0,
+            "unknown": 0,
+            "coverage": "N/A"
+          }
+        },
+        "snapshot": {
+          "matrix_rules_version": "evidence-matrix-v1",
+          "dictionary_version": "skill-aliases-v1",
+          "extraction_rules_version": "source-candidates-v1",
+          "classification_rules_version": "priority-groups-v1",
+          "as_of": "2026-11-15",
+          "profile_id": "synthetic-profile",
+          "profile_revision": 1,
+          "job_id": "synthetic-match",
+          "job_revision": 1,
+          "review_revision": 1
         }
       }
     },
@@ -362,7 +1152,7 @@
       "as_of": "2026-11-15",
       "review": {
         "unreviewed": [],
-        "corrections": {}
+        "corrections": []
       },
       "expected": {
         "rows": [
@@ -370,10 +1160,42 @@
             "quote": "Python is required.",
             "state": "direct",
             "reason": "exact_match",
+            "method": "alias_lexicon",
             "priority": "mandatory",
-            "fact_ids": [
-              "proj-py",
-              "skill-python"
+            "fact_refs": [
+              [
+                "proj-py",
+                1
+              ],
+              [
+                "skill-python",
+                1
+              ]
+            ],
+            "evidence_refs": [
+              [
+                "attestation-one",
+                1
+              ]
+            ],
+            "parts": [
+              {
+                "kind": "technology",
+                "quote": "Python",
+                "state": "direct",
+                "reason": "exact_match",
+                "method": "alias_lexicon",
+                "fact_refs": [
+                  [
+                    "proj-py",
+                    1
+                  ],
+                  [
+                    "skill-python",
+                    1
+                  ]
+                ]
+              }
             ]
           }
         ],
@@ -412,6 +1234,18 @@
             "unknown": 0,
             "coverage": "N/A"
           }
+        },
+        "snapshot": {
+          "matrix_rules_version": "evidence-matrix-v1",
+          "dictionary_version": "skill-aliases-v1",
+          "extraction_rules_version": "source-candidates-v1",
+          "classification_rules_version": "priority-groups-v1",
+          "as_of": "2026-11-15",
+          "profile_id": "synthetic-profile",
+          "profile_revision": 1,
+          "job_id": "synthetic-match",
+          "job_revision": 1,
+          "review_revision": 1
         }
       }
     },
@@ -421,10 +1255,16 @@
       "as_of": "2026-11-15",
       "review": {
         "unreviewed": [
-          "Python is required.",
-          "Docker experience."
+          {
+            "quote": "Python is required.",
+            "occurrence": 1
+          },
+          {
+            "quote": "Docker experience.",
+            "occurrence": 1
+          }
         ],
-        "corrections": {}
+        "corrections": []
       },
       "expected": {
         "rows": [
@@ -432,15 +1272,21 @@
             "quote": "Python is required.",
             "state": "unknown",
             "reason": "requirement_unreviewed",
+            "method": "not_evaluated",
             "priority": "mandatory",
-            "fact_ids": []
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": []
           },
           {
             "quote": "Docker experience.",
             "state": "unknown",
             "reason": "requirement_unreviewed",
+            "method": "not_evaluated",
             "priority": "preferred",
-            "fact_ids": []
+            "fact_refs": [],
+            "evidence_refs": [],
+            "parts": []
           }
         ],
         "excluded": {
@@ -480,6 +1326,18 @@
             "unknown": 0,
             "coverage": "N/A"
           }
+        },
+        "snapshot": {
+          "matrix_rules_version": "evidence-matrix-v1",
+          "dictionary_version": "skill-aliases-v1",
+          "extraction_rules_version": "source-candidates-v1",
+          "classification_rules_version": "priority-groups-v1",
+          "as_of": "2026-11-15",
+          "profile_id": "synthetic-profile",
+          "profile_revision": 1,
+          "job_id": "synthetic-match",
+          "job_revision": 1,
+          "review_revision": 0
         }
       }
     }
