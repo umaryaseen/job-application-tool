@@ -73,3 +73,69 @@ The candidate stays within scope: no CLI command, ESCO service, model, dependenc
 ## Required follow-up and next gate
 
 Fix F-05 with explicit Unicode case-fold-aware matching that does not use `re.IGNORECASE`'s dotted/dotless-I extras; retain literal spans and add negative tests for `GİT` and `GıT`, plus coverage for the relevant `ß` case-fold behavior if a reviewed alias uses it. Fix F-06 by checking the raw surface length before trimming and add an over-boundary regression case. Rerun the focused pytest command, Ruff check/format, mypy, diff check, and the Unicode/200,000-character probes on the corrective head. The corrective commit requires another independent review before approval.
+
+---
+
+## Round 2 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning `xhigh`,
+  sandbox `workspace-write` on a throwaway detached checkout of `f26da14` plus a
+  dedicated temporary directory, no network, session
+  `01a1dd1d-9637-7830-9fb4-9cfbb7dd7061`. Tracked files unchanged; exit 0.
+
+The reviewer's round-2 report follows verbatim.
+
+## Round 2
+
+- Reviewer: Codex, independent implementation reviewer; implementation not authored by reviewer
+- Date: 2026-11-15
+- Base: `ee590699b49077a1cd61161caa679f104b99b659` (tree `1d7387c7dd2aa5fb11ae63d2d6ee19f9ab9d24f7`)
+- Candidate: `f26da14bc265d7ccf56290c6777aa8cb54857605` (tree `9bd41db5d082342799817b2babf2cbc41c8488e6`)
+- Fixture amendment: `cd9493f97d7bf266731ae7ebc7fbcaa1e4880918`
+- Scope: TASK-013 corrective re-review, fixture contract/cases, normalization matcher, TASK-012 adapter, architecture/security/scope compliance
+
+VERDICT: APPROVED
+
+### Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Detached checkout clean |
+| Full corrective diff `git diff a56309a..f26da14bc265d7ccf56290c6777aa8cb54857605` | 0 | 264 lines, 5 paths inspected |
+| Full base-to-head diff `git diff ee590699b49077a1cd61161caa679f104b99b659..f26da14bc265d7ccf56290c6777aa8cb54857605` | 0 | 2,042 lines, 11 paths inspected |
+| Independent fixture-contract probe | 0 | 43 scan, 25 surface, 8 relation cases; 0 errors |
+| `.venv/bin/python -m pytest tests/test_skill_normalization.py tests/test_requirement_classification.py -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-013-r2-tmp/pytest` | 0 | 388 passed |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 81 files formatted |
+| `.venv/bin/mypy src --cache-dir /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-013-r2-tmp/mypy` | 0 | 50 source files passed |
+| `git diff --check ee59069..f26da14bc265d7ccf56290c6777aa8cb54857605` | 0 | No whitespace errors |
+| Unicode, overlap, surface, relation, bound and performance probe | 0 | All assertions passed; 200,000-character no-match input completed in 0.007 s after matcher warm-up; first-call probe completed in 0.877 s |
+| Cross-concept alias-collision probe | 0 | 3 collision dictionaries rejected |
+| TASK-012 adapter offset/polarity probe | 0 | 5 rows, 5 normalized terms, 0 assertion errors |
+| Renderer tests | Not run | Nested `sandbox-exec` required; hosted CI covers renderer tests |
+
+### Part A — fixture re-review
+
+The amended README resolves F-01 through F-04. The independent contract probe checked every amended and unchanged label against the README rules, without using the production matcher, and found no discrepancies.
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-01 | blocking — closed | `tests/fixtures/normalization/README.md`, `aliases.json` | Surface semantics now explicitly trim whitespace, require one whole-alias match, and exclude scan semantics. | `Python 3` and compound `Deep Learning — applied object detection` are correctly unmatched; padded `Kubernetes` is correctly matched. |
+| F-02 | high — closed | `tests/fixtures/normalization/README.md`, `aliases.json` | The reviewed inventory is named and explicitly excludes Go, TS, Rust, Swift and Objective-C. | `Go-to-market` correctly has no mention. |
+| F-03 | high — closed | `tests/fixtures/normalization/README.md`, `aliases.json` | Relation orientation and non-traversal are explicit. | All 8 relation rows match typed dictionary relations; no relation is treated as equivalence. |
+| F-04 | medium — closed | `tests/fixtures/normalization/README.md`, `aliases.json` | Unicode alphanumeric boundaries, combining marks, underscores and punctuation are defined. | Independent scan/surface audit: 0 errors across all 68 expected mentions and 25 surfaces. |
+| — | — | — | No unresolved fixture-label finding. | All 43 scan, 25 surface and 8 relation labels comply. |
+
+### Part B — implementation findings
+
+F-05 is fixed by explicit per-character Unicode `casefold()` matching and rejection of aliases with multi-character folds. Dotted/dotless-I false positives are rejected while valid equivalents such as `GIT`, long-s `ſQL`, and Kelvin-sign `Kubernetes` match.
+
+F-06 is fixed by checking raw surface length before trimming. Oversized alias-plus-whitespace input now raises `NormalizationError`.
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-05 | high — closed | `src/job_application_engine/normalization/aliases.py` | `re.IGNORECASE` false positives removed; exact Unicode case-fold semantics enforced. | `GİT`, `GıT`, `JAVASCRİPT`, and `PYTHONİ` produce no mentions; multi-character-fold alias validation rejects `Straße`. |
+| F-06 | medium — closed | `src/job_application_engine/normalization/aliases.py` | Raw `normalize_surface` input is bounded before trimming. | `normalize_surface("Python" + " " * 200001)` raises `NormalizationError`. |
+| — | — | — | No new implementation finding. | Unicode, boundary, longest-match/backtracking, ambiguity, relation, polarity, adapter, bound and performance probes passed. |
+
+The candidate remains within TASK-013 scope: no CLI change, dependency, model, network access, profile access, possession or approval logic was added. Exact aliases remain distinct from typed broader/related relations, unmatched surfaces retain literal text, and TASK-012 offsets and negation polarity are preserved.
