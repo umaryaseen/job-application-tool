@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, cast
 
-from pydantic import Field, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from ..domain.common import Sha256, StableId, StrictModel
 from ..domain.evidence import (
@@ -25,7 +25,7 @@ from ..verification.support import (
     sha256_text,
     support_bundle_digest,
 )
-from .validation import ProvenanceValidationError, ValidationIssue
+from .validation import ProvenanceValidationError, ValidationIssue, _content_issue
 
 ReviewText = Annotated[str, Field(min_length=1, max_length=20000)]
 
@@ -129,6 +129,12 @@ def record_human_review(
     """Record a review only when the displayed content matches current revision bytes."""
 
     target = _find_target(profile, target_type, target_id, target_revision)
+    invalid = _content_issue(
+        target_type, f"{target_id} revision {target_revision}", cast(BaseModel, target)
+    )
+    if invalid is not None:
+        # Never issue a receipt for content that violates its model invariants.
+        raise ProvenanceValidationError([invalid])
     if target_type == "variant":
         variant = cast(ApprovedVariant, target)
         expected_content = variant.text

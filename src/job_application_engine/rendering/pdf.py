@@ -33,7 +33,7 @@ from .presentation import present_plan
 RENDERCV_VERSION = "2.8"
 TYPST_VERSION = "0.15.0"
 FONTS_VERSION = "0.5.1"
-TEMPLATE_VERSION = "baseline-v3-presentation-m1-fix005-hyphen-compounds"
+TEMPLATE_VERSION = "baseline-v4-m1-fix006-expected-completion-display-headings"
 NETWORK_DENY_PROFILE = "(version 1) (allow default) (deny network*)"
 MAX_PDF_BYTES = 2_000_000
 DEFAULT_TIMEOUT_SECONDS = 60

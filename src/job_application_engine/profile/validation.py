@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
+from pydantic import BaseModel, ValidationError
+
 from ..domain.evidence import (
     DocumentSource,
     EvidenceRecord,
@@ -144,6 +146,42 @@ def _check_binding_cycles(
         visit(binding_id)
 
 
+def _content_issue(kind: str, identity: str, record: BaseModel) -> ValidationIssue | None:
+    """Re-run model validators on a supplied instance (model_copy skips them).
+
+    Status and approval are neutralized so this checks content invariants only;
+    status/approval consistency is reported separately with its own issue codes.
+    """
+    neutral: dict[str, object] = {}
+    if "status" in type(record).model_fields:
+        neutral["status"] = "draft"
+    if "approval" in type(record).model_fields:
+        neutral["approval"] = None
+    try:
+        type(record).model_validate_json(record.model_copy(update=neutral).model_dump_json())
+    except ValidationError:
+        return ValidationIssue(
+            f"invalid_{kind}_content", f"{identity} violates its model invariants"
+        )
+    return None
+
+
+def content_invariant_issues(profile: ProfileRevision) -> list[ValidationIssue]:
+    issues = [
+        _content_issue("fact", f"{fact.fact_id} revision {fact.revision}", fact)
+        for fact in profile.facts
+    ]
+    issues += [
+        _content_issue("evidence", f"{item.evidence_id} revision {item.revision}", item)
+        for item in profile.evidence
+    ]
+    issues += [
+        _content_issue("variant", f"{item.variant_id} revision {item.revision}", item)
+        for item in profile.variants
+    ]
+    return [issue for issue in issues if issue is not None]
+
+
 def validate_profile(
     profile: ProfileRevision,
     *,
@@ -153,6 +191,7 @@ def validate_profile(
     """Validate all revision-bound support relationships and local approvals."""
 
     issues: list[ValidationIssue] = []
+    issues.extend(content_invariant_issues(profile))
     facts = _index(profile.facts, "fact", issues)
     evidence = _index(profile.evidence, "evidence", issues)
     bindings = _index(profile.support_bindings, "binding", issues)

@@ -19,13 +19,16 @@ from ..domain.fact import (
 from ..domain.profile import ProfileRevision
 from ..profile.baseline import _entity_name
 
-_SKILL_CATEGORIES = (
-    "Data processing & analysis",
-    "Databases & backend",
-    "Visualization & frontend",
-    "AI & retrieval",
-    "Tools & infrastructure",
+# Internal category identifiers stay in facts and plans; only these static,
+# non-claim display headings and their order are presentation policy.
+_SKILL_HEADINGS = (
+    ("AI & retrieval", "AI & Machine Learning"),
+    ("Data processing & analysis", "Data Engineering & Analytics"),
+    ("Databases & backend", "Backend & Databases"),
+    ("Visualization & frontend", "Frontend & Visualization"),
+    ("Tools & infrastructure", "Cloud & Infrastructure"),
 )
+_SKILL_CATEGORIES = tuple(category for category, _ in _SKILL_HEADINGS)
 
 
 @dataclass(frozen=True)
@@ -76,6 +79,15 @@ def _date_range(period: Any) -> str:
         return f"Start: {start}"
     end = _pretty_date(period.end)
     return f"End: {end}" if end else ""
+
+
+def _education_period(fact: EducationFact) -> str:
+    """An ongoing degree with an expected date shows that date, never an award."""
+    if fact.expected_completion_date is None:
+        return _date_range(fact.period)
+    expected = f"Expected {_pretty_date(fact.expected_completion_date)}"
+    start = _pretty_date(fact.period.start)
+    return f"{start} – {expected}" if start else expected
 
 
 def _fact_index(profile: ProfileRevision) -> dict[tuple[str, int], Any]:
@@ -174,12 +186,14 @@ def present_plan(plan: DocumentPlan, profile: ProfileRevision) -> tuple[DisplayS
                     text = f"{fact.program}, {_entity_name(profile, fact.institution_id)}"
                     if fact.degree_name:
                         text = f"{fact.degree_name} — {text}"
-                    period = _date_range(fact.period)
+                    period = _education_period(fact)
                     if period:
                         text += f" | {period}"
                     if fact.degree_status not in {"unknown", "ongoing"}:
                         text += f" ({fact.degree_status})"
                     lines.append(DisplayLine(text))
+                    if fact.specialization:
+                        lines.append(DisplayLine(f"Specialization: {fact.specialization}"))
                     if fact.thesis_title:
                         lines.append(DisplayLine(f"Thesis: {fact.thesis_title}"))
                     if fact.thesis_description:
@@ -203,10 +217,10 @@ def present_plan(plan: DocumentPlan, profile: ProfileRevision) -> tuple[DisplayS
                     grouped.setdefault(fact.category, []).append(fact)
                 else:
                     ungrouped.append(fact)
-            for category in _SKILL_CATEGORIES:
+            for category, heading in _SKILL_HEADINGS:
                 if category not in grouped:
                     continue
-                lines.append(DisplayLine(category, style="subheading"))
+                lines.append(DisplayLine(heading, style="subheading"))
                 lines.append(
                     DisplayLine(
                         " | ".join(

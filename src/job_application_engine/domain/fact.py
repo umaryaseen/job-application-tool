@@ -9,6 +9,7 @@ from typing import Annotated, Literal
 from pydantic import Field, field_validator, model_validator
 
 from .common import DatePoint, DateRange, LongText, ShortText, StableId, StrictModel
+from .common import _date_key as date_key
 from .evidence import EvidenceRef, FactApproval
 
 
@@ -223,9 +224,24 @@ class EducationFact(FactBase):
     degree_status: Literal["ongoing", "completed", "withdrawn", "unknown"]
     period: DateRange
     completion_date: DatePoint | None = None
+    expected_completion_date: DatePoint | None = None
+    specialization: ShortText | None = None
     thesis_title: ShortText | None = None
     thesis_description: LongText | None = None
     coursework: list[ShortText] = Field(default_factory=list, max_length=32)
+
+    @model_validator(mode="after")
+    def completion_matches_status(self) -> EducationFact:
+        if self.degree_status == "ongoing" and self.completion_date is not None:
+            # An actual completion date on an ongoing degree would claim an award.
+            raise ValueError("an ongoing degree cannot have an actual completion date")
+        if self.expected_completion_date is not None:
+            if self.degree_status != "ongoing" or self.period.end_state == "known":
+                raise ValueError("an expected completion date requires an ongoing degree")
+            start = self.period.start
+            if start is not None and date_key(self.expected_completion_date) < date_key(start):
+                raise ValueError("expected completion cannot precede the start date")
+        return self
 
 
 class SkillFact(FactBase):
