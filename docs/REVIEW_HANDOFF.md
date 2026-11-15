@@ -1,14 +1,13 @@
-# Review handoff: M1-FIX-007 slash-joined compounds
+# Review handoff: M1-FIX-008 LinkedIn label and compact skill groups
 
-**Status: APPROVED WITH FOLLOW-UP — AWAITING MERGE** (round 2 on `b906a7f`).
-See [the review](reviews/M1-FIX-007.md). TASK-013 and M1-FIX-006 are merged.
+**Status: APPROVED WITH FOLLOW-UP — AWAITING MERGE** (round 4 on `1f380f7`).
+See [the review](reviews/M1-FIX-008.md).
 
 ## Scoped closure check (pending)
 
-After `b906a7f` the branch only (1) merges main (`9c1d5580`, already reviewed
-TASK-013) with PROGRESS/REVIEW_HANDOFF conflict resolutions and (2) adds a
-documentation closure: the round-2 report appended, follow-up F-03 closed by
-describing the sweep accurately in the task (a bounded offset sweep with a
-line-start witness), F-04 closed by removing the trailing blank line, PROGRESS
-and this handoff. Confirm the merge introduces no unreviewed code and the
-records are accurate; do not repeat runtime reviews.
+After `1f380f7` the branch only adds a documentation closure: the verbatim
+round-4 report with provenance, follow-up F-04 closed by recording hosted CI
+run `43732274933` on `1f380f7`, F-03 left as the limit already stated in task
+item 5, and the PROGRESS status/next action plus this handoff. Confirm the
+delta introduces no code and the records are accurate; do not repeat runtime
+reviews.

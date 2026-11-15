@@ -17,24 +17,30 @@ from ..domain.fact import (
     SkillFact,
 )
 from ..domain.profile import ProfileRevision
-from ..profile.baseline import _entity_name
+from ..profile.baseline import _entity_name, contact_label
 
 # Internal category identifiers stay in facts and plans; only these static,
 # non-claim display headings and their order are presentation policy.
 _SKILL_HEADINGS = (
+    ("Programming languages", "Programming Languages"),
     ("AI & retrieval", "AI & Machine Learning"),
     ("Data processing & analysis", "Data Engineering & Analytics"),
     ("Databases & backend", "Backend & Databases"),
     ("Visualization & frontend", "Frontend & Visualization"),
     ("Tools & infrastructure", "Cloud & Infrastructure"),
+    ("Quality & development", "Quality & Development"),
 )
 _SKILL_CATEGORIES = tuple(category for category, _ in _SKILL_HEADINGS)
+SKILL_GROUP_HEADINGS = frozenset(heading for _, heading in _SKILL_HEADINGS)
 
 
 @dataclass(frozen=True)
 class DisplayLine:
     text: str
     style: str = "body"
+    # A "skill-group" line is "<lead>: <skills>"; ``lead`` is the static,
+    # allowlisted group heading that the PDF renders in bold.
+    lead: str = ""
 
 
 @dataclass(frozen=True)
@@ -149,7 +155,9 @@ def present_plan(plan: DocumentPlan, profile: ProfileRevision) -> tuple[DisplayS
                     else:
                         # Keep each contact scalar on its own compact line so
                         # long URLs remain an indivisible extraction token.
-                        lines.append(DisplayLine(f"{fact.value.kind.title()}: {fact.value.value}"))
+                        lines.append(
+                            DisplayLine(f"{contact_label(fact.value)}: {fact.value.value}")
+                        )
         elif section.section_id == "experience":
             for line in section.lines:
                 fact = (
@@ -217,25 +225,18 @@ def present_plan(plan: DocumentPlan, profile: ProfileRevision) -> tuple[DisplayS
                     grouped.setdefault(fact.category, []).append(fact)
                 else:
                     ungrouped.append(fact)
+            # One compact line per group: the static heading leads the skills.
             for category, heading in _SKILL_HEADINGS:
                 if category not in grouped:
                     continue
-                lines.append(DisplayLine(heading, style="subheading"))
-                lines.append(
-                    DisplayLine(
-                        " | ".join(
-                            _skill_label(fact)
-                            for fact in sorted(
-                                grouped[category],
-                                key=lambda item: (
-                                    item.name.casefold(),
-                                    item.fact_id,
-                                    item.revision,
-                                ),
-                            )
-                        )
+                joined = " | ".join(
+                    _skill_label(fact)
+                    for fact in sorted(
+                        grouped[category],
+                        key=lambda item: (item.name.casefold(), item.fact_id, item.revision),
                     )
                 )
+                lines.append(DisplayLine(f"{heading}: {joined}", style="skill-group", lead=heading))
             lines.extend(
                 DisplayLine(_skill_label(fact))
                 for fact in sorted(

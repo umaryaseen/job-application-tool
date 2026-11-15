@@ -13,6 +13,7 @@ from job_application_engine.rendering.pdf import build_pdf
 from tests.test_document_plan import approved_baseline
 
 ORACLES = Path(__file__).parents[1] / "fixtures" / "rendering" / "task007"
+HEADING_LABELS = {"Contact", "Professional Experience"}
 
 
 def expected(name: str) -> ExpectedDocument:
@@ -99,7 +100,10 @@ def adversarial_pdf(path: Path, mutation: str = "none") -> Path:
         escaped = line.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
         x = 580 if mutation == "overflow" and index == 4 else 55
         mode = 3 if mutation == "hidden" and index == 4 else 0
-        commands.append(f"BT /F1 11 Tf {mode} Tr {x} {780 - index * 25} Td ({escaped}) Tj ET")
+        # Like the real template, standard headings are set larger than body text.
+        heading = line in HEADING_LABELS and mutation != "heading_body_size"
+        size = 16 if heading else 11
+        commands.append(f"BT /F1 {size} Tf {mode} Tr {x} {780 - index * 25} Td ({escaped}) Tj ET")
     if mutation == "image_only":
         img = DecodedStreamObject()
         img.set_data(b"\x00\x00\x00")

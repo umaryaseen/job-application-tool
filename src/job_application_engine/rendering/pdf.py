@@ -24,16 +24,17 @@ from pathlib import Path
 from ..config import ConfigurationError, private_data_root, safe_private_path
 from ..domain.document import DocumentPlan
 from ..domain.profile import ProfileRevision
+from ..profile.baseline import URL_CONTACT_LABELS
 from ..profile.review import LocalReviewReceipt
 from ..verification.document import validate_document_plan
 from ..verification.support import EvidenceKey
 from .packages import PackageAssetsError, prepare_typst_packages
-from .presentation import present_plan
+from .presentation import SKILL_GROUP_HEADINGS, present_plan
 
 RENDERCV_VERSION = "2.8"
 TYPST_VERSION = "0.15.0"
 FONTS_VERSION = "0.5.1"
-TEMPLATE_VERSION = "baseline-v5-m1-fix007-slash-compounds"
+TEMPLATE_VERSION = "baseline-v6-m1-fix008-display-labels"
 NETWORK_DENY_PROFILE = "(version 1) (allow default) (deny network*)"
 MAX_PDF_BYTES = 2_000_000
 DEFAULT_TIMEOUT_SECONDS = 60
@@ -95,6 +96,8 @@ def _yaml_for_plan(
         for line_index, line in enumerate(section.lines):
             token = f"JAECLAIM_{section_index:02d}_{line_index:03d}"
             tokens[token] = {"text": line.text, "style": line.style}
+            if line.style == "skill-group":
+                tokens[token]["lead"] = line.lead
             section_lines.append(f"      - {json.dumps(token, ensure_ascii=False)}")
     template = _template_text().replace("    __JAE_SECTIONS__", "\n".join(section_lines))
     if header_name is not None:
@@ -131,7 +134,8 @@ def _private_stage(root: Path, stage: Path) -> Path:
 def _contact_url_width_guard(contact_text: str) -> str:
     """Return a Typst measurement guard for each literal URL contact line."""
 
-    url_lines = [line for line in contact_text.splitlines() if line.startswith("Url: ")]
+    prefixes = tuple(f"{label}: " for label in URL_CONTACT_LABELS)
+    url_lines = [line for line in contact_text.splitlines() if line.startswith(prefixes)]
     checks: list[str] = []
     for line in url_lines:
         encoded = json.dumps(line, ensure_ascii=False)
@@ -177,7 +181,9 @@ def _compound_width_guard(tokens: Sequence[tuple[str, str]]) -> str:
             continue
         seen.add(key)
         size = "15pt" if style == "name" else "11pt"
-        weight = ', weight: "bold"' if style in {"employment", "subheading"} else ""
+        # A skill-group line mixes a bold lead with regular text; measuring its
+        # compounds in bold is the conservative (wider) choice.
+        weight = ', weight: "bold"' if style in {"employment", "subheading", "skill-group"} else ""
         inset = "0.4cm" if style in {"bullet", "project"} else "0pt"
         encoded = json.dumps(token, ensure_ascii=False)
         error = json.dumps(HYPHENATED_COMPOUND_WIDTH_ERROR)
@@ -192,6 +198,44 @@ def _compound_width_guard(tokens: Sequence[tuple[str, str]]) -> str:
             "}\n"
         )
     return "".join(checks)
+
+
+_TOKEN_STYLES = frozenset(
+    {
+        "body",
+        "name",
+        "subheading",
+        "employment",
+        "bullet",
+        "project",
+        "skill-group",
+        "header-name",
+        "header-contacts",
+    }
+)
+
+
+def _valid_token_value(value: object) -> bool:
+    """Accept only the exact token shapes the trusted parent writes.
+
+    A skill-group token also carries ``lead``: one allowlisted static group
+    heading that its text must start with, followed by ": ".
+    """
+
+    if not isinstance(value, dict):
+        return False
+    text_value, style = value.get("text"), value.get("style")
+    if not isinstance(text_value, str) or style not in _TOKEN_STYLES:
+        return False
+    if style != "skill-group":
+        return set(value) == {"text", "style"}
+    lead = value.get("lead")
+    return (
+        set(value) == {"text", "style", "lead"}
+        and isinstance(lead, str)
+        and lead in SKILL_GROUP_HEADINGS
+        and text_value.startswith(f"{lead}: ")
+    )
 
 
 def _worker(stage_argument: str) -> int:
@@ -258,25 +302,11 @@ def _worker(stage_argument: str) -> int:
             return 24
         compound_tokens: list[tuple[str, str]] = []
         for token, value in tokens.items():
-            if (
-                not isinstance(token, str)
-                or not isinstance(value, dict)
-                or not isinstance(value.get("text"), str)
-                or value.get("style")
-                not in {
-                    "body",
-                    "name",
-                    "subheading",
-                    "employment",
-                    "bullet",
-                    "project",
-                    "header-name",
-                    "header-contacts",
-                }
-            ):
+            if not isinstance(token, str) or not _valid_token_value(value):
                 return 25
             text_value = value["text"]
             style = value["style"]
+            lead = value.get("lead")
             if style not in {"header-name", "header-contacts"}:
                 compound_tokens.extend(
                     (match.group("token"), style)
@@ -311,6 +341,13 @@ def _worker(stage_argument: str) -> int:
                 )
             elif style == "subheading":
                 replacement = f'#text(weight: "bold")[{_literal_text_expression(text_value)}]'
+            elif style == "skill-group":
+                assert isinstance(lead, str)
+                rest = text_value[len(lead) + 2 :]
+                replacement = (
+                    f'#text(weight: "bold")[{_literal_text_expression(lead + ":")}]'
+                    f'#text(" "){_literal_text_expression(rest)}'
+                )
             else:
                 replacement = _literal_text_expression(text_value)
             typ_text = typ_text.replace(token, replacement).replace(

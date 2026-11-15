@@ -140,6 +140,8 @@ def test_real_production_pdf_complete_content_and_geometry(tmp_path: Path, two_p
         ("wrong_scope", ["critical_fields_poppler", "critical_fields_pypdf"]),
         ("unexpected", ["complete_text_poppler", "complete_text_pypdf"]),
         ("heading", ["standard_headings_poppler", "standard_headings_pypdf"]),
+        # Identical text, headings at body size: only the presentation check can see it.
+        ("heading_body_size", ["heading_presentation"]),
         ("hidden", ["visibility_operators"]),
         ("clip", ["visibility_operators"]),
         ("overflow", ["complete_text_poppler", "text_geometry"]),
