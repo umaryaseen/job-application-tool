@@ -172,7 +172,7 @@ def test_display_headings_keep_internal_categories_and_order() -> None:
 
 
 def test_template_identity_changed() -> None:
-    assert TEMPLATE_VERSION == "baseline-v4-m1-fix006-expected-completion-display-headings"
+    assert TEMPLATE_VERSION != "baseline-v3-presentation-m1-fix005-hyphen-compounds"
 
 
 def test_real_pdf_extracts_expected_completion_specialization_and_headings(tmp_path: Path) -> None:

@@ -3,9 +3,10 @@
 Last reconciled: 2026-11-15 against main `ee590699` (merged PR #5). TASK-011
 and TASK-012 are integrated. TASK-009 personal acceptance remains open: the
 applicant has supplied content decisions for the pending private revision, and
-M1-FIX-006 (expected completion, specialization, display headings) is
-independently approved on `task/009-m1-fix-006` and awaits merge before any new
-personal baseline is generated.
+M1-FIX-006 is merged. A first corrected private baseline (artifact r0010) was
+generated for applicant content review; its independent QA found two issues:
+slash-joined terms wrapping in extracted text (fixed by M1-FIX-007, awaiting
+review) and a third page that needs an applicant content decision.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -21,7 +22,8 @@ personal baseline is generated.
 | Publication state correction | APPROVED, documentation only | [Scoped review](reviews/TASK-009-PUBLICATION-STATE.md); no runtime or approval-policy changes |
 | TASK-011 | Reviewed and merged into main through PR #4 | [Implementation review](reviews/TASK-011.md), [guide](JOB_EXTRACTION.md), merge `f6a3bf0` |
 | TASK-012 | Reviewed and merged into main through PR #5 | [Review](reviews/TASK-012.md) round 11 APPROVED on `07375b1`; documentation closure `065d89e` scoped review APPROVED (Codex session `01a1db73-cb5f-7501-8cc2-4e2f10a55c05`); merge `ee59069` |
-| M1-FIX-006 | APPROVED — AWAITING MERGE | [Task](tasks/M1-FIX-006.md), [review](reviews/M1-FIX-006.md) round 2 APPROVED on `591b339`; CI 43666629755 success |
+| M1-FIX-006 | Reviewed and merged into main through PR #6 | [Review](reviews/M1-FIX-006.md) round 2 APPROVED; closure scoped review APPROVED; merge `68aa536` |
+| M1-FIX-007 | IMPLEMENTED — AWAITING REVIEW | [Task](tasks/M1-FIX-007.md); slash-joined compounds stay atomic; [handoff](REVIEW_HANDOFF.md) |
 | TASK-013–020 | NOT IMPLEMENTED | Skill aliases, review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |

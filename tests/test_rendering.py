@@ -289,7 +289,7 @@ def test_unbreakable_hyphenated_compound_fails_before_publication(tmp_path: Path
         [("hyphen-overflow", "synthetic-" * 200 + "end")],
     )
     plan = compile_baseline(profile, as_of=date(2026, 9, 12), reviews=reviews)
-    with pytest.raises(PdfRenderError, match="hyphenated compound.*fixed A4"):
+    with pytest.raises(PdfRenderError, match="hyphenated or slash-joined compound.*fixed A4"):
         build_pdf(plan, profile, reviews=reviews, data_root=tmp_path)
     assert not (tmp_path / "outputs" / "baseline.pdf").exists()
 
