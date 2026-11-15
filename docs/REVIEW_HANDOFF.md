@@ -1,160 +1,60 @@
-# Review handoff: TASK-012 priority, negation and alternatives
+# Review handoff: M1-FIX-006 expected completion, specialization, display headings
 
-**Status: implementation APPROVED** in round 11 on `07375b1` (tree `bf360e66`);
-hosted CI 43628074843 passed 458 tests. See [the review](reviews/TASK-012.md).
+**Status: APPROVED — AWAITING MERGE** (round 2 on `591b339`, tree
+`c4799dea`); hosted CI 43666629755 passed. See [the review](reviews/M1-FIX-006.md).
 
 ## Scoped closure check (pending)
 
-The only change after `07375b1` is this documentation closure: the verbatim
-round-11 report appended to `docs/reviews/TASK-012.md`, PROGRESS state and this
-handoff. Confirm no runtime, test, fixture, dependency or workflow file changed,
-the records are faithful, and the TASK-009 note stays generic. Do not repeat
-runtime reviews for this documentation-only tail.
+The only change after `591b339` is this documentation closure: the round-2
+report appended to `docs/reviews/M1-FIX-006.md`, PROGRESS and this handoff.
+Confirm no runtime, test, fixture, schema, dependency or workflow file changed
+and the records are faithful. Do not repeat runtime reviews.
 
 ## Historical review scope
 
-Implementer: Claude Code. Independent reviewer: a separate Codex session (or
-another engineer). TASK-011 is merged (`f6a3bf05`); its reviews are complete.
-The TASK-012 fixture labels are already independently
-[approved](reviews/TASK-012-FIXTURES.md); do not re-derive or change them to fit
-output. Review the implementation commit supplied with this handoff.
+Implementer: Claude Code. Independent reviewer: a separate Codex session.
+Base: main `ee590699b49077a1cd61161caa679f104b99b659`. Branch:
+`task/009-m1-fix-006`. Review the exact candidate commit supplied with this
+handoff. TASK-012 is merged; its reviews are complete (see
+[the review](reviews/TASK-012.md)).
 
-## Round 11: corrective re-review
+## Round 2: corrective re-review
 
-Round 10 on `ad83f8d` returned CHANGES REQUIRED for F-19 (F-20 non-blocking).
-Re-review `ad83f8d..<candidate>`: the CEFR compound exception now accepts only
-true hyphens, and signs inside recognized terms are ignored before amounts.
-Confirm F-01–F-18 stay as recorded. Append a "Round 11" section.
-
-## Round 10 (completed)
-
-Round 9 on `1722e32` returned CHANGES REQUIRED for F-18. Re-review
-`1722e32..<candidate>`: sign detection by Unicode category (Sm/Pd) on both
-sides of amounts and CEFR levels, the CEFR word-joining hyphen exception, and
-stray math-symbol/standalone-dash withholding. Confirm F-01–F-17 stay as
-recorded. Append a "Round 10" section.
-
-## Round 9 (completed)
-
-Round 8 on `f5d65ee` returned CHANGES REQUIRED for F-17 (F-16 non-blocking).
-Re-review `f5d65ee..<candidate>`: adjacent signs/comparison symbols reject
-thresholds (hyphen only before an amount, so "C1-Niveau" and ranges still
-work), stray comparison symbols withhold thresholds, and scope leads skip
-closing brackets. Confirm F-01–F-15 stay as recorded. Append a "Round 9"
-section.
-
-## Round 8 (completed)
-
-Round 7 on `faee434` returned CHANGES REQUIRED for F-15 (F-16 non-blocking).
-Re-review `faee434..<candidate>`: all word sets are now case-folded at
-construction, with an invariant test. Confirm F-01–F-14 stay as recorded.
-Append a "Round 8" section.
-
-## Round 7 (completed)
-
-Round 6 on `12221f7` returned CHANGES REQUIRED for F-13 (F-14 non-blocking).
-Re-review `12221f7..<candidate>`: every filler word and connective now ends a
-degree field, a dangling field link withholds the degree condition, and
-spoken/written/native-style words directly before a recognized language are
-covered modifiers. Confirm F-01–F-12 stay as recorded. Append a "Round 7"
-section.
-
-## Round 6 (completed)
-
-Round 5 on `d30ecc7` returned CHANGES REQUIRED for F-12 only. Re-review
-`d30ecc7..<candidate>`: degree fields stop only at function words/connectives;
-content descriptors are no longer global filler and are exempt only as
-adjacent degree modifiers or "language" after a recognized language. Probe
-whether any remaining FILLER word can form a meaningful operand on its own, and
-confirm F-01–F-11 stay as recorded. Append a "Round 6" section.
-
-## Round 5 (completed)
-
-Round 4 on `b91ead6` returned CHANGES REQUIRED for F-11 only. Re-review
-`b91ead6..<candidate>`: explicit degree-term grammar, leaf-only coverage and
-the early CEFR bound. Confirm F-01–F-10 stay as recorded. The literal field
-rule (up to four words, words appended without a separator join the field) is
-documented; judge whether it is acceptable. Append a "Round 5" section.
-
-## Round 4 (completed)
-
-Round 3 on `2f43f4f` returned CHANGES REQUIRED for F-09 only (F-10
-non-blocking). Re-review `2f43f4f..<candidate>`: stray/contradictory operator
-words now withhold all thresholds, and `uninterpreted_text` withholds
-thresholds with the condition. Confirm F-01–F-08 stay fixed. Append a
-"Round 4" section; do not rewrite earlier rounds.
-
-## Round 3 (completed)
-
-Round 2 on `fbc4c97` returned CHANGES REQUIRED (F-05–F-08). Re-review
-`fbc4c97..<candidate>`: the coverage rule (`uninterpreted_text`, filler list),
-unit-word and unsupported-operator detection, the scope-word requirement and
-the sanitized PROGRESS note. Probe for remaining partial conditions and for
-filler-list entries that could themselves hide an operand. Append a "Round 3"
-section; do not rewrite earlier rounds.
-
-## Round 2 (completed)
-
-Round 1 on `f41df6b` returned CHANGES REQUIRED (F-01–F-04; see
-[the review](reviews/TASK-012.md)). Re-review the corrective delta
-`f41df6b..<candidate>`: verify each finding is fixed for its reproduction and
-for nearby variants, that the generalized symbol/comma/semicolon,
-duration-bound, scope-stop and duplicate-scope rules do not hide other
-partial conditions, that controls (CI/CD, "Ideally, Python", supported lists)
-still work, that the fixture oracle is byte-identical, and that the
-documentation tail (PROGRESS incl. the sanitized TASK-009 state note, guide,
-CODEX_HANDOFF harness note) is faithful. Append a "Round 2" section to
-`docs/reviews/TASK-012.md` content in your report; do not rewrite round 1.
-
-Base: main `f6a3bf0560df9c3e7594cc835f13864d98c3c6c3`.
-Branch: `task/012-requirement-semantics`. Fixture commit `2988f63` precedes the
-implementation commit; inspect both with `git diff f6a3bf0..<candidate>`.
+Round 1 on `ae6c461` returned CHANGES REQUIRED for F-01 (model_copy bypass of
+education invariants). Re-review `ae6c461..<candidate>`: content-invariant
+re-validation in `validate_profile` and `record_human_review`, the three
+regressions, and that status/approval issue codes are unchanged. Append a
+"Round 2" section to `docs/reviews/M1-FIX-006.md`.
 
 ## Read first
 
-AGENTS, PROGRESS, TASK-012, A18/A19 (and A17 for spans), ADR-007/011/021, the
-"Pasted jobs and requirement model" section of ARCHITECTURE, SECURITY_AND_PRIVACY,
-REVIEW_PROTOCOL, JOB_EXTRACTION and the fixture README.
+AGENTS, PROGRESS, [the task](tasks/M1-FIX-006.md), ADR-011/012/013/014/015 and
+the archived ADR-017/018 context, ARCHITECTURE (profile, plan, presentation,
+QA and approval sections), SECURITY_AND_PRIVACY, REVIEW_PROTOCOL.
 
 ## Review focus
 
-- Labels: explicit EN/DE cue lexicon; general headings carry no priority; cue
-  headings and marker lines scope later clauses; clause/heading and mixed-cue
-  conflicts stay unspecified with review; a preferred scope never yields
-  mandatory; recognized not-required forms versus unsupported negation.
-- Groups: ANY/ALL parser (consistent conjunction, either/both/sowohl…als auch,
-  parentheses, depth/term bounds), degree-or-equivalent and related-field
-  handling, and the rule that any unaccounted OR/AND nulls the condition (never
-  split or partially kept). Look for inputs where an OR still yields a partial
-  or mandatory single-term condition.
-- Thresholds: integer durations and CEFR operators/units/literal scopes,
-  vague/decimal/contradictory forms rejected to review.
-- Integrity: every span verified against the raw source and inside its clause
-  or referenced heading/marker; rows aligned with extraction candidates; binding
-  to job revision/raw hash/extraction digest; `validate_classification`
-  rejects relabelled, split or invented content even with recomputed digests.
-- Bounds and security: adversarial 200,000-byte inputs stay sub-second or fail
-  with a bounded `ExtractionError`; read-only `jae job-classify`; sanitized CLI
-  errors; no network, execution of posting text, profile access, persistence,
-  provider or new dependency. The `load_saved_source` refactor must leave
-  TASK-011 `job-extract` behaviour and tests unchanged.
-- Scope: no aliases/normalization (TASK-013), no correction versions (TASK-014),
-  no matching, tailoring or approval; documentation matches actual behaviour.
+- The education model never implies an award: no actual completion date on an
+  ongoing degree; an expected date only for an ongoing degree without a known
+  end and not before a known start.
+- Digest stability: empty new fields are stripped from canonical payloads; the
+  pinned legacy digest is unchanged; no existing approval or binding can break
+  or be silently reused for changed content.
+- Presentation, plan claim text and TXT/PDF: expected date and specialization
+  are visible claims bound to plan text; degrees without them render exactly
+  as before; internal skill categories unchanged and only static display
+  headings/order change; unknown categories stay ungrouped.
+- Template identity bump, schema export, and the updated expected-heading
+  fixtures and test helpers reflect only the intended change (no weakened
+  assertions).
+- No personal data in Git; no dependency change.
 
 ## Verification
 
-Runtime: `uv run pytest tests/test_requirement_classification.py
-tests/test_requirement_spans.py tests/test_ingestion.py -ra` (in a sandbox, call
-`.venv/bin/python -m pytest` with `--basetemp` outside the checkout; data inside
-the repository is rejected by design), `uv run ruff check .`,
-`uv run ruff format --check .`, `uv run mypy src`, `git diff --check`. Also try
-your own adversarial inputs. The full suite needs macOS `sandbox-exec`, Poppler
-and the pinned Typst assets; inspect hosted CI for the exact published head
-rather than repeating renderer tests in a sandbox that cannot nest them.
-Implementer results are in PROGRESS (458 passed locally); they are not a
-substitute for your checks.
-
-Record actual commands/results, exact head/tree, findings and one verdict in
-`docs/reviews/TASK-012.md` without modifying implementation. Do not merge or
-approve applicant facts. TASK-009 personal acceptance and all M1/M2, matching,
-tailoring and export gates remain unchanged.
+Focused: `uv run pytest tests/test_m1_fix006.py tests/test_m1_fix003.py
+tests/test_document_plan.py tests/test_profile_schema.py -ra`, plus Ruff,
+format, mypy and `git diff --check`. Renderer tests need macOS
+`sandbox-exec`, Poppler and pinned Typst assets: inspect hosted CI for the
+exact published head. Implementer full suite: 474 passed. Record commands,
+findings and one verdict in `docs/reviews/M1-FIX-006.md` without modifying
+implementation. Do not approve applicant facts or artifacts.

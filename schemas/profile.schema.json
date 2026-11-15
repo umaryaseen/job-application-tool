@@ -966,6 +966,36 @@
           "title": "Evidence Refs",
           "type": "array"
         },
+        "expected_completion_date": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "day": "#/$defs/DayDate",
+                  "month": "#/$defs/MonthDate",
+                  "year": "#/$defs/YearDate"
+                },
+                "propertyName": "precision"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/YearDate"
+                },
+                {
+                  "$ref": "#/$defs/MonthDate"
+                },
+                {
+                  "$ref": "#/$defs/DayDate"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Completion Date"
+        },
         "fact_id": {
           "maxLength": 64,
           "minLength": 2,
@@ -998,6 +1028,20 @@
           "minimum": 1,
           "title": "Revision",
           "type": "integer"
+        },
+        "specialization": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Specialization"
         },
         "status": {
           "default": "draft",

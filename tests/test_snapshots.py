@@ -32,6 +32,7 @@ from job_application_engine.snapshots.store import (
 )
 from job_application_engine.verification.document import profile_digest
 from job_application_engine.verification.support import (
+    canonical_fact_payload,
     canonical_json,
     evidence_digest,
     fact_digest,
@@ -87,7 +88,7 @@ def eligible_profile() -> tuple[ProfileRevision, list[object], bytes]:
         if fact.status != "approved":
             facts.append(fact)
             continue
-        displayed = canonical_json(fact.model_dump(mode="json", exclude={"approval"}))
+        displayed = canonical_json(canonical_fact_payload(fact))
         review = record_human_review(
             profile,
             target_type="fact",

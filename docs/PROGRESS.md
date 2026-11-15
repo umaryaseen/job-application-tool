@@ -1,13 +1,11 @@
 # Current implementation state
 
-Last reconciled: 2026-11-14 against main `f6a3bf05` (merged PR #4). TASK-011
-draft source candidates are integrated; final PR #4 CI 43545596860 passed 204
-tests with lint/types and its checkout tree matched the reviewed tree. TASK-009
-personal acceptance remains open. Accepted ADR-021 permits source-only analysis
-on reviewed dependencies; TASK-012 on
-[PR #5](https://github.com/umaryaseen/job-application-tool/pull/5) is
-independently APPROVED (review round 11 on `07375b1`) with passing final-head
-CI and awaits merge.
+Last reconciled: 2026-11-15 against main `ee590699` (merged PR #5). TASK-011
+and TASK-012 are integrated. TASK-009 personal acceptance remains open: the
+applicant has supplied content decisions for the pending private revision, and
+M1-FIX-006 (expected completion, specialization, display headings) is
+independently approved on `task/009-m1-fix-006` and awaits merge before any new
+personal baseline is generated.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -22,7 +20,8 @@ CI and awaits merge.
 | Sanitized publication | PR #3 MERGED | [Publication note](reviews/TASK-009-PUBLICATION.md); main `83497777`, final published CI `43541161616` |
 | Publication state correction | APPROVED, documentation only | [Scoped review](reviews/TASK-009-PUBLICATION-STATE.md); no runtime or approval-policy changes |
 | TASK-011 | Reviewed and merged into main through PR #4 | [Implementation review](reviews/TASK-011.md), [guide](JOB_EXTRACTION.md), merge `f6a3bf0` |
-| TASK-012 | APPROVED — AWAITING MERGE | [Fixture review](reviews/TASK-012-FIXTURES.md) APPROVED; [implementation review](reviews/TASK-012.md) rounds 1–10 CHANGES REQUIRED (F-01–F-20), round 11 APPROVED on `07375b1`; CI 43628074843: 458 passed |
+| TASK-012 | Reviewed and merged into main through PR #5 | [Review](reviews/TASK-012.md) round 11 APPROVED on `07375b1`; documentation closure `065d89e` scoped review APPROVED (Codex session `01a1db73-cb5f-7501-8cc2-4e2f10a55c05`); merge `ee59069` |
+| M1-FIX-006 | APPROVED — AWAITING MERGE | [Task](tasks/M1-FIX-006.md), [review](reviews/M1-FIX-006.md) round 2 APPROVED on `591b339`; CI 43666629755 success |
 | TASK-013–020 | NOT IMPLEMENTED | Skill aliases, review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -38,11 +37,12 @@ That is not PDF/TXT content approval, final artifact approval or permission to
 export. Those gates remain pending. This reconciliation does not read, replace,
 approve or regenerate private profiles, receipts, plans or artifacts.
 
-Reconciled 2026-11-14: the private records hold a later content revision that
-awaits applicant review, so r0009's content is not the current candidate for
-content approval. Its details and the review packet stay in the private data
-root. Next: applicant review, any required correction or typed-model change
-with independent review, then a new baseline, QA and separate final approval.
+Reconciled 2026-11-15: the private records hold a later content revision, so
+r0009's content is not the current candidate for content approval. The
+applicant has now returned written content decisions; details stay in the
+private data root. Next: reviewed M1-FIX-006, a corrected private revision with
+receipts bound to those decisions, a new baseline with QA, then separate final
+artifact approval. No export is authorized.
 
 Pre-sync local progress and handoffs are archived under `history/`; their old
 task gates describe their historical candidates. Published documentation uses
@@ -67,7 +67,38 @@ section scope and lexical hints, all draft with unspecified priority, verified
 by an independently reviewed 16 EN/16 DE oracle and hosted CI. Detailed
 evidence lives in each linked review.
 
-## TASK-012 implementation (approved, awaiting merge)
+## M1-FIX-006 implementation (approved, awaiting merge)
+
+Adds optional `expected_completion_date` and `specialization` to education
+facts. An expected date requires an ongoing degree without a known end, may not
+precede the start, and an ongoing degree can no longer carry an actual
+completion date (which would claim an award). Empty new fields are stripped
+from canonical payloads, so existing digests are unchanged: a pinned legacy
+digest test still passes, and the private reviewed profile validates with its
+existing receipts and recompiles a plan byte-identical to the stored one.
+Display: `April 2023 – Expected March 2027` and a `Specialization:` line; plan
+claim text carries both values. Skill groups keep internal category IDs; only
+static display headings change (AI & Machine Learning, Data Engineering &
+Analytics, Backend & Databases, Frontend & Visualization, Cloud &
+Infrastructure). Template identity is now
+`baseline-v4-m1-fix006-expected-completion-display-headings`. The exported
+profile schema gains the two optional fields; expected-heading fixtures were
+updated for the intended display change, and four test helpers now display
+the canonical payload rather than a raw dump. Full suite: 471 passed (macOS,
+real sandboxed renderer); Ruff, format, mypy and diff checks clean.
+
+Review round 1 on `ae6c461` returned CHANGES REQUIRED (F-01): model
+invariants ran only at construction, so a `model_copy(update=...)` copy could
+carry an ongoing degree with an actual completion date (or an expected date
+before its start) through `validate_profile` and the review operation. Both
+trusted boundaries now re-validate each fact, evidence and variant's content
+invariants (status/approval neutralized, reported separately as before), and
+the review operation refuses to issue a receipt for invalid content. Three
+regressions fail on `ae6c461` and pass now. Full suite: 474 passed. Review
+round 2 on `591b339` returned APPROVED with no unresolved findings; hosted CI
+43666629755 passed on that head.
+
+## TASK-012 implementation (merged)
 
 Adds read-only `jae job-classify`: a deterministic layer over the unchanged
 TASK-011 candidates. Explicit EN/DE cues give mandatory/preferred/unspecified
@@ -212,7 +243,9 @@ not interpreted.
 
 ## Next action
 
-Merge reviewed PR #5 after the scoped review of this documentation closure. Then TASK-013
+Merge reviewed M1-FIX-006 (PR #6), then write the corrected private content
+revision and generate the new baseline for applicant review. TASK-013 (reviewed
+skill aliases) proceeds on its own branch. Then TASK-013
 (reviewed skill aliases, separate from lexical extraction) and TASK-014
 (source-bound correction/review versions). Separately, TASK-009 waits on
 applicant review of the private content revision; appearance-only approval

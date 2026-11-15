@@ -88,9 +88,14 @@ def fact_line_text(profile: ProfileRevision, fact: Any) -> str:
     if isinstance(fact, EducationFact):
         degree = fact.degree_name or "Degree not specified"
         status = fact.degree_status
+        details = [f"status: {status}", format_date_range(fact.period)]
+        if fact.expected_completion_date is not None:
+            details.append(f"expected completion: {_date_text(fact.expected_completion_date)}")
+        if fact.specialization:
+            details.append(f"specialization: {fact.specialization}")
         return (
             f"{degree} — {fact.program}, {_entity_name(profile, fact.institution_id)}"
-            f" (status: {status}; {format_date_range(fact.period)})"
+            f" ({'; '.join(details)})"
         )
     if isinstance(fact, SkillFact):
         return f"{fact.name} (context: {fact.context}; proficiency: {fact.proficiency})"

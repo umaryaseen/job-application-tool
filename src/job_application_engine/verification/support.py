@@ -42,7 +42,13 @@ def _strip_empty_presentation_fields(payload: dict[str, Any]) -> dict[str, Any]:
 
     kind = payload.get("kind")
     if kind == "education":
-        for key in ("thesis_title", "thesis_description", "coursework"):
+        for key in (
+            "thesis_title",
+            "thesis_description",
+            "coursework",
+            "expected_completion_date",
+            "specialization",
+        ):
             value = payload.get(key)
             if value is None or value == []:
                 payload.pop(key, None)
