@@ -1,0 +1,718 @@
+{
+  "scan_cases": [
+    {
+      "id": "en-01",
+      "locale": "en",
+      "text": "Experience with C, C++ and C#.",
+      "expected": [
+        {
+          "quote": "C",
+          "concept": "c",
+          "status": "matched"
+        },
+        {
+          "quote": "C++",
+          "concept": "cpp",
+          "status": "matched"
+        },
+        {
+          "quote": "C#",
+          "concept": "csharp",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-02",
+      "locale": "en",
+      "text": "R and Python for statistics.",
+      "expected": [
+        {
+          "quote": "R",
+          "concept": "r",
+          "status": "matched"
+        },
+        {
+          "quote": "Python",
+          "concept": "python",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-03",
+      "locale": "en",
+      "text": "Work closely with our R&D department.",
+      "expected": []
+    },
+    {
+      "id": "en-04",
+      "locale": "en",
+      "text": "Present results to C-level stakeholders.",
+      "expected": []
+    },
+    {
+      "id": "en-05",
+      "locale": "en",
+      "text": "Objective-C or Swift on iOS.",
+      "expected": []
+    },
+    {
+      "id": "en-06",
+      "locale": "en",
+      "text": "Experience with C/C++ embedded code.",
+      "expected": [
+        {
+          "quote": "C",
+          "concept": "c",
+          "status": "matched"
+        },
+        {
+          "quote": "C++",
+          "concept": "cpp",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-07",
+      "locale": "en",
+      "text": ".NET and ASP.NET Core services.",
+      "expected": [
+        {
+          "quote": ".NET",
+          "concept": "dotnet",
+          "status": "matched"
+        },
+        {
+          "quote": "ASP.NET Core",
+          "concept": "aspnet",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-08",
+      "locale": "en",
+      "text": "Java, not JavaScript.",
+      "expected": [
+        {
+          "quote": "Java",
+          "concept": "java",
+          "status": "matched"
+        },
+        {
+          "quote": "JavaScript",
+          "concept": "javascript",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-09",
+      "locale": "en",
+      "text": "Modern JS/TS frontend work.",
+      "expected": [
+        {
+          "quote": "JS",
+          "concept": "javascript",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-10",
+      "locale": "en",
+      "text": "Node.js or NodeJS backends.",
+      "expected": [
+        {
+          "quote": "Node.js",
+          "concept": "nodejs",
+          "status": "matched"
+        },
+        {
+          "quote": "NodeJS",
+          "concept": "nodejs",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-11",
+      "locale": "en",
+      "text": "Build ML and NLP models.",
+      "expected": [
+        {
+          "quote": "ML",
+          "concept": "machine-learning",
+          "status": "matched"
+        },
+        {
+          "quote": "NLP",
+          "concept": "nlp",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-12",
+      "locale": "en",
+      "text": "Deep learning with PyTorch.",
+      "expected": [
+        {
+          "quote": "Deep learning",
+          "concept": "deep-learning",
+          "status": "matched"
+        },
+        {
+          "quote": "PyTorch",
+          "concept": "pytorch",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-13",
+      "locale": "en",
+      "text": "AWS and Amazon SageMaker.",
+      "expected": [
+        {
+          "quote": "AWS",
+          "concept": "aws",
+          "status": "matched"
+        },
+        {
+          "quote": "Amazon SageMaker",
+          "concept": "aws-sagemaker",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-14",
+      "locale": "en",
+      "text": "Deploy on SageMaker or EC2.",
+      "expected": [
+        {
+          "quote": "SageMaker",
+          "concept": "aws-sagemaker",
+          "status": "matched"
+        },
+        {
+          "quote": "EC2",
+          "concept": "aws-ec2",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-15",
+      "locale": "en",
+      "text": "k8s and Kubernetes clusters.",
+      "expected": [
+        {
+          "quote": "k8s",
+          "concept": "kubernetes",
+          "status": "matched"
+        },
+        {
+          "quote": "Kubernetes",
+          "concept": "kubernetes",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-16",
+      "locale": "en",
+      "text": "Postgres or PostgreSQL databases.",
+      "expected": [
+        {
+          "quote": "Postgres",
+          "concept": "postgresql",
+          "status": "matched"
+        },
+        {
+          "quote": "PostgreSQL",
+          "concept": "postgresql",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-17",
+      "locale": "en",
+      "text": "Add 5 ml of solution; the aws team.",
+      "expected": []
+    },
+    {
+      "id": "en-18",
+      "locale": "en",
+      "text": "Apache Spark and Spark streaming.",
+      "expected": [
+        {
+          "quote": "Apache Spark",
+          "concept": "apache-spark",
+          "status": "matched"
+        },
+        {
+          "quote": "Spark",
+          "concept": "apache-spark",
+          "status": "ambiguous"
+        }
+      ]
+    },
+    {
+      "id": "en-19",
+      "locale": "en",
+      "text": "LLMs and large language models.",
+      "expected": [
+        {
+          "quote": "LLMs",
+          "concept": "llm",
+          "status": "matched"
+        },
+        {
+          "quote": "large language models",
+          "concept": "llm",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-20",
+      "locale": "en",
+      "text": "Azure DevOps pipelines on Azure.",
+      "expected": [
+        {
+          "quote": "Azure DevOps",
+          "concept": "azure-devops",
+          "status": "matched"
+        },
+        {
+          "quote": "Azure",
+          "concept": "azure",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-21",
+      "locale": "en",
+      "text": "JAVA and javascript.",
+      "expected": [
+        {
+          "quote": "JAVA",
+          "concept": "java",
+          "status": "matched"
+        },
+        {
+          "quote": "javascript",
+          "concept": "javascript",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-22",
+      "locale": "en",
+      "text": "Machine   learning and deep\nlearning.",
+      "expected": [
+        {
+          "quote": "Machine   learning",
+          "concept": "machine-learning",
+          "status": "matched"
+        },
+        {
+          "quote": "deep\nlearning",
+          "concept": "deep-learning",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "en-23",
+      "locale": "en",
+      "text": "Python3 and Pythonic code.",
+      "expected": []
+    },
+    {
+      "id": "en-24",
+      "locale": "en",
+      "text": "CI/CD with Git and Docker.",
+      "expected": [
+        {
+          "quote": "CI/CD",
+          "concept": "ci-cd",
+          "status": "matched"
+        },
+        {
+          "quote": "Git",
+          "concept": "git",
+          "status": "matched"
+        },
+        {
+          "quote": "Docker",
+          "concept": "docker",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-01",
+      "locale": "de",
+      "text": "Kenntnisse in maschinellem Lernen.",
+      "expected": [
+        {
+          "quote": "maschinellem Lernen",
+          "concept": "machine-learning",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-02",
+      "locale": "de",
+      "text": "Erfahrung mit künstlicher Intelligenz (KI).",
+      "expected": [
+        {
+          "quote": "künstlicher Intelligenz",
+          "concept": "artificial-intelligence",
+          "status": "matched"
+        },
+        {
+          "quote": "KI",
+          "concept": "artificial-intelligence",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-03",
+      "locale": "de",
+      "text": "Deutschkenntnisse und Englisch.",
+      "expected": [
+        {
+          "quote": "Deutschkenntnisse",
+          "concept": "lang-german",
+          "status": "matched"
+        },
+        {
+          "quote": "Englisch",
+          "concept": "lang-english",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-04",
+      "locale": "de",
+      "text": "Deutsch- und Englischkenntnisse.",
+      "expected": [
+        {
+          "quote": "Deutsch",
+          "concept": "lang-german",
+          "status": "matched"
+        },
+        {
+          "quote": "Englischkenntnisse",
+          "concept": "lang-english",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-05",
+      "locale": "de",
+      "text": "C# und .NET im Backend.",
+      "expected": [
+        {
+          "quote": "C#",
+          "concept": "csharp",
+          "status": "matched"
+        },
+        {
+          "quote": ".NET",
+          "concept": "dotnet",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-06",
+      "locale": "de",
+      "text": "Datenbanken wie PostgreSQL.",
+      "expected": [
+        {
+          "quote": "PostgreSQL",
+          "concept": "postgresql",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-07",
+      "locale": "de",
+      "text": "Deep Learning (z. B. PyTorch).",
+      "expected": [
+        {
+          "quote": "Deep Learning",
+          "concept": "deep-learning",
+          "status": "matched"
+        },
+        {
+          "quote": "PyTorch",
+          "concept": "pytorch",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-08",
+      "locale": "de",
+      "text": "AWS (inkl. SageMaker).",
+      "expected": [
+        {
+          "quote": "AWS",
+          "concept": "aws",
+          "status": "matched"
+        },
+        {
+          "quote": "SageMaker",
+          "concept": "aws-sagemaker",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-09",
+      "locale": "de",
+      "text": "Power BI und DAX.",
+      "expected": [
+        {
+          "quote": "Power BI",
+          "concept": "power-bi",
+          "status": "matched"
+        },
+        {
+          "quote": "DAX",
+          "concept": "dax",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-10",
+      "locale": "de",
+      "text": "Go-to-market und Kundenkontakt.",
+      "expected": []
+    },
+    {
+      "id": "de-11",
+      "locale": "de",
+      "text": "Grundlagen des maschinellen Lernens.",
+      "expected": [
+        {
+          "quote": "maschinellen Lernens",
+          "concept": "machine-learning",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-12",
+      "locale": "de",
+      "text": "Französisch oder Spanisch.",
+      "expected": [
+        {
+          "quote": "Französisch",
+          "concept": "lang-french",
+          "status": "matched"
+        },
+        {
+          "quote": "Spanisch",
+          "concept": "lang-spanish",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-13",
+      "locale": "de",
+      "text": "Erfahrung mit R und Python.",
+      "expected": [
+        {
+          "quote": "R",
+          "concept": "r",
+          "status": "matched"
+        },
+        {
+          "quote": "Python",
+          "concept": "python",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "de-14",
+      "locale": "de",
+      "text": "Azure DevOps und Azure Pipelines.",
+      "expected": [
+        {
+          "quote": "Azure DevOps",
+          "concept": "azure-devops",
+          "status": "matched"
+        },
+        {
+          "quote": "Azure Pipelines",
+          "concept": "azure-pipelines",
+          "status": "matched"
+        }
+      ]
+    }
+  ],
+  "surface_cases": [
+    {
+      "surface": "C++",
+      "concept": "cpp",
+      "status": "matched"
+    },
+    {
+      "surface": "c++",
+      "concept": "cpp",
+      "status": "matched"
+    },
+    {
+      "surface": "C#",
+      "concept": "csharp",
+      "status": "matched"
+    },
+    {
+      "surface": "C",
+      "concept": "c",
+      "status": "matched"
+    },
+    {
+      "surface": "c",
+      "concept": null,
+      "status": "unmatched"
+    },
+    {
+      "surface": "R",
+      "concept": "r",
+      "status": "matched"
+    },
+    {
+      "surface": ".NET",
+      "concept": "dotnet",
+      "status": "matched"
+    },
+    {
+      "surface": "ASP.NET",
+      "concept": "aspnet",
+      "status": "matched"
+    },
+    {
+      "surface": "Machine Learning",
+      "concept": "machine-learning",
+      "status": "matched"
+    },
+    {
+      "surface": "Deep Learning",
+      "concept": "deep-learning",
+      "status": "matched"
+    },
+    {
+      "surface": "PyTorch",
+      "concept": "pytorch",
+      "status": "matched"
+    },
+    {
+      "surface": "Amazon Web Services",
+      "concept": "aws",
+      "status": "matched"
+    },
+    {
+      "surface": "Amazon SageMaker",
+      "concept": "aws-sagemaker",
+      "status": "matched"
+    },
+    {
+      "surface": "Spark",
+      "concept": "apache-spark",
+      "status": "ambiguous"
+    },
+    {
+      "surface": "Python 3",
+      "concept": null,
+      "status": "unmatched"
+    },
+    {
+      "surface": "QuuxDB",
+      "concept": null,
+      "status": "unmatched"
+    },
+    {
+      "surface": "Deep Learning — applied object detection",
+      "concept": null,
+      "status": "unmatched"
+    },
+    {
+      "surface": "  Kubernetes ",
+      "concept": "kubernetes",
+      "status": "matched"
+    },
+    {
+      "surface": "Deutsch",
+      "concept": "lang-german",
+      "status": "matched"
+    },
+    {
+      "surface": "maschinelles Lernen",
+      "concept": "machine-learning",
+      "status": "matched"
+    }
+  ],
+  "relations": [
+    {
+      "from": "aws-sagemaker",
+      "type": "broader",
+      "to": "aws"
+    },
+    {
+      "from": "aws-ec2",
+      "type": "broader",
+      "to": "aws"
+    },
+    {
+      "from": "aspnet",
+      "type": "broader",
+      "to": "dotnet"
+    },
+    {
+      "from": "azure-devops",
+      "type": "related",
+      "to": "azure"
+    },
+    {
+      "from": "azure-pipelines",
+      "type": "broader",
+      "to": "azure-devops"
+    },
+    {
+      "from": "pytorch",
+      "type": "related",
+      "to": "deep-learning"
+    },
+    {
+      "from": "deep-learning",
+      "type": "broader",
+      "to": "machine-learning"
+    },
+    {
+      "from": "machine-learning",
+      "type": "broader",
+      "to": "artificial-intelligence"
+    }
+  ]
+}
