@@ -19,4 +19,15 @@ foreign or temporary files, re-signed tampering, time order, changed JD text or
 rules output); newer JD revisions starting unreviewed; private, bounded,
 duplicate-key-free correction input; sanitized errors; no raw posting change.
 Record findings and one verdict in `docs/reviews/TASK-014.md` without modifying
-implementation. Implementer full suite: 651 passed, no skips.
+implementation. Implementer full suite: 664 passed, no skips (after the round-1 correction).
+
+## Round 2 request
+
+Round 1 ([report](reviews/TASK-014.md)) returned CHANGES REQUIRED: F-01 missing
+tail undetected, F-02 re-signed last-revision metadata undetected, F-03 non-UTC
+times accepted. The correction adds `RequirementReviewHead` (`head.json`):
+created atomically with the review folder, advanced after each publication and
+never moved backwards; replay requires it to match the revision count and last
+digest, tolerating only a one-revision lag after a crash. Review times must be
+UTC. Whole-folder deletion is documented as undetectable and fail-safe (no
+hard gates). Review the delta from `18bd782`.

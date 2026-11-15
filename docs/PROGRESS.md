@@ -111,15 +111,17 @@ and the view is always rebuilt by replaying the chain over the re-verified
 deterministic classification. Corrected spans must quote the raw JD inside
 their clause. A row is reviewed only through `accept` naming its displayed
 review reasons; only reviewed, unnegated, structured, mandatory rows become
-hard gates. A newer JD revision starts unreviewed. Synthetic tests:
+hard gates. A newer JD revision starts unreviewed. Round 1 review (CHANGES
+REQUIRED) led to a verified head record (missing tail, missing head and a
+re-signed last revision now fail) and UTC-only review times. Synthetic tests:
 `tests/test_requirement_review.py` (A20).
 
 Implementer verification on macOS (Python 3.12, locked environment):
 
 | Command | Result |
 | --- | --- |
-| `uv run pytest tests/test_requirement_review.py` | Exit 0; 31 passed |
-| `uv run pytest` | Exit 0; 651 passed, no skips |
+| `uv run pytest tests/test_requirement_review.py` | Exit 0; 44 passed |
+| `uv run pytest` | Exit 0; 664 passed, no skips |
 | `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 87 files formatted |
 | `uv run mypy src` | Exit 0; 53 source files |
 

@@ -13,6 +13,8 @@ import json
 import os
 import re
 import secrets
+import shutil
+import tempfile
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -22,6 +24,7 @@ from ..domain.job import JobRevision
 from ..domain.requirement import RequirementClassification
 from ..domain.requirement_review import (
     RequirementCorrection,
+    RequirementReviewHead,
     RequirementReviewRevision,
     RequirementReviewView,
 )
@@ -39,6 +42,7 @@ from ..ingestion.text import load_job_revision
 from ..verification.support import canonical_json, model_digest
 
 REVIEW_FOLDER = "requirement-reviews"
+HEAD_NAME = "head.json"
 MAX_REVISION_BYTES = 2_000_000
 MAX_CORRECTION_BYTES = 2_000_000
 _REVISION_NAME = re.compile(r"v([0-9]{6})\.json")
@@ -108,6 +112,8 @@ def _revision_files(root: Path, folder: Path) -> list[Path]:
         raise ReviewError("requirement review history is not a directory")
     numbers = []
     for entry in folder.iterdir():
+        if entry.name == HEAD_NAME:
+            continue
         if entry.name.startswith(_TEMPORARY_PREFIX) and not entry.is_symlink():
             continue
         match = _REVISION_NAME.fullmatch(entry.name)
@@ -192,9 +198,61 @@ def replay(
     return view
 
 
+def _head(job: JobRevision, number: int, digest: str | None) -> RequirementReviewHead:
+    head = RequirementReviewHead(
+        job_id=job.job_id,
+        job_revision=job.revision,
+        review_revision=number,
+        revision_digest=digest,
+        head_digest="0" * 64,
+    )
+    return head.model_copy(update={"head_digest": model_digest(head, exclude={"head_digest"})})
+
+
+def _read_head(root: Path, folder: Path, job: JobRevision) -> RequirementReviewHead:
+    path = safe_private_path((folder / HEAD_NAME).relative_to(root), root)
+    if not path.is_file():
+        raise ReviewError("requirement review head is missing")
+    try:
+        head = RequirementReviewHead.model_validate_json(_bounded_json(path, 4_000))
+    except ValueError as error:
+        if isinstance(error, ReviewError):
+            raise
+        raise ReviewError("requirement review head is invalid") from None
+    if model_digest(head, exclude={"head_digest"}) != head.head_digest or (
+        head.job_id,
+        head.job_revision,
+    ) != (job.job_id, job.revision):
+        raise ReviewError("requirement review head is invalid")
+    return head
+
+
 def _history(root: Path, job: JobRevision) -> list[RequirementReviewRevision]:
+    """Stored revisions, checked against the head before replay.
+
+    A review folder is created together with its head, so a folder without one
+    fails. The head may lag the files by exactly one valid revision (a crash
+    between publication and acknowledgement); any other mismatch, such as a
+    missing tail or a re-signed last revision, fails. Removing the whole review
+    folder cannot be detected and returns the unreviewed draft, which never
+    yields a hard gate.
+    """
+
     folder = _folder(root, job.job_id, job.revision)
-    return [_parse_revision(path) for path in _revision_files(root, folder)]
+    if not folder.exists():
+        return []
+    revisions = [_parse_revision(path) for path in _revision_files(root, folder)]
+    head = _read_head(root, folder, job)
+    count = len(revisions)
+    if head.review_revision == count:
+        expected = revisions[-1].revision_digest if count else None
+    elif head.review_revision == count - 1:
+        expected = revisions[-2].revision_digest if count >= 2 else None
+    else:
+        raise ReviewError("requirement review history does not match its head")
+    if head.revision_digest != expected:
+        raise ReviewError("requirement review history does not match its head")
+    return revisions
 
 
 def load_review(
@@ -211,22 +269,61 @@ def load_review(
     return ReviewState(source, job, classification, view, tuple(revisions), latest)
 
 
-def _publish(folder: Path, number: int, record: RequirementReviewRevision) -> Path:
-    folder.mkdir(mode=0o700, parents=True, exist_ok=True)
-    final = folder / f"v{number:06d}.json"
+def _private_file(folder: Path, data: bytes) -> Path:
     temporary = folder / f"{_TEMPORARY_PREFIX}{secrets.token_hex(8)}"
     descriptor = os.open(temporary, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    with os.fdopen(descriptor, "wb") as stream:
+        stream.write(data)
+        stream.flush()
+        os.fsync(stream.fileno())
+    return temporary
+
+
+def _head_bytes(head: RequirementReviewHead) -> bytes:
+    return (canonical_json(head) + "\n").encode("utf-8")
+
+
+def _create_folder(root: Path, job: JobRevision, folder: Path) -> None:
+    """Create the review folder and its empty head in one atomic rename."""
+
+    parent = safe_private_path(folder.parent.relative_to(root), root)
+    parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    stage = Path(tempfile.mkdtemp(prefix=_TEMPORARY_PREFIX, dir=parent))
     try:
-        with os.fdopen(descriptor, "wb") as stream:
-            stream.write((canonical_json(record) + "\n").encode("utf-8"))
-            stream.flush()
-            os.fsync(stream.fileno())
+        os.replace(_private_file(stage, _head_bytes(_head(job, 0, None))), stage / HEAD_NAME)
         try:
-            os.link(temporary, final)
-        except FileExistsError:
-            raise ConcurrentReviewError(
-                "requirement review changed since this correction was prepared; reload and retry"
-            ) from None
+            os.rename(stage, folder)
+        except OSError:
+            if not folder.is_dir():
+                raise
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
+
+
+def _write_head(root: Path, folder: Path, job: JobRevision, head: RequirementReviewHead) -> None:
+    """Advance the head atomically; never move it backwards."""
+
+    current = _read_head(root, folder, job)
+    if current.review_revision >= head.review_revision:
+        return
+    temporary = _private_file(folder, _head_bytes(head))
+    try:
+        os.replace(temporary, folder / HEAD_NAME)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _publish(folder: Path, number: int, record: RequirementReviewRevision) -> Path:
+    """Publish once: the exclusive hard link fails if the revision already exists."""
+
+    final = folder / f"v{number:06d}.json"
+    temporary = _private_file(folder, (canonical_json(record) + "\n").encode("utf-8"))
+    try:
+        os.link(temporary, final)
+    except FileExistsError:
+        raise ConcurrentReviewError(
+            "requirement review changed since this correction was prepared; reload and retry"
+        ) from None
     finally:
         temporary.unlink(missing_ok=True)
     return final
@@ -299,7 +396,11 @@ def apply_correction(
     record = record.model_copy(
         update={"revision_digest": model_digest(record, exclude={"revision_digest"})}
     )
-    path = _publish(_folder(root, state.job.job_id, state.job.revision), number, record)
+    folder = _folder(root, state.job.job_id, state.job.revision)
+    if not folder.exists():
+        _create_folder(root, state.job, folder)
+    path = _publish(folder, number, record)
+    _write_head(root, folder, state.job, _head(state.job, number, record.revision_digest))
     stored = load_review(state.job.job_id, revision=state.job.revision, data_root=root)
     if stored.view.view_digest != result.view_digest:
         raise ReviewError("stored requirement review does not reproduce its result")

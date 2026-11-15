@@ -229,11 +229,18 @@ negated (`not_required`), carry an uninterpreted negation or no structure
 
 Each correction is stored once as
 `jobs/<job_id>/requirement-reviews/r<job revision>/v<n>.json`, recording the
-reviewer, UTC time, JD record and raw digests, classification digest, base
-revision and view digests, the operations and the resulting view digest.
-Loading re-verifies the JD, rebuilds the classification and replays the chain;
-a gap, foreign file, edited or re-signed record, changed JD text or changed
-rules output fails with exit 2. A correction must name the review state it was
+reviewer, UTC time (other offsets are refused), JD record and raw digests,
+classification digest, base revision and view digests, the operations and the
+resulting view digest. A small `head.json` (created with the folder, advanced
+atomically after each publication) records the expected revision count and the
+last revision digest. Loading re-verifies the JD, rebuilds the classification
+and replays the chain; a gap, missing tail or head, foreign file, edited or
+re-signed record, changed JD text or changed rules output fails with exit 2. A
+head one revision behind a valid newer revision (a crash between publishing and
+acknowledging) is accepted and caught up by the next correction. Deleting the
+entire review folder cannot be detected; the job then shows its unreviewed
+draft, which never yields a hard gate. Hashes detect accidental or partial
+changes, not a deliberate rewrite by the local account owner (ADR-012). A correction must name the review state it was
 prepared against, so two reviewers cannot both extend the same state, and a
 newer JD revision starts unreviewed while older reviews remain historical and
 read-only. Limits: negation and duplicate groups are rule observations that

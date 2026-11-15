@@ -9,7 +9,7 @@ over the deterministic draft. Nothing here is a career fact or a match.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Annotated, Literal
 
 from pydantic import Field, field_validator, model_validator
@@ -121,15 +121,38 @@ class RequirementReviewRevision(StrictModel):
 
     @field_validator("reviewed_at")
     @classmethod
-    def timestamp_is_aware(cls, value: datetime) -> datetime:
-        if value.tzinfo is None or value.utcoffset() is None:
-            raise ValueError("reviewed_at requires a timezone")
+    def timestamp_is_utc(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() != timedelta(0):
+            raise ValueError("reviewed_at must be a UTC timestamp")
         return value
 
     @model_validator(mode="after")
     def chain_start(self) -> RequirementReviewRevision:
         if (self.review_revision == 1) != (self.base_revision_digest is None):
             raise ValueError("only the first review revision has no base revision")
+        return self
+
+
+class RequirementReviewHead(StrictModel):
+    """The acknowledged end of one review history.
+
+    Revision files are immutable; this small record is replaced (atomically)
+    after each publication, so a missing tail, a missing only revision or a
+    re-signed last revision no longer matches it. Interior changes already
+    break the hash chain.
+    """
+
+    schema_version: Literal["1.0"] = "1.0"
+    job_id: StableId
+    job_revision: int = Field(strict=True, ge=1, le=999999)
+    review_revision: int = Field(strict=True, ge=0, le=999999)
+    revision_digest: Sha256 | None
+    head_digest: Sha256
+
+    @model_validator(mode="after")
+    def empty_head(self) -> RequirementReviewHead:
+        if (self.review_revision == 0) != (self.revision_digest is None):
+            raise ValueError("a head digest exists exactly when revisions exist")
         return self
 
 

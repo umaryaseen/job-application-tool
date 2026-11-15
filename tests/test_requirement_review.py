@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -279,7 +279,7 @@ def test_racing_writer_loses_at_the_exclusive_link(root: Path, monkeypatch) -> N
     with pytest.raises(ConcurrentReviewError):
         apply(root, fix)
     folder = root / "jobs/synthetic-role/requirement-reviews/r000001"
-    assert sorted(p.name for p in folder.iterdir()) == ["v000001.json"]
+    assert sorted(p.name for p in folder.iterdir()) == ["head.json", "v000001.json"]
 
 
 def test_changed_jd_invalidates_prior_review(root: Path) -> None:
@@ -583,3 +583,106 @@ def test_cli_shows_review_and_applies_a_private_correction(root: Path, monkeypat
     assert "reload and retry" in capsys.readouterr().err
     assert main(["job-review", "--job-id", "synthetic-role"]) == 0
     assert json.loads(capsys.readouterr().out)["hard_gate_ids"] == [python["candidate_id"]]
+
+
+# Round 1 review: F-01 (tail loss), F-02 (re-signed last revision), F-03 (UTC).
+def _head_path(root: Path) -> Path:
+    return _stored(root).parent / "head.json"
+
+
+@pytest.mark.parametrize(
+    "tamper",
+    [
+        lambda root: _stored(root, 2).unlink(),  # newest tail missing
+        lambda root: (_stored(root, 2).unlink(), _stored(root).unlink()),  # all files, head kept
+        lambda root: _head_path(root).unlink(),  # head missing
+        lambda root: _head_path(root).write_text(
+            _head_path(root).read_text().replace('"review_revision":2', '"review_revision":1')
+        ),  # head edited without its digest
+        lambda root: _head_path(root).write_text("{}"),
+        lambda root: _head_path(root).rename(_head_path(root).with_name("old-head.json")),
+    ],
+)
+def test_missing_tail_head_or_history_fails(root: Path, tamper) -> None:
+    _accept_docker_then_terraform(root)
+    tamper(root)
+    with pytest.raises(ReviewError):
+        load_review("synthetic-role", data_root=root)
+
+
+def test_deleting_the_only_revision_fails(root: Path) -> None:
+    state = load_review("synthetic-role", data_root=root)
+    apply(root, correction(state, accept(rows_by_quote(state)["Docker."])))
+    _stored(root).unlink()
+    with pytest.raises(ReviewError, match="head"):
+        load_review("synthetic-role", data_root=root)
+
+
+def test_resigned_last_revision_metadata_fails(root: Path) -> None:
+    state = load_review("synthetic-role", data_root=root)
+    row = state.view.rows[0]
+    apply(root, correction(state, {"op": "reopen", "candidate_id": row.candidate_id}))
+    # The view is unchanged by reopen, so only the head can expose a new actor/time.
+    for change in ({"reviewer_id": "reviewer-z"}, {"reviewed_at": T0 + timedelta(hours=1)}):
+        original = _stored(root).read_bytes()
+        _resign(_stored(root), **change)
+        with pytest.raises(ReviewError, match="head"):
+            load_review("synthetic-role", data_root=root)
+        _stored(root).write_bytes(original)
+    assert load_review("synthetic-role", data_root=root).view.review_revision == 1
+
+
+def test_head_lagging_by_one_valid_revision_is_a_recoverable_crash(root: Path, monkeypatch) -> None:
+    state = load_review("synthetic-role", data_root=root)
+    rows = rows_by_quote(state)
+    apply(root, correction(state, accept(rows["Docker."])))
+    state = load_review("synthetic-role", data_root=root)
+    with monkeypatch.context() as patch:
+        patch.setattr(store, "_write_head", lambda *args: None)  # crash before acknowledgement
+        apply(root, correction(state, accept(rows["Terraform experience."])), minutes=1)
+    lagging = load_review("synthetic-role", data_root=root)
+    assert lagging.view.review_revision == 2
+    assert json.loads(_head_path(root).read_text())["review_revision"] == 1
+    # A second unacknowledged revision is not a crash state: publication verification
+    # and every later load fail closed.
+    with monkeypatch.context() as patch:
+        patch.setattr(store, "_write_head", lambda *args: None)
+        python = rows["Python or Java is required."]
+        with pytest.raises(ReviewError, match="head"):
+            apply(root, correction(lagging, accept(python)), minutes=2)
+    with pytest.raises(ReviewError, match="head"):
+        load_review("synthetic-role", data_root=root)
+
+
+def test_next_publication_acknowledges_a_lagging_head(root: Path, monkeypatch) -> None:
+    state = load_review("synthetic-role", data_root=root)
+    rows = rows_by_quote(state)
+    with monkeypatch.context() as patch:
+        patch.setattr(store, "_write_head", lambda *args: None)
+        apply(root, correction(state, accept(rows["Docker."])))
+    assert json.loads(_head_path(root).read_text())["review_revision"] == 0
+    state = load_review("synthetic-role", data_root=root)
+    apply(root, correction(state, accept(rows["Terraform experience."])), minutes=1)
+    assert json.loads(_head_path(root).read_text())["review_revision"] == 2
+
+
+def test_removing_the_whole_review_store_returns_the_ungated_draft(root: Path) -> None:
+    _accept_docker_then_terraform(root)
+    import shutil
+
+    shutil.rmtree(_stored(root).parent)
+    state = load_review("synthetic-role", data_root=root)
+    assert state.view.review_revision == 0 and hard_gates(state.view) == []
+    assert all(row.review_state == "draft" for row in state.view.rows)
+
+
+@pytest.mark.parametrize(
+    "when",
+    [datetime(2026, 11, 15, 14, tzinfo=timezone(timedelta(hours=2))), datetime(2026, 11, 15, 12)],
+)
+def test_review_time_must_be_utc(root: Path, when: datetime) -> None:
+    state = load_review("synthetic-role", data_root=root)
+    fix = correction(state, {"op": "reopen", "candidate_id": state.view.rows[0].candidate_id})
+    with pytest.raises(ReviewError, match="time"):
+        apply_correction(fix, reviewer_id="reviewer-a", reviewed_at=when, data_root=root)
+    assert not _stored(root).exists()
