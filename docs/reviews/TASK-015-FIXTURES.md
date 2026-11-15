@@ -95,3 +95,111 @@ The language, credential, degree and authorization labels also follow the writte
 The positive parts are sound: approved facts are required; draft/revoked records are ignored; language assessments are typed and never converted; authorization is exact and never inferred from residence/location/nationality; role text does not upgrade seniority; part-time duration is calendar time without FTE scaling; and interval unions count overlap once while preserving gaps and unknown dates. All literals are synthetic (`synthetic-person`, `synthetic-employer`, `synthetic-project`, synthetic credential/education names); no applicant names, contacts, URLs, secrets or external source captures appear. The report does not approve an implementation or any applicant facts.
 
 The high findings must be resolved in the fixture/rules before implementation can use this file as a complete TASK-015 oracle. After corrections, rerun the independent recomputation, JSON/invariant checks and the eventual focused evaluator; then request a fresh independent review of the new commit.
+
+## Round 2 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning
+  `xhigh`, read-only review (writes only to a temporary directory) of a
+  throwaway detached checkout of `5bf2123`, no network, session
+  `01a1e057-05ec-7f93-871d-dacf218dca9c`. Tracked files unchanged; exit 0.
+- The report below is verbatim, except that 3 header lines ending in Markdown
+  hard-break spaces were turned into list items for whitespace checks.
+  Follow-ups F-01..F-03 are applied in the next
+  commit (authorization statement-date precision with month/year cases; the
+  months-only duration API stated and a tested threshold adapter; the as-of
+  intersection stated for known ends with a non-last-day boundary case) and
+  are checked in the implementation review.
+
+## Round 2 report
+
+VERDICT: APPROVED WITH FOLLOW-UP
+
+# TASK-015 fixture oracle review, round 2
+
+- Reviewer: Codex independent fixture reviewer, separate from the Claude Code fixture author.
+- Date: 2026-11-15.
+- Commit reviewed: `5bf2123286f1729e61911730ad761bba029e3b8a` (detached checkout).
+Review scope: `tests/fixtures/matching/README.md` and `tests/fixtures/matching/constraints.json`, read against `docs/REVIEW_HANDOFF.md`, `AGENTS.md`, `docs/REVIEW_PROTOCOL.md`, TASK-015, A07/A22/A23, ADR-007, ADR-011, the matching/tailoring and typed-fact sections of `docs/ARCHITECTURE.md`, `fact.py`, `common.py`, and the normalization modules. No evaluator exists in this checkout.
+
+## Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --porcelain=v1` | 0 | Clean checkout; no tracked or untracked changes. |
+| `git rev-parse HEAD` | 0 | Reviewed commit is `5bf2123286f1729e61911730ad761bba029e3b8a`. |
+| `git diff --check HEAD^ HEAD` | 0 | No whitespace errors. |
+| `git diff --name-status HEAD^ HEAD` | 0 | Handoff/review documentation, TASK-015 clarification, README and constraints fixture only; no implementation code. |
+| `python3 -m json.tool tests/fixtures/matching/constraints.json >/dev/null` | 0 | JSON parses. |
+| `python3 /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-015-fx2-tmp/recompute_round2.py` | 0 | Independent standard-library evaluator; all 88 complete expected objects matched, 0 mismatches. It did not import repository matching code. |
+| `python3 /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-015-fx2-tmp/scan_round2.py` | 0 | 88 unique case IDs, 25 unique base fact IDs, sorted fact-ID assertions, valid synthetic scan, no email or URL. |
+| `python3 -m pytest --version` | 1 | Pytest is unavailable (`No module named pytest`); no TASK-015 evaluator can be run. |
+| `uv --version` | 127 | `uv` is unavailable; no dependency installation was attempted. |
+
+The review read no private data directory, home directory, other worktree, or network resource. The only generated files are the two reviewer scripts and this report under the permitted temporary directory.
+
+## Independent recomputation
+
+The script independently applied the written rules: NFC/whitespace/casefold name matching; German/Deutsch concept identity; approved-only filtering; CEFR ordering without IELTS, native, or self-description conversion; credential UTC-expiry and valid-through boundaries; awarded-date earliest/latest precision; degree completion precision and precedence; authorization matching, as-of and expiry precedence; and per-interval lower/upper month sets intersected with the as-of cutoffs before unioning. It compared state, rationale, sorted `fact_ids`, all duration bounds, and every exclusion for every row.
+
+The 88 cases break down as follows:
+
+| Constraint family | Cases | Direct | Explicitly unmet | Unknown | No evidence |
+|---|---:|---:|---:|---:|---:|
+| Language | 15 | 5 | 4 | 5 | 1 |
+| Credential | 21 | 8 | 8 | 4 | 1 |
+| Degree | 12 | 3 | 5 | 3 | 1 |
+| Authorization | 12 | 4 | 0 | 8 | 0 |
+| Duration | 28 | 10 | 0 | 12 | 6 |
+
+The expected duration results recomputed as follows. A dash means an empty list/map.
+
+| Case | State / rationale | Lower/upper months | Contributing facts | Exclusions |
+|---|---|---:|---|---|
+| `dur-overall-5y` | direct / duration_meets | 83/86 | emp-a, emp-b, emp-c | emp-d: unknown_start |
+| `dur-overall-7y-overlap-counted-once` | unknown / precision_insufficient | 83/86 | emp-a, emp-b, emp-c | emp-d: unknown_start |
+| `dur-overall-8y-below` | unknown / below_threshold_with_unknown_intervals | 83/86 | emp-a, emp-b, emp-c | emp-d: unknown_start |
+| `dur-overall-pinned-as-of` | direct / duration_meets | 12/13 | emp-a | emp-b: starts_after_as_of; emp-c: starts_after_as_of; emp-d: unknown_start |
+| `dur-overall-only-unknown-dates` | unknown / only_unknown_dates | 0/0 | — | emp-a/b/c: starts_after_as_of; emp-d: unknown_start |
+| `dur-python-meets` | direct / duration_meets | 13/15 | proj-1, proj-3 | proj-4: unknown_start |
+| `dur-python-below` | unknown / below_threshold_with_unknown_intervals | 13/15 | proj-1, proj-3 | proj-4: unknown_start |
+| `dur-sql-meets-unknown-end-excluded` | direct / duration_meets | 10/12 | proj-1 | proj-6: unknown_end |
+| `dur-sql-precision` | unknown / precision_insufficient | 10/12 | proj-1 | proj-6: unknown_end |
+| `dur-pytorch-precision` | unknown / precision_insufficient | 10/12 | proj-2 | — |
+| `dur-deep-learning-is-not-pytorch` | no_evidence / no_scoped_interval | 0/0 | — | — |
+| `dur-kubernetes-none` | no_evidence / no_scoped_interval | 0/0 | — | — |
+| `dur-docker-only-unknown` | unknown / only_unknown_dates | 0/0 | — | proj-5: unknown_start |
+| `dur-role-exact` | direct / duration_meets | 33/34 | emp-b | — |
+| `dur-role-normalized` | direct / duration_meets | 33/34 | emp-b | — |
+| `dur-role-senior-not-inferred` | no_evidence / no_scoped_interval | 0/0 | — | — |
+| `dur-role-starts-after-as-of` | no_evidence / no_scoped_interval | 0/0 | — | emp-c: starts_after_as_of |
+| `dur-part-time-is-calendar-time` | direct / duration_meets | 36/38 | emp-c | — |
+| `dur-day-start-after-as-of-same-month` | no_evidence / no_scoped_interval | 0/0 | — | emp-intern: starts_after_as_of |
+| `dur-day-start-before-as-of-same-month` | unknown / precision_insufficient | 0/1 | emp-trainee | — |
+| `dur-known-end-after-as-of-is-cut` | direct / duration_meets | 2/3 | emp-contract | — |
+| `dur-year-precision-short` | unknown / precision_insufficient | 0/24 | emp-ra | — |
+| `dur-year-precision-meets` | direct / duration_meets | 36/60 | emp-le | — |
+| `dur-year-precision-uncertain` | unknown / precision_insufficient | 36/60 | emp-le | — |
+| `dur-python-periodless-facts-never-add-time` | direct / duration_meets | 13/15 | proj-1, proj-3 | proj-4: unknown_start |
+| `dur-exposure-skill-is-not-duration` | no_evidence / no_scoped_interval | 0/0 | — | — |
+| `dur-pytorch-documented-below` | unknown / documented_below_threshold | 10/12 | proj-2 | — |
+| `dur-role-documented-below` | unknown / documented_below_threshold | 33/34 | emp-b | — |
+
+The typed rows also matched exactly. In particular, the corpus exercises CEFR below/equal/above and unspecified levels; IELTS and self-description without conversion; draft/revoked filtering; credential expiry, timezone conversion, in-progress, unknown, and future award precision; degree ongoing/completed/withdrawn/unknown and multi-fact precedence; authorization scope/country, absence, location non-inference, status unknown, expiry and as-of; and direct-result versus non-direct `fact_ids` semantics.
+
+The interval arithmetic is consistent: employment unions are 83/86 after counting emp-a/emp-b overlap once and retaining the gap before emp-c; Python projects are 13/15 after counting proj-1/proj-3 overlap once; SQL and PyTorch are 10/12; Software Engineer is 33/34; the ongoing Working Student is 36/38; year-precision contributors produce 0/24 and 36/60; and the pinned 2019-01-31 case is 12/13. No interval is summed twice, and no period-less responsibility, skill, study, exposure, or education fact adds time.
+
+## Findings
+
+| ID | Severity | Location | Finding | Suggested correction |
+|---|---|---|---|---|
+| F-01 | medium | `tests/fixtures/matching/README.md:84-96`; `src/job_application_engine/domain/common.py:30-56`; authorization cases | Authorization `as_of` precision is only defined for the case where its earliest possible day is later than the evaluation date. A month/year statement whose possible interval contains the evaluation date has no rule or fixture. This is inconsistent with the explicit interval-precision treatment for credential awards and degree completion and can let a statement become `direct` while its effective date may be later than `as_of`. | Define the containing-interval result explicitly (prefer an `unknown` precision rationale unless earliest-only semantics are deliberate), then add month and year boundary cases. |
+| F-02 | medium | `tests/fixtures/matching/README.md:97-115`; `src/job_application_engine/domain/requirement.py:133-168` | The fixture constraint is `{months, scope}` only, while TASK-012's duration threshold model accepts integer `years` or `months` and operators (`gte`, `gt`, `range`, `unqualified`). No case or rule says that this oracle receives thresholds pre-normalized to months, so an implementation can pass all 28 duration rows while mishandling a `5 years` or non-default operator requirement. | Either state that the fixture API is pre-normalized to `months` and add an adapter test such as 5 years → 60 months, or extend the fixture constraint and expected semantics to carry unit/operator cases. |
+| F-03 | low | `tests/fixtures/matching/README.md:112-115`; `constraints.json:dur-known-end-after-as-of-is-cut` | The expected 2/3-month result for a known interval ending 2026-11-30 evaluated on 2026-11-15 requires the as-of intersection to cap known ends as well as ongoing ends. The prose starts this rule with “Ongoing end is the as_of day” and does not explicitly say that the subsequent lower/upper intersection applies to every known-end interval. | Say directly that every candidate's lower and upper sets, including known ends, are intersected with the lower/upper as-of cutoffs; retain the current known-end case and add a known non-last-day end boundary. |
+
+These are bounded rule/coverage follow-ups; they do not change any current expected object. The round-one findings about A22 scope, duration uncertainty rationale, year-precision contributors, period-less exclusions, multi-fact precedence, and future credential awards are addressed in this revision.
+
+## Architecture, factuality, security and synthetic-data assessment
+
+The rules preserve the required safety boundaries. Only approved facts contribute; draft and revoked facts are ignored. IELTS, native/self-description, residence/location/nationality, role wording, and “Working Student” do not manufacture CEFR level, authorization, seniority, or FTE. Overlapping intervals are unioned once, gaps are not bridged, and incomplete dates yield uncertainty or no evidence rather than a negative. Credential and degree states are explicit facts; duration below a documented threshold remains `unknown`, never `explicitly_unmet`.
+
+The fixture is synthetic: subject and entity identifiers are `synthetic-*`, labels use synthetic employers/projects/credentials/schools, and the scan found no email address, URL, or personal name. No secrets, source captures, or applicant records are present.

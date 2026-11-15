@@ -88,13 +88,19 @@ currency) is not part of TASK-015.
    `status: unknown` → `unknown` / `authorization_status_unknown`. A `known`
    statement matches when its country (and scope, when the constraint states
    one) compare equal. A matching statement whose `as_of` earliest possible day
-   is later than the evaluation `as_of` → `statement_after_as_of`; an expired
-   one (rule 4 expiry) → `authorization_expired_needs_review`; otherwise it is
-   valid. Precedence over all facts: any valid matching statement → `direct` /
+   is later than the evaluation `as_of` → `statement_after_as_of`; whose `as_of`
+   latest possible day is later than the evaluation `as_of` (its period contains
+   it) → `statement_date_precision`; an expired one (rule 4 expiry) →
+   `authorization_expired_needs_review`; otherwise it is valid. Precedence over
+   all facts: any valid matching statement → `direct` /
    `authorization_statement_matches`; else `unknown` with the first that applies
-   of `statement_after_as_of`, `authorization_expired_needs_review`,
-   `authorization_status_unknown`, `no_matching_authorization_statement`.
-7. **Duration** `{months, scope}` with scope `overall` (approved employment),
+   of `statement_after_as_of`, `statement_date_precision`,
+   `authorization_expired_needs_review`, `authorization_status_unknown`,
+   `no_matching_authorization_statement`.
+7. **Duration** `{months, scope}`, with the threshold already expressed as a
+   minimum number of months (converting a TASK-012 threshold's years, months
+   and operator is the caller's step and is tested separately), and scope
+   `overall` (approved employment),
    `skill` (approved projects whose `technologies` contain a whole surface of
    the concept) or `role` (approved employment whose title equals the text).
    Responsibilities, skills without periods and education never contribute.
@@ -109,10 +115,11 @@ currency) is not part of TASK-015.
      last day, else the previous month; upper = that month. Month precision →
      lower = previous month, upper = that month. Year precision → lower =
      December of the previous year, upper = December of that year.
-   - Ongoing end is the `as_of` day (day precision). The lower set is then
-     intersected with all months up to the lower end of the `as_of` day and the
-     upper set with all months up to the `as_of` month. The cutoff only removes
-     months; it never moves a start earlier.
+   - Ongoing end is the `as_of` day (day precision). For every candidate,
+     whether its end is known or ongoing, the lower set is then intersected
+     with all months up to the lower end of the `as_of` day and the upper set
+     with all months up to the `as_of` month. The cutoff only removes months;
+     it never moves a start earlier.
    - Excluded with a reason, checked in this order: unknown start
      (`unknown_start`), unknown end (`unknown_end`), a start whose earliest
      possible day is later than the `as_of` day (`starts_after_as_of`; for a

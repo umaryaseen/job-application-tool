@@ -2461,6 +2461,147 @@
           "cred-fut"
         ]
       }
+    },
+    {
+      "id": "auth-statement-month-contains-as-of",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "as_of": "2026-01-15",
+      "expected": {
+        "state": "unknown",
+        "rationale": "statement_date_precision",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-statement-month-last-day",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "as_of": "2026-01-31",
+      "expected": {
+        "state": "direct",
+        "rationale": "authorization_statement_matches",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-statement-year-contains-as-of",
+      "constraint": {
+        "type": "authorization",
+        "country": "Austria",
+        "scope": null
+      },
+      "as_of": "2026-06-01",
+      "extra_facts": [
+        {
+          "fact_id": "auth-at",
+          "kind": "authorization",
+          "status": "approved",
+          "value": {
+            "status": "known",
+            "country": "Austria",
+            "as_of": {
+              "precision": "year",
+              "year": 2026
+            }
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "statement_date_precision",
+        "fact_ids": [
+          "auth-at",
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-statement-year-ended",
+      "constraint": {
+        "type": "authorization",
+        "country": "Austria",
+        "scope": null
+      },
+      "as_of": "2027-01-01",
+      "extra_facts": [
+        {
+          "fact_id": "auth-at",
+          "kind": "authorization",
+          "status": "approved",
+          "value": {
+            "status": "known",
+            "country": "Austria",
+            "as_of": {
+              "precision": "year",
+              "year": 2026
+            }
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "authorization_statement_matches",
+        "fact_ids": [
+          "auth-at"
+        ]
+      }
+    },
+    {
+      "id": "dur-known-end-non-last-day-after-as-of",
+      "constraint": {
+        "type": "duration",
+        "months": 3,
+        "scope": {
+          "kind": "role",
+          "title": "Seasonal"
+        }
+      },
+      "extra_facts": [
+        {
+          "fact_id": "emp-season",
+          "kind": "employment",
+          "status": "approved",
+          "employer_id": "synthetic-employer",
+          "title": "Seasonal",
+          "period": {
+            "start": {
+              "precision": "day",
+              "year": 2026,
+              "month": 8,
+              "day": 1
+            },
+            "start_state": "known",
+            "end": {
+              "precision": "day",
+              "year": 2026,
+              "month": 11,
+              "day": 20
+            },
+            "end_state": "known"
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "emp-season"
+        ],
+        "lower_months": 3,
+        "upper_months": 4,
+        "excluded": {}
+      }
     }
   ]
 }
