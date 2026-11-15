@@ -3,9 +3,10 @@
 Last reconciled: 2026-11-15 against main `01f3a40` (merged PR #8). TASK-011,
 TASK-012, M1-FIX-006, TASK-013 and M1-FIX-007 are integrated. M1-FIX-008
 (LinkedIn contact label, compact and extended skill groups, QA heading checks)
-is independently approved with follow-up and awaits merge. TASK-009 personal acceptance remains open: the
-applicant's latest decisions are applied privately and the next baseline
-candidate waits on M1-FIX-008; details stay in the private data root.
+is independently approved with follow-up and awaits merge. TASK-009 personal
+acceptance remains open: the applicant's latest decisions are applied privately
+and the next baseline candidate waits on M1-FIX-008; details stay in the
+private data root.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
