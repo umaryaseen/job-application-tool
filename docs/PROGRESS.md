@@ -21,7 +21,7 @@ new personal baseline is generated.
 | Publication state correction | APPROVED, documentation only | [Scoped review](reviews/TASK-009-PUBLICATION-STATE.md); no runtime or approval-policy changes |
 | TASK-011 | Reviewed and merged into main through PR #4 | [Implementation review](reviews/TASK-011.md), [guide](JOB_EXTRACTION.md), merge `f6a3bf0` |
 | TASK-012 | Reviewed and merged into main through PR #5 | [Review](reviews/TASK-012.md) round 11 APPROVED on `07375b1`; documentation closure `065d89e` scoped review APPROVED (Codex session `01a1db73-cb5f-7501-8cc2-4e2f10a55c05`); merge `ee59069` |
-| M1-FIX-006 | CORRECTED — AWAITING RE-REVIEW | [Task](tasks/M1-FIX-006.md), [review](reviews/M1-FIX-006.md) round 1 CHANGES REQUIRED (F-01), [handoff](REVIEW_HANDOFF.md) |
+| M1-FIX-006 | APPROVED — AWAITING MERGE | [Task](tasks/M1-FIX-006.md), [review](reviews/M1-FIX-006.md) round 2 APPROVED on `591b339`; CI 43666629755 success |
 | TASK-013–020 | NOT IMPLEMENTED | Skill aliases, review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -67,7 +67,7 @@ section scope and lexical hints, all draft with unspecified priority, verified
 by an independently reviewed 16 EN/16 DE oracle and hosted CI. Detailed
 evidence lives in each linked review.
 
-## M1-FIX-006 implementation (awaiting review)
+## M1-FIX-006 implementation (approved, awaiting merge)
 
 Adds optional `expected_completion_date` and `specialization` to education
 facts. An expected date requires an ongoing degree without a known end, may not
@@ -94,7 +94,9 @@ before its start) through `validate_profile` and the review operation. Both
 trusted boundaries now re-validate each fact, evidence and variant's content
 invariants (status/approval neutralized, reported separately as before), and
 the review operation refuses to issue a receipt for invalid content. Three
-regressions fail on `ae6c461` and pass now. Full suite: 474 passed.
+regressions fail on `ae6c461` and pass now. Full suite: 474 passed. Review
+round 2 on `591b339` returned APPROVED with no unresolved findings; hosted CI
+43666629755 passed on that head.
 
 ## TASK-012 implementation (merged)
 
@@ -241,8 +243,8 @@ not interpreted.
 
 ## Next action
 
-Obtain independent review of M1-FIX-006, then prepare the corrected private
-content revision and new baseline for applicant review. TASK-013 (reviewed
+Merge reviewed M1-FIX-006 (PR #6), then write the corrected private content
+revision and generate the new baseline for applicant review. TASK-013 (reviewed
 skill aliases) proceeds on its own branch. Then TASK-013
 (reviewed skill aliases, separate from lexical extraction) and TASK-014
 (source-bound correction/review versions). Separately, TASK-009 waits on

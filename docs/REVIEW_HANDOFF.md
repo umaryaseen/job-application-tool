@@ -1,5 +1,17 @@
 # Review handoff: M1-FIX-006 expected completion, specialization, display headings
 
+**Status: APPROVED** in round 2 on `591b339` (tree `c4799dea`); hosted CI
+43666629755 passed. See [the review](reviews/M1-FIX-006.md).
+
+## Scoped closure check (pending)
+
+The only change after `591b339` is this documentation closure: the round-2
+report appended to `docs/reviews/M1-FIX-006.md`, PROGRESS and this handoff.
+Confirm no runtime, test, fixture, schema, dependency or workflow file changed
+and the records are faithful. Do not repeat runtime reviews.
+
+## Historical review scope
+
 Implementer: Claude Code. Independent reviewer: a separate Codex session.
 Base: main `ee590699b49077a1cd61161caa679f104b99b659`. Branch:
 `task/009-m1-fix-006`. Review the exact candidate commit supplied with this
