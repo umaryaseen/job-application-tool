@@ -1,33 +1,13 @@
 # Review handoff: TASK-015 scoped constraints and experience intervals
 
-Implementer: Claude Code. Independent reviewer: a separate Codex session.
-Base: main `e88546e`. Branch: `task/015-constraints-durations`. TASK-014 is
-merged.
+**Status: APPROVED — AWAITING MERGE** (round 2 on `223eeff`). See
+[the review](reviews/TASK-015.md) and the
+[fixture review](reviews/TASK-015-FIXTURES.md).
 
-Read AGENTS, PROGRESS, [the task](tasks/TASK-015.md) (including its
-clarifications), A07/A22/A23, ADR-007, ADR-011, ARCHITECTURE (matching,
-language, authorization, years), REVIEW_PROTOCOL, SECURITY_AND_PRIVACY,
-[the guide](MATCHING.md) and the [fixture review](reviews/TASK-015-FIXTURES.md).
+## Scoped closure check (pending)
 
-The oracle `tests/fixtures/matching/` was reviewed before implementation
-(round 2 APPROVED WITH FOLLOW-UP); follow-ups F-01..F-03 were added afterwards
-in their own commit and must be checked here: authorization statement-date
-precision (`statement_date_precision`, month/year cases), the months-only
-duration API with `months_from_threshold`, and the as-of intersection for known
-ends (non-last-day case). Focus: that the evaluator implements exactly the
-README rules; no inference of language level, authorization, seniority or FTE;
-duration bounds, unions, exclusions and cutoffs (including day-level starts,
-extreme years and many intervals); multi-fact precedence and `fact_ids`;
-expiry in UTC; validation of the profile before evaluation; and that unknown
-data is never turned into a negative. Record findings and one verdict in
-`docs/reviews/TASK-015.md` without modifying implementation.
-
-## Round 2 request
-
-Round 1 ([report](reviews/TASK-015.md)) found F-01: language identity accepted
-any TASK-013 concept, including ambiguous and technology aliases. Identity now
-comes only from an exact concept of kind `language`, or from the normalized
-name of a surface no alias covers; a constraint naming an ambiguous or
-non-language term raises `ConstraintError`, and such a fact never matches. A
-duration skill scope may not name a language concept. Review the delta from
-`4cc18ef`.
+After `223eeff` the branch only adds a documentation closure: the verbatim
+round-2 report with provenance (including hosted CI run `43747494384` on
+`223eeff`), the PROGRESS status and next action, and this handoff. Confirm the
+delta introduces no code and the records are accurate; do not repeat runtime
+reviews.

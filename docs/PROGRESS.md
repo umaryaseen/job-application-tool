@@ -3,7 +3,7 @@
 Last reconciled: 2026-11-15 against main `e88546e` (merged PR #10). TASK-011,
 TASK-012, M1-FIX-006, TASK-013, M1-FIX-007, M1-FIX-008 and TASK-014 are
 integrated. TASK-015 (scoped constraints and experience intervals) is
-implemented and awaits independent review. TASK-009 personal acceptance
+independently approved and awaits merge. TASK-009 personal acceptance
 remains open: a baseline candidate built from merged code awaits applicant
 review; details stay in the private data root.
 
@@ -26,7 +26,7 @@ review; details stay in the private data root.
 | M1-FIX-007 | Reviewed and merged into main through PR #8 | [Task](tasks/M1-FIX-007.md); [review](reviews/M1-FIX-007.md) round 2 APPROVED WITH FOLLOW-UP on `b906a7f`; follow-ups closed; merge `01f3a40` |
 | M1-FIX-008 | Reviewed and merged into main through PR #9 | [Task](tasks/M1-FIX-008.md); [review](reviews/M1-FIX-008.md) round 4 APPROVED WITH FOLLOW-UP on `1f380f7`; follow-ups closed; closure check APPROVED; merge `5cdc022` |
 | TASK-014 | Reviewed and merged into main through PR #10 | [Review](reviews/TASK-014.md) round 5 APPROVED on `1aa8221`; closure check APPROVED; merge `e88546e`; [guide](JOB_EXTRACTION.md#review-and-correct-requirements) |
-| TASK-015 | IMPLEMENTED — AWAITING REVIEW | [Fixture review](reviews/TASK-015-FIXTURES.md) round 2 APPROVED WITH FOLLOW-UP; [guide](MATCHING.md); branch `task/015-constraints-durations` |
+| TASK-015 | APPROVED — AWAITING MERGE | [Review](reviews/TASK-015.md) round 2 APPROVED on `223eeff`, hosted CI `43747494384`; [fixture review](reviews/TASK-015-FIXTURES.md) round 2 APPROVED WITH FOLLOW-UP, follow-ups applied and checked; [guide](MATCHING.md) |
 | TASK-016–020 | NOT IMPLEMENTED | Match states, coverage and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -104,7 +104,7 @@ regressions fail on `ae6c461` and pass now. Full suite: 474 passed. Review
 round 2 on `591b339` returned APPROVED with no unresolved findings; hosted CI
 43666629755 passed on that head.
 
-## TASK-015 implementation (awaiting review)
+## TASK-015 implementation (approved, awaiting merge)
 
 Adds the `matching` library: typed language, credential, degree, authorization
 and duration constraints evaluated against approved facts at a pinned `as_of`
@@ -339,11 +339,10 @@ not interpreted.
 
 ## Next action
 
-Independent implementation review of TASK-015 against
-`docs/REVIEW_PROTOCOL.md`, including the fixture follow-ups F-01..F-03 added
-after fixture approval. Then TASK-016 (match states, coverage and mapping of
-reviewed requirements). TASK-009 waits on the applicant's review of the
-candidate built from merged code; final artifact approval and export stay
-separate. Before any downstream feature makes `source_url` clickable or
-fetchable, validate allowed URL schemes (F-02). Personal records stay outside
-Git and CI; no matching, tailoring, export or application occurs.
+Merge reviewed TASK-015 (PR #11) after its scoped closure check and final-head
+CI. Then TASK-016 (match states, coverage and mapping of reviewed
+requirements). TASK-009 waits on the applicant's review of the candidate built
+from merged code; final artifact approval and export stay separate. Before any
+downstream feature makes `source_url` clickable or fetchable, validate allowed
+URL schemes (F-02). Personal records stay outside Git and CI; no matching,
+tailoring, export or application occurs.

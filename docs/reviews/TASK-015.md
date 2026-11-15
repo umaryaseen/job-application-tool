@@ -80,3 +80,81 @@ Fix TASK-015 review finding F-01 only.
 - Acceptance: sanitized regressions for ambiguous `Spark` and non-language `AWS`/`Amazon Web Services` return `no_evidence` (or literal-name behavior only where both surfaces are genuinely unmatched), while `German`/`Deutsch` remains one language concept; focused oracle and independent randomized probes remain green.
 - Tests to retain/add/run: focused TASK-015 suite, full suite in hosted macOS CI, Ruff, format, mypy and diff checks; rerun the independent ambiguity and concept-kind probes.
 - Non-goals: no matcher redesign, no TASK-016 semantic matching, no weakening of alias or profile validation.
+
+## Round 2 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning
+  `xhigh`, sandbox `workspace-write` on a throwaway detached checkout of
+  `223eeff` plus a dedicated temporary directory, no network, session
+  `01a1e07d-201a-7151-93e1-5638406831ff`. Tracked files unchanged; exit 0.
+- Hosted CI on `223eeff`: run `43747494384` success (renderer coverage).
+- The report below is verbatim.
+
+## Round 2 report
+
+VERDICT: APPROVED
+
+# TASK-015 independent implementation review — round 2
+
+- Reviewer: Codex, independent implementation reviewer in a separate session from the Claude Code implementer.
+- Date: 2026-11-15.
+- Base: `4cc18efa6b7686a65794afc7c3fc76a31726f40d` (tree `73dd126cca85d0b4ea491d221d83edcf29702418`).
+- Candidate: `223eeffc6421fb4ddef115103cbb8e11a273cdd0` (tree `51bf64bfa71ea696e2ce1933705eda9c3a1332d8`).
+- Review checkout: detached candidate checkout; clean before and after review. Tracked files were not modified.
+- Scope: `git diff 4cc18efa6b7686a65794afc7c3fc76a31726f40d..223eeffc6421fb4ddef115103cbb8e11a273cdd0`.
+
+## Artifacts inspected
+
+Read the repository instructions, `docs/PROGRESS.md`, `docs/REVIEW_HANDOFF.md`, `docs/REVIEW_PROTOCOL.md`, `docs/tasks/TASK-015.md`, the relevant matching/language/authorization/years sections of `docs/ARCHITECTURE.md`, A07/A22/A23 in `docs/ACCEPTANCE_CRITERIA.md`, `docs/SECURITY_AND_PRIVACY.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/adr/ADR-007.md`, `docs/adr/ADR-011.md`, `docs/MATCHING.md`, `docs/reviews/TASK-015-FIXTURES.md`, `tests/fixtures/matching/README.md`, the full round-1 report in `docs/reviews/TASK-015.md`, the candidate diff, `src/job_application_engine/matching/constraints.py`, `src/job_application_engine/normalization/aliases.py`, `src/job_application_engine/normalization/dictionary.py`, and `tests/test_constraints.py`.
+
+The candidate change is limited to the reviewed F-01 correction: exact language concepts are the only concept-backed language identity; unmatched surfaces use normalized names; ambiguous and non-language aliases are rejected as language constraints and cannot match language facts; language concept IDs are rejected as duration skill scopes; focused regressions and documentation are added.
+
+## Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch`; `git rev-parse HEAD^{tree}`; base/candidate tree checks | 0 | Detached candidate checkout; clean before and after; candidate tree `51bf64bfa71ea696e2ce1933705eda9c3a1332d8`. |
+| `git diff --stat 4cc18efa6b7686a65794afc7c3fc76a31726f40d..223eeffc6421fb4ddef115103cbb8e11a273cdd0` | 0 | 6 files changed, 170 insertions, 13 deletions. The runtime delta is `constraints.py`; the rest is focused tests and documentation/review handoff. |
+| `.venv/bin/python -m pytest tests/test_constraints.py -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-015-r2-tmp/pytest` | 0 | **122 passed, 0 failed, 0 skipped** in 4.34 s. |
+| `PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-015-r2-tmp/pytest-full` | 1 | **818 passed, 29 failed, 0 skipped** in 113.58 s. Every failure is in pre-existing renderer/QA coverage requiring nested `sandbox-exec`, offline Typst/RenderCV, or host Poppler/pypdf tool verification unavailable in this checkout; no TASK-015 matching test failed. Hosted CI is the required environment for these renderer checks. |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed. |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 92 files already formatted. |
+| `.venv/bin/mypy src --cache-dir /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-015-r2-tmp/mypy` | 0 | No issues in 56 source files. |
+| `git diff --check 4cc18efa6b7686a65794afc7c3fc76a31726f40d..223eeffc6421fb4ddef115103cbb8e11a273cdd0` | 0 | No whitespace errors. |
+| `.venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-015-r2-tmp/round2_probe.py` | 0 | Independent probe harness passed; counts are recorded below. It created only temporary files under the permitted review temp directory. |
+
+The 29 full-suite failures were:
+
+- `tests/rendering/test_pdf_qa.py`: `test_real_production_pdf_complete_content_and_geometry[False]`, `[True]`; `test_actual_negative_pdf_fails_for_intended_reason[wrong_scope-check_ids9]`, `[hidden-check_ids13]`; `test_adversarial_control_is_valid_and_empty_denominators_are_null`; `test_missing_tool_is_not_a_pass[pdftotext]`, `[pdftoppm]`, `[pypdf]`; `test_visual_observation_is_explicit_and_hash_bound`; `test_qa_module_command_records_unchecked_visuals` (10).
+- `tests/test_m1_fix.py`: `test_m1_real_pdf_qa_and_snapshot_export_preserve_claims`, `test_m1_cli_build_forwards_required_support_captures` (2).
+- `tests/test_m1_fix004.py`: `test_real_no_project_pdf_has_no_project_heading_or_extra_page`, `test_real_over_capacity_pdf_preserves_content_without_shrinking`, `test_exact_review_long_contact_url_fails_before_publication`, `test_fitting_contact_url_is_complete_in_both_extractors`, `test_over_width_contact_url_fails_with_bounded_diagnostic` (5).
+- `tests/test_m1_fix006.py`: `test_real_pdf_extracts_expected_completion_specialization_and_headings` (1).
+- `tests/test_m1_fix007.py`: `test_over_width_trailing_slash_token_fails_before_publication`, `test_real_pdf_keeps_slash_compounds_complete_in_both_extractors`, `test_unbreakable_slash_compound_fails_before_publication` (3).
+- `tests/test_m1_fix008.py`: `test_over_width_linkedin_url_fails_before_publication`, `test_real_pdf_compact_groups_and_linkedin_extract_exactly` (2).
+- `tests/test_rendering.py`: `test_production_pdf_preserves_complete_unicode_content_with_two_extractors`, `test_production_pdf_keeps_hostile_text_literal_and_does_not_read_sentinel`, `test_production_pdf_handles_long_two_page_plan_without_pruning`, `test_production_pdf_preserves_url_and_hyphenation_sensitive_words`, `test_literal_hyphen_compounds_are_complete_in_summary_and_project_body`, `test_unbreakable_hyphenated_compound_fails_before_publication` (6).
+
+## Independent probes
+
+The probe used a separate standard-library expected-value implementation for interval union and evaluator outcomes; it did not use production interval arithmetic to calculate expected bounds.
+
+- F-01 reproductions: `Spark`, `AWS`, and `Amazon Web Services` each raise `ConstraintError` when used as a language constraint. Approved language facts carrying those surfaces do not match a `German` language constraint.
+- Dictionary matrix: all **82 aliases** were exercised as language constraints and as language facts. The 12 exact aliases belonging to the four language concepts matched only their own language concept. All 70 technology/field aliases (including ambiguous `Spark`) were rejected as language constraints; cross-side checks were **328** (4 language constraints × 82 aliases) and produced no non-language language match.
+- Unmatched identity: NFC/NFD diacritics (`Café`/decomposed `cafe\u0301`, `München`/decomposed `Mu\u0308nchen`), casefold expansion (`Straße`/`STRASSE`), dotted-I combining form (`İstanbul`/`i\u0307STANBUL`), dotless-I distinction (`I`/`ı`), whitespace collapsing, and 11 unmatched/extra-word cases passed. Surfaces containing a language alias plus extra words stayed unmatched and compared only by normalized name.
+- Duration skill scopes: all four language concept IDs were rejected; all 40 non-language concept IDs remained accepted for evaluation.
+- Independent randomized comparisons: 5,000 interval sets (32,488 intervals), 300 overall-duration profiles, 250 language profiles, 250 credential profiles, 250 degree profiles, and 250 authorization profiles all matched the independent expected states, rationales, bounds, exclusions, and fact references.
+- The independently reviewed fixture contains **93 cases**; all 93 oracle cases are included in the focused suite and passed within the 122-test run.
+- No probe or check used network access, `$JAE_DATA_DIR\), the home directory, another worktree, or private/personal data.
+
+## Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| — | — | — | No unresolved findings. Round-1 F-01 is fixed by the candidate and covered by the focused regressions and the independent probes above. | The three F-01 surfaces now raise `ConstraintError`; non-language facts do not match language constraints; exact language aliases remain equivalent; unmatched names retain normalized-name comparison. |
+
+## Architecture, security and acceptance assessment
+
+The correction now enforces the TASK-013 identity boundary required by A07: concept identity is used only for exact language concepts, while ambiguous aliases and technology/field concepts cannot satisfy a language requirement. It preserves the explicit unmatched-name behavior, CEFR-only comparison, and non-inference rules. Duration scope validation now rejects every language concept while preserving accepted non-language concept scopes.
+
+The diff adds no dependency, subprocess, network, persistence, or private-data path. It does not broaden approval or fact eligibility, and all matching facts still come from the validated approved profile. The only full-suite failures are renderer/QA environment limitations recorded above. No secrets or personal data were introduced.
+
+The focused suite, independent oracle comparisons, randomized interval/evaluator comparisons, Ruff, formatting, mypy, and diff checks provide the required acceptance evidence. There are no follow-up findings for this round.
