@@ -35,3 +35,14 @@ No legal advice, career-wide→AI-years conversion, FTE assumptions, seniority i
 ## Handoff and review
 
 Follow AGENTS.md, inspect dependencies and source/ADR context, work on `task/015-short-description`, and implement this task only. Update PROGRESS with actual commands/results, risks and next task; commit as IMPLEMENTED — AWAITING REVIEW. An independent reviewer inspects code/diff/tests/security/acceptance using REVIEW_PROTOCOL. The implementer cannot approve their own work. Additional corrections should be narrow commits preserving negative tests.
+
+## Clarifications (fixture review round 1)
+
+- "Numeric constraints" means duration thresholds: TASK-012 extracts only
+  duration and CEFR thresholds. Comparing metric facts (counts, percent,
+  currency) is not part of this task.
+- A22 is split: this task covers direct, explicitly unmet, no-evidence and
+  unknown results of typed language, credential, degree, authorization and
+  duration constraints, and that exposure, self-study and period-less facts
+  never satisfy a duration. TASK-016 covers `equivalent`, `adjacent`, negative
+  mentions and production/depth semantics of free-text requirements.

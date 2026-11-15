@@ -23,10 +23,22 @@ them independently of any output.
   name, degree name; every authorization fact). For durations they are the
   facts that contributed at least one upper month.
 
-## States
+## States and scope
 
-`direct`, `explicitly_unmet`, `no_evidence`, `unknown`. (`equivalent` and
-`adjacent` belong to TASK-016.) No state is an application decision.
+`direct`, `explicitly_unmet`, `no_evidence`, `unknown`. No state is an
+application decision.
+
+A22 is split between two independently reviewed oracles. This one covers the
+typed constraints: direct versus explicitly unmet (a CEFR level below the
+requirement, an expired, in-progress or not-yet-awarded credential, an ongoing
+or withdrawn degree) versus no evidence versus unknown, and that exposure,
+self-study, responsibilities and other facts without their own period never
+satisfy a duration. TASK-016 covers `equivalent`, `adjacent`, negative
+mentions and production/depth semantics of free-text requirements.
+
+"Numeric" means duration thresholds: the requirement model (TASK-012) extracts
+only duration and CEFR thresholds. Comparing metric facts (counts, percent,
+currency) is not part of TASK-015.
 
 ## Rules
 
@@ -45,14 +57,19 @@ them independently of any output.
    converted to CEFR, a self-description is never parsed (even "C1" or
    "Native"), and native is never C2.
 4. **Credential** `{name}`. No matching fact → `no_evidence` /
-   `no_credential_fact`. Per fact: `awarded` and not expired at `as_of` →
-   valid; `expired`, or `awarded` past its expiry → expired; `in_progress`;
-   `unknown`. Expiry: `expires_at` (converted to UTC) earlier than the `as_of`
-   date, or `valid_through` whose last day (end of its year, month or the day)
-   is earlier than `as_of`. Any valid → `direct` / `credential_valid`; else any
-   `unknown` → `unknown` / `credential_status_unknown`; else any in progress →
-   `explicitly_unmet` / `credential_in_progress`; else `explicitly_unmet` /
-   `credential_expired`.
+   `no_credential_fact`. Each matching fact has one outcome: `status: unknown`
+   → status unknown; `in_progress` → in progress; `expired` → expired;
+   `awarded` → not yet awarded if `awarded_on`'s earliest possible day is
+   later than `as_of`, award uncertain if `awarded_on`'s latest possible day is
+   later than `as_of` (its period contains `as_of`), expired if past its
+   expiry, otherwise valid. Expiry: `expires_at` converted to UTC with its date
+   earlier than `as_of`, or `valid_through` whose last day (end of its year,
+   month or the day) is earlier than `as_of`. Result, first that applies: any
+   valid → `direct` / `credential_valid`; any status unknown → `unknown` /
+   `credential_status_unknown`; any award uncertain → `unknown` /
+   `award_date_precision`; any in progress → `explicitly_unmet` /
+   `credential_in_progress`; any not yet awarded → `explicitly_unmet` /
+   `awarded_after_as_of`; otherwise `explicitly_unmet` / `credential_expired`.
 5. **Degree** `{degree_name}` against education `degree_name`. No matching fact
    → `no_evidence` / `no_degree_fact`. `ongoing` → `explicitly_unmet` /
    `degree_in_progress`; `withdrawn` → `explicitly_unmet` / `degree_withdrawn`;
@@ -61,7 +78,9 @@ them independently of any output.
    possible day later than `as_of` → `explicitly_unmet` /
    `completed_after_as_of`, its latest possible day on or before `as_of` →
    `direct` / `degree_completed`, otherwise `unknown` / `completion_precision`.
-   Several facts: `direct` beats `unknown` beats `explicitly_unmet`.
+   Several facts: the first rationale that applies in the order
+   `degree_completed`, `degree_status_unknown`, `completion_precision`,
+   `degree_in_progress`, `completed_after_as_of`, `degree_withdrawn`.
 6. **Authorization** `{country, scope}`. Only an exact applicant-approved
    statement can support it; nothing is inferred from location, residence,
    nationality or student status, and absence is never a negative. No
@@ -90,21 +109,25 @@ them independently of any output.
      last day, else the previous month; upper = that month. Month precision →
      lower = previous month, upper = that month. Year precision → lower =
      December of the previous year, upper = December of that year.
-   - Ongoing end is the `as_of` day (day precision). Every lower month is also
-     capped at the lower end of the `as_of` day and every upper month at the
-     `as_of` month.
-   - Excluded with a reason: unknown start (`unknown_start`), unknown end
-     (`unknown_end`), upper start after the `as_of` month
-     (`starts_after_as_of`).
+   - Ongoing end is the `as_of` day (day precision). The lower set is then
+     intersected with all months up to the lower end of the `as_of` day and the
+     upper set with all months up to the `as_of` month. The cutoff only removes
+     months; it never moves a start earlier.
+   - Excluded with a reason, checked in this order: unknown start
+     (`unknown_start`), unknown end (`unknown_end`), a start whose earliest
+     possible day is later than the `as_of` day (`starts_after_as_of`; for a
+     day-precision start this is the day itself).
    - Lower and upper results are the sizes of the unions of the month sets
      (overlap counted once, gaps excluded).
    - `lower ≥ months` → `direct` / `duration_meets`. No contributing fact and
-     no excluded candidate → `no_evidence` / `no_scoped_interval`. Otherwise
-     `unknown`: no contributing fact but uncertain exclusions →
-     `only_unknown_dates`; `lower < months ≤ upper` → `precision_insufficient`;
-     `upper < months` → `documented_below_threshold`. A documented total below
-     the threshold is not a negative, because the profile does not claim to be
-     complete; duration never yields `explicitly_unmet`.
+     no uncertain exclusion (`unknown_start`, `unknown_end`) → `no_evidence` /
+     `no_scoped_interval`. Otherwise `unknown`, first that applies: no
+     contributing fact → `only_unknown_dates`; `lower < months ≤ upper` →
+     `precision_insufficient`; `upper < months` with an uncertain exclusion →
+     `below_threshold_with_unknown_intervals` (an undated interval could close
+     the gap); `upper < months` → `documented_below_threshold`. A documented
+     total below the threshold is not a negative, because the profile does not
+     claim to be complete; duration never yields `explicitly_unmet`.
    - `starts_after_as_of` alone is not uncertainty: with no other candidate the
      result is `no_evidence` / `no_scoped_interval`.
 
