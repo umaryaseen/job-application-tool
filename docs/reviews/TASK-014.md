@@ -211,3 +211,75 @@ F-04 and F-05 from round 2 are resolved by the candidate. F-06 is an additional 
 ## Required next gate
 
 Fix F-06 with a pre-publication serialized-size check and a regression covering a valid correction just below the input limit. The check must occur before folder/head/file publication and must leave no committed or unreadable history when it rejects. Rerun the focused suite, full renderer-capable suite, Ruff, format, mypy, diff check and the concurrency/deletion/crash probes. Re-review the corrected head; this report does not approve the candidate.
+
+## Round 4 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning
+  `xhigh`, sandbox `workspace-write` on a throwaway detached checkout of
+  `f448ae7` plus a dedicated temporary directory, no network, session
+  `01a1e018-2c70-7950-a7e7-99a6a723203d`. Tracked files unchanged; exit 0.
+- The report below is verbatim. F-07 is addressed by the next commit for round 5.
+
+## Round 4 report
+
+VERDICT: CHANGES REQUIRED
+
+# TASK-014 independent implementation review — round 4
+
+Reviewer: Codex, independent implementation reviewer. The implementation was authored by Claude Code and was not written by this reviewer.
+
+Date: 2026-11-15
+
+Base: `026922a3278be368cd4b5c7a18667facae43c91b`; base tree `c21563298f31c9b7436ce4035e7349ed9bb6a4be`
+
+Candidate: `f448ae75752e857daaa23c6d3d27a6c1c8b4e2b5`; candidate tree `031a98e42ac7939784ff5ed0b9c2b6d818e4b9cf`
+
+Checkout: supplied detached checkout. Tracked files were unchanged during this review.
+
+Scope: base-to-candidate round-4 delta, cumulative TASK-014/A20 behavior, serialized-size preflight, read-limit boundaries, missing-newest-file recovery, F-04/F-05 deletion/locking, crash recovery, source-bound correction replay, private bounded input, and the relevant ADR/security/acceptance contracts.
+
+Data and network: synthetic reserved-example postings only; no network, `JAE_DATA_DIR`, home-directory data, other worktrees, or personal data were read. Probe scripts, logs and roots were under the permitted `codex-014-r4-tmp` directory.
+
+## Artifacts inspected
+
+`AGENTS.md`, `docs/PROGRESS.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/REVIEW_HANDOFF.md`, `docs/REVIEW_PROTOCOL.md`, `docs/tasks/TASK-014.md`, A20 in `docs/ACCEPTANCE_CRITERIA.md`, relevant `docs/ARCHITECTURE.md` and `docs/SECURITY_AND_PRIVACY.md` sections, `docs/adr/ADR-007.md`, `docs/adr/ADR-012.md`, the review section of `docs/JOB_EXTRACTION.md`, the complete `026922a..f448ae7` diff, `src/job_application_engine/snapshots/requirements.py`, and `tests/test_requirement_review.py`.
+
+## Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `pwd && git status --short --branch && git show -s --format=... HEAD` | 0 | Detached candidate at `f448ae7`; clean at inspection. |
+| `git rev-parse 026922a...^{tree} f448ae7...^{tree}` | 0 | Base/candidate trees matched the supplied identities. |
+| `git diff --stat 026922a...f448ae7` and `git diff --name-status ...` | 0 | 6 modified paths; 135 insertions and 9 deletions; no implementation files outside the documented change. |
+| `git diff --no-ext-diff --unified=20 026922a...f448ae7 -- ...` | 0 | Complete changed-source, test and documentation inspection completed. |
+| `.venv/bin/python -m pytest tests/test_requirement_review.py -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r4-tmp/pytest` | 0 | **48 passed**, 0 failed, 0 skipped. |
+| `PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r4-tmp/pytest-full` | 1 | **641 passed, 27 failed, 0 skipped**. All 27 failures were renderer/QA paths whose worker returned exit 71 because nested macOS `sandbox-exec` cannot be applied in this checkout. Failure counts: `tests/rendering/test_pdf_qa.py` 10, `tests/test_m1_fix.py` 2, `tests/test_m1_fix004.py` 5, `tests/test_m1_fix006.py` 1, `tests/test_m1_fix007.py` 3, `tests/test_rendering.py` 6. Hosted renderer-capable CI is required for these checks. |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed. |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 87 files already formatted. |
+| `.venv/bin/mypy src --cache-dir=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r4-tmp/mypy` | 0 | No issues in 53 source files. |
+| `git diff --check 026922a...f448ae7` | 0 | No whitespace errors. |
+| `.venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r4-tmp/probe_r4.py` | 0 | Fresh/existing F-06, exact limits, missing-newest materialization, F-04 deletion, crash and writer-lock probes completed; detailed results below. |
+| `.venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r4-tmp/probe_crash_after_head.py` | 0 | Simulated crash after head commit left head revision 2, no `v000002.json`, and replay revision 2. |
+| `git status --short --branch` and `git diff --name-only` (final) | 0 | No tracked changes. |
+
+## Round-4 probes
+
+- The round-3 reproduction used a 3,995-codepoint requirement row and 30 `set_thresholds` operations with 16 valid source-bound thresholds each. The correction JSON was 1,999,710 bytes, below the 2,000,000-byte correction-input limit. On a fresh history, apply was refused with `ReviewError: correction is too large to store; split it into smaller corrections`; the revision folder, `head.json`, and revision files were absent. On a history containing one accepted revision, the same refusal left every existing file byte-identical and the history readable at revision 1 with the same view.
+- A stored revision padded to exactly 2,000,000 bytes loaded successfully; the same revision at 2,000,001 bytes was rejected with the size-limit error. A head padded to exactly 2,004,000 bytes (`MAX_REVISION_BYTES + HEAD_OVERHEAD_BYTES`) loaded successfully; at 2,004,001 bytes it was rejected. This confirms the writer's shared head limit matches the reader's limit.
+- The committed-but-missing-newest path still has a defect. Under a controlled legacy-limit setup, a valid committed record serialized to 2,000,062 bytes and its head to 2,000,240 bytes. After deleting the newest revision file, `load_review` accepted the head-only lag at revision 1. A subsequent small correction entered `_publish(folder, len(history), history[-1])` and materialized the oversized missing record before publishing the new revision. The resulting folder contained the oversized `v000001.json`, a new `v000002.json`, and a new head; the final `load_review` failed with `ReviewError: review JSON exceeds its size limit`.
+- F-04 remains fixed: deleting the newest file after a mandatory acceptance followed by a reopen replayed the committed revision from the head at revision 2, with zero hard gates; the old hard gate was not restored. The file remained absent until a later successful correction.
+- Crash behavior remains fixed: a simulated failure after committing the head and before writing its newest file replayed the embedded head revision and left the newest file absent, as designed.
+- F-05 locking remains fixed: an attempted nested writer while the per-history `flock` was held was refused with `ConcurrentReviewError: another requirement review is being stored; reload and retry`. The focused suite's writer and stale-base regressions also passed.
+
+## Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-06 | resolved in this candidate | `src/job_application_engine/snapshots/requirements.py:431-438` | The candidate now serializes the canonical revision and embedded head and checks both against the exact read limits before creating the revision folder, committing the head, or publishing a revision. The fresh and existing-history under-input-limit probes passed, including byte identity and readability. | `probe_r4.py`: 1,999,710-byte correction; refused before revision-folder/head/file publication on a fresh history and without changing an existing history. Exact and one-byte-over read-limit cases also passed. |
+| F-07 | **blocking** | `src/job_application_engine/snapshots/requirements.py:442-444` | The preflight covers only the new `record` and `head`. If `_history` recovered a committed-but-missing newest file from `head.latest`, `_apply_locked` later materializes `history[-1]` without checking its serialized size. A head can be within the larger head read limit while its embedded revision is above `MAX_REVISION_BYTES`; materializing that record writes a revision that the next load rejects, permanently poisoning the history. This violates the bounded-history and “no oversized write” invariant during the documented crash/deletion recovery path. | `probe_r4.py`: controlled legacy state with head 2,000,240 bytes and missing embedded record 2,000,062 bytes; lagged load succeeded at revision 1; a small correction wrote the oversized missing `v000001.json`, then `load_review` failed with `review JSON exceeds its size limit`. |
+
+F-04 and F-05 are resolved by this candidate. F-07 remains blocking because a valid recovery correction can create an unreadable history after the round-4 preflight has passed.
+
+## Required next gate
+
+Before `_publish(folder, len(history), history[-1])`, reject or otherwise safely handle an embedded missing revision whose canonical serialized form exceeds `MAX_REVISION_BYTES`; alternatively reject such a head during reconciliation so no oversized materialization can occur. Add a regression that constructs a head-only lag with an oversized embedded revision, verifies the correction refuses before any file/head mutation, and confirms the resulting state remains fail-closed or otherwise readable according to the chosen contract. Then rerun the focused suite, full renderer-capable suite, Ruff, format, mypy, diff check, and the F-04/F-05/crash/size probes.
