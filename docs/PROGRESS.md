@@ -1,11 +1,11 @@
 # Current implementation state
 
-Last reconciled: 2026-11-15 against main `9c1d5580` (merged PR #7). TASK-011,
-TASK-012, M1-FIX-006 and TASK-013 are integrated; M1-FIX-007 is independently
-approved on PR #8 and awaits merge. TASK-009 personal acceptance remains open:
-the applicant's content decisions are applied privately and a corrected private
-baseline is in applicant review; its QA findings and pending applicant
-decisions are recorded in the private data root.
+Last reconciled: 2026-11-15 against main `01f3a40` (merged PR #8). TASK-011,
+TASK-012, M1-FIX-006, TASK-013 and M1-FIX-007 are integrated. M1-FIX-008
+(LinkedIn contact label, compact and extended skill groups) is implemented and
+awaits independent review. TASK-009 personal acceptance remains open: the
+applicant's latest decisions are applied privately and the next baseline
+candidate waits on M1-FIX-008; details stay in the private data root.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -13,7 +13,7 @@ decisions are recorded in the private data root.
 | TASK-005 | APPROVED WITH FOLLOW-UP | Renderer comparison remains unmeasured |
 | TASK-006–008 | APPROVED in prior history | Existing renderer/QA/snapshot reviews |
 | M1-FIX-001–005 and focused corrections | Approved implementations recorded locally | [Local baseline history](history/PROGRESS_LOCAL_TASK_009.md), individual review files |
-| TASK-009 / M1 | baseline-r0009 has technical QA and appearance-only approval; a later private content revision awaits applicant review | See [baseline state](#preserve-the-local-baseline-result); content approval, new baseline, final artifact acceptance and export pending |
+| TASK-009 / M1 | baseline-r0009 has technical QA and appearance-only approval; later applicant decisions are applied privately | See [baseline state](#preserve-the-local-baseline-result); next candidate needs M1-FIX-008, then applicant review, final artifact acceptance and export |
 | CLEANUP-001 | Reviewed and merged into main through PR #1 | [Review](reviews/CLEANUP-001.md), merge `0d81aa1` |
 | TASK-010 | Reviewed and merged into main through PR #2 | [Review](reviews/TASK-010.md), [intake guide](JOB_INTAKE.md), merge `0cc9119` |
 | Local integration | MERGE COMMITTED; CODE AND DOCUMENTATION REVIEWED | [Code review](reviews/MERGE-TASK-009-MAIN.md), [documentation review](reviews/MERGE-TASK-009-MAIN-DOCS.md); local merge `266e5ef3` |
@@ -23,7 +23,8 @@ decisions are recorded in the private data root.
 | TASK-012 | Reviewed and merged into main through PR #5 | [Review](reviews/TASK-012.md) round 11 APPROVED on `07375b1`; documentation closure `065d89e` scoped review APPROVED (Codex session `01a1db73-cb5f-7501-8cc2-4e2f10a55c05`); merge `ee59069` |
 | M1-FIX-006 | Reviewed and merged into main through PR #6 | [Review](reviews/M1-FIX-006.md) round 2 APPROVED on `591b339`; closure scoped review APPROVED; merge `68aa536` |
 | TASK-013 | Reviewed and merged into main through PR #7 | [Review](reviews/TASK-013.md) round 2 APPROVED on `f26da14`; closure scoped review APPROVED; merge `9c1d558` |
-| M1-FIX-007 | APPROVED WITH FOLLOW-UP — AWAITING MERGE | [Task](tasks/M1-FIX-007.md); [review](reviews/M1-FIX-007.md) round 2 on `b906a7f`; low documentation follow-ups F-03/F-04 closed in this closure |
+| M1-FIX-007 | Reviewed and merged into main through PR #8 | [Task](tasks/M1-FIX-007.md); [review](reviews/M1-FIX-007.md) round 2 APPROVED WITH FOLLOW-UP on `b906a7f`; follow-ups closed; merge `01f3a40` |
+| M1-FIX-008 | IMPLEMENTED — AWAITING REVIEW | [Task](tasks/M1-FIX-008.md); branch `task/009-m1-fix-008-display-labels` |
 | TASK-014–020 | NOT IMPLEMENTED | Review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -42,9 +43,10 @@ approve or regenerate private profiles, receipts, plans or artifacts.
 Reconciled 2026-11-15: the private records hold a later content revision, so
 r0009's content is not the current candidate for content approval. The
 applicant has now returned written content decisions; details stay in the
-private data root. Next: reviewed M1-FIX-006, a corrected private revision with
-receipts bound to those decisions, a new baseline with QA, then separate final
-artifact approval. No export is authorized.
+private data root. M1-FIX-006 and M1-FIX-007 are merged and those decisions
+are applied with receipts; a further applicant decision round needs reviewed
+M1-FIX-008 before the next candidate is built, QA'd and reviewed. Final
+artifact approval stays separate. No export is authorized.
 
 Pre-sync local progress and handoffs are archived under `history/`; their old
 task gates describe their historical candidates. Published documentation uses
@@ -99,6 +101,26 @@ the review operation refuses to issue a receipt for invalid content. Three
 regressions fail on `ae6c461` and pass now. Full suite: 474 passed. Review
 round 2 on `591b339` returned APPROVED with no unresolved findings; hosted CI
 43666629755 passed on that head.
+
+## M1-FIX-008 implementation (awaiting review)
+
+A URL contact on a `linkedin.com` host (or subdomain) is labelled `LinkedIn:`;
+other URLs keep `Url:`, and the contact-URL width guard covers both labels.
+Two internal skill categories get display headings ("Programming Languages"
+first, "Quality & Development" last), and every skill group now renders as one
+`<heading>: <skills>` line with a bold, allowlisted heading; TXT carries the
+same text. Fixtures that pinned the two-line layout or the v5 template identity
+are updated to the compact line. Identity: `baseline-v6-m1-fix008-display-labels`.
+
+Implementer verification on macOS (Python 3.12, locked environment, offline
+Typst assets):
+
+| Command | Result |
+| --- | --- |
+| `uv run pytest tests/test_m1_fix008.py` | Exit 0; 34 passed |
+| `uv run pytest` | Exit 0; 654 passed, no skips |
+| `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 84 files formatted |
+| `uv run mypy src` | Exit 0; 50 source files |
 
 ## TASK-013 implementation (merged)
 
@@ -259,10 +281,10 @@ not interpreted.
 
 ## Next action
 
-Merge reviewed M1-FIX-007 (PR #8), regenerate the corrected private baseline
-and present it with QA for applicant review. Then TASK-014 (source-bound
-requirement review and correction versions). Separately, TASK-009 waits on
-applicant review of the private content revision; appearance-only approval
-keeps its scope. Before any downstream feature makes `source_url`
-clickable or fetchable, validate allowed URL schemes (F-02). Personal records
-stay outside Git and CI; no matching, tailoring, export or application occurs.
+Independent review of M1-FIX-008 against `docs/REVIEW_PROTOCOL.md`; after
+merge, regenerate the private baseline candidate with QA for applicant review
+(final artifact approval and export stay separate). TASK-014 (source-bound
+requirement review and correction versions) proceeds independently. Before any
+downstream feature makes `source_url` clickable or fetchable, validate allowed
+URL schemes (F-02). Personal records stay outside Git and CI; no matching,
+tailoring, export or application occurs.

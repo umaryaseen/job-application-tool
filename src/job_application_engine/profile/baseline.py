@@ -5,12 +5,17 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import date
 from typing import Any
+from urllib.parse import urlsplit
 
 from ..domain.common import Locale
 from ..domain.document import DocumentLine, DocumentPlan, DocumentSection
 from ..domain.fact import (
+    ContactEmail,
     ContactFact,
+    ContactLocation,
     ContactName,
+    ContactPhone,
+    ContactUrl,
     EducationFact,
     EmploymentFact,
     FactRef,
@@ -66,11 +71,31 @@ def _entity_name(profile: ProfileRevision, entity_id: str) -> str:
     raise ValueError(f"missing entity {entity_id}")
 
 
+# Static, non-claim contact labels. A URL contact whose parsed host is
+# linkedin.com or one of its subdomains is labelled "LinkedIn"; every other URL
+# keeps the generic "Url" label. The renderer's URL width guard covers both.
+URL_CONTACT_LABELS = ("Url", "LinkedIn")
+
+
+def contact_label(value: ContactEmail | ContactPhone | ContactUrl | ContactLocation) -> str:
+    """Display label derived only from the contact kind and the URL's parsed host."""
+
+    if isinstance(value, ContactUrl):
+        try:
+            host = urlsplit(value.value).hostname or ""
+        except ValueError:
+            host = ""
+        if host == "linkedin.com" or host.endswith(".linkedin.com"):
+            return "LinkedIn"
+        return "Url"
+    return value.kind.title()
+
+
 def fact_line_text(profile: ProfileRevision, fact: Any) -> str:
     if isinstance(fact, ContactFact):
         if isinstance(fact.value, ContactName):
             return fact.value.value
-        return f"{fact.value.kind.title()}: {fact.value.value}"
+        return f"{contact_label(fact.value)}: {fact.value.value}"
     if isinstance(fact, EmploymentFact):
         return (
             f"{fact.title} — {_entity_name(profile, fact.employer_id)}"

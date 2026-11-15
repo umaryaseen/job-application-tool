@@ -118,12 +118,7 @@
       "entries": [
         {
           "entry_id": "Skills-0",
-          "text": "Data Engineering & Analytics",
-          "fields": {}
-        },
-        {
-          "entry_id": "Skills-1",
-          "text": "Größe Ä Ö Ü ß (study, recent experience)",
+          "text": "Data Engineering & Analytics: Größe Ä Ö Ü ß (study, recent experience)",
           "fields": {
             "skill": "Größe Ä Ö Ü ß",
             "qualifier": "study, recent experience"

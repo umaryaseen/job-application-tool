@@ -159,7 +159,8 @@ def test_display_headings_keep_internal_categories_and_order() -> None:
         }
     )
     skills = next(s for s in present_plan(plan, profile) if s.label == "Skills")
-    headings = [line.text for line in skills.lines if line.style == "subheading"]
+    # M1-FIX-008 renders each group as one "<heading>: <skills>" line.
+    headings = [line.lead for line in skills.lines if line.style == "skill-group"]
     assert headings == [
         "AI & Machine Learning",
         "Data Engineering & Analytics",
@@ -172,8 +173,8 @@ def test_display_headings_keep_internal_categories_and_order() -> None:
 
 
 def test_template_identity_changed() -> None:
-    # M1-FIX-006 introduced v4; M1-FIX-007 superseded it with the exact v5 identity.
-    assert TEMPLATE_VERSION == "baseline-v5-m1-fix007-slash-compounds"
+    # M1-FIX-006 introduced v4; M1-FIX-007 (v5) and M1-FIX-008 (v6) superseded it.
+    assert TEMPLATE_VERSION == "baseline-v6-m1-fix008-display-labels"
 
 
 def test_real_pdf_extracts_expected_completion_specialization_and_headings(tmp_path: Path) -> None:

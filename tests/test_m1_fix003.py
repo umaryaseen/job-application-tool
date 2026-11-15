@@ -62,8 +62,7 @@ def test_explicit_skill_categories_are_grouped_without_inventing_qualifiers() ->
     sections = present_plan(plan, profile)
     skills = next(section for section in sections if section.label == "Skills")
     assert [line.text for line in skills.lines] == [
-        "Data Engineering & Analytics",
-        "Größe Ä Ö Ü ß (study, recent experience)",
+        "Data Engineering & Analytics: Größe Ä Ö Ü ß (study, recent experience)",
     ]
     assert "expert" not in skills.lines[-1].text
 
@@ -95,8 +94,7 @@ def test_duplicate_skill_names_keep_distinct_fact_qualifiers() -> None:
     )
     skills = next(s for s in present_plan(plan, profile) if s.label == "Skills")
     assert [line.text for line in skills.lines] == [
-        "Data Engineering & Analytics",
-        "Größe Ä Ö Ü ß (study, recent experience)",
+        "Data Engineering & Analytics: Größe Ä Ö Ü ß (study, recent experience)",
         "Größe Ä Ö Ü ß (study, basic exposure)",
     ]
 
