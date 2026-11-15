@@ -17,6 +17,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unicodedata
 from collections.abc import Mapping, Sequence
 from importlib.resources import files
 from pathlib import Path
@@ -42,6 +43,10 @@ DEFAULT_TIMEOUT_SECONDS = 60
 CONTACT_URL_WIDTH_ERROR = (
     "contact URL exceeds the fixed A4 20 mm margin and 11 pt contact width; "
     "use an approved shorter URL or omit this contact"
+)
+ITEM_CONTENT_ERROR = (
+    "a skill or contact item has no visible text, contains a control or line-break "
+    "character, or begins with the | separator; use an approved corrected wording"
 )
 ITEM_WIDTH_ERROR = (
     "a skill or contact item exceeds the fixed A4 content width at the approved "
@@ -225,11 +230,31 @@ _TOKEN_STYLES = frozenset(
 )
 
 
+def item_problem(item: object) -> str | None:
+    """Why ``item`` cannot be one unbreakable skill or contact box, or None.
+
+    An item must contain visible text, no control, line- or paragraph-separator
+    character (any of which would break the box), and must not begin with the
+    "|" separator (which would then start a line).
+    """
+
+    if not isinstance(item, str):
+        return "not text"
+    if any(unicodedata.category(char) in {"Cc", "Zl", "Zp"} for char in item):
+        return "contains a control or line-break character"
+    visible = [char for char in item if unicodedata.category(char)[0] not in {"Z", "C"}]
+    if not visible:
+        return "has no visible text"
+    if visible[0] == "|":
+        return "begins with the | separator"
+    return None
+
+
 def _valid_items(items: object) -> bool:
     return (
         isinstance(items, list)
         and bool(items)
-        and all(isinstance(item, str) and item and "\n" not in item for item in items)
+        and all(item_problem(item) is None for item in items)
     )
 
 
@@ -362,6 +387,7 @@ def _worker(stage_argument: str) -> int:
             return 24
         compound_tokens: list[tuple[str, str]] = []
         item_boxes: list[tuple[str, bool]] = []
+        replacements: dict[str, str] = {}
         for token, value in tokens.items():
             if not isinstance(token, str) or not _valid_token_value(value):
                 return 25
@@ -427,10 +453,28 @@ def _worker(stage_argument: str) -> int:
                 )
             else:
                 replacement = _literal_text_expression(text_value)
-            typ_text = typ_text.replace(token, replacement).replace(
-                token.replace("_", r"\_"), replacement
-            )
-        if "JAECLAIM_" in typ_text:
+            replacements[token] = replacement
+        # One pass over the generated source: inserted candidate text is never
+        # scanned again, so text that happens to spell a placeholder stays text.
+        spellings = {token: token for token in replacements}
+        spellings |= {token.replace("_", r"\_"): token for token in replacements}
+        placeholder = re.compile(
+            "|".join(re.escape(text) for text in sorted(spellings, key=len, reverse=True))
+        )
+        used: set[str] = set()
+
+        def substitute(match: re.Match[str]) -> str:
+            token = spellings[match.group(0)]
+            used.add(token)
+            return replacements[token]
+
+        claims_before = len(re.findall(r"JAECLAIM", typ_text))
+        claims_matched = sum(
+            spellings[match.group(0)].startswith("JAECLAIM")
+            for match in placeholder.finditer(typ_text)
+        )
+        typ_text = placeholder.sub(substitute, typ_text)
+        if used != set(replacements) or claims_before != claims_matched:
             return 26
         compound_guard = _compound_width_guard(compound_tokens)
         contact_text = next(
@@ -515,6 +559,11 @@ def build_pdf(
     final_path.parent.mkdir(parents=True, exist_ok=True)
 
     yaml_text, tokens = _yaml_for_plan(plan, profile)
+    item_lists = [value["items"] for value in tokens.values() if "items" in value] + [
+        items for value in tokens.values() for items in value.get("lines", [])
+    ]
+    if any(item_problem(item) is not None for items in item_lists for item in items):
+        raise PdfRenderError(ITEM_CONTENT_ERROR)
     with tempfile.TemporaryDirectory(prefix=".jae-pdf-", dir=root) as temporary:
         stage = Path(temporary)
         _private_stage(root, stage)

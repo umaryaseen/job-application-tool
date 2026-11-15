@@ -19,3 +19,13 @@ display; template identity; no typography, selection or provenance change.
 Record findings and one verdict in `docs/reviews/M1-FIX-009.md` without
 modifying implementation. Renderer tests need macOS `sandbox-exec`: inspect
 hosted CI for the exact head.
+
+## Round 2 request
+
+Round 1 ([report](reviews/M1-FIX-009.md)) found F-01 (items that begin with
+"|" or have no visible text), F-02 (control and Unicode line-separator
+characters inside items) and F-03 (placeholder collisions from repeated global
+replacement). Items are now checked by `item_problem` in the parent (clear
+`ITEM_CONTENT_ERROR`) and in the worker token check; placeholders are
+substituted in one regex pass with all placeholders accounted for. Review the
+delta from `241145c`.

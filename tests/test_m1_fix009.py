@@ -20,6 +20,7 @@ from job_application_engine.rendering.pdf import (
     _valid_token_value,
     _yaml_for_plan,
     build_pdf,
+    item_problem,
 )
 from job_application_engine.rendering.presentation import present_plan
 from job_application_engine.rendering.text import render_text
@@ -342,3 +343,65 @@ def test_employment_header_and_its_dates_never_end_a_page_early(tmp_path: Path, 
         "January 2022 – ongoing",
     )
     assert not last.startswith(orphans), last
+
+
+# Review round 1: F-01/F-02 item content, F-03 placeholder collisions.
+
+
+@pytest.mark.parametrize(
+    ("item", "ok"),
+    [
+        ("Azure Pipelines", True),
+        ("A | B", True),  # an inner separator stays inside one unbreakable box
+        ("C#", True),
+        ("|A", False),
+        ("​|A", False),  # invisible character before the separator
+        ("   ", False),
+        ("​", False),
+        (" ", False),
+        ("A\rB", False),
+        ("A B", False),
+        ("A B", False),
+        ("A\u0085B", False),
+        ("A\tB", False),
+        ("A\nB", False),
+    ],
+)
+def test_item_content_rules(item: str, ok: bool) -> None:
+    assert (item_problem(item) is None) is ok
+    token = {"text": f"Programming Languages: {item}", "style": "skill-group",
+             "lead": "Programming Languages", "items": [item]}  # fmt: skip
+    assert _valid_token_value(token) is ok
+
+
+@renderer
+@pytest.mark.parametrize(
+    "fact",
+    [
+        {"fact_id": "skill-pipe", "kind": "skill", "name": "|A", "context": "unknown",
+         "category": "AI & retrieval"},
+        {"fact_id": "skill-ls", "kind": "skill", "name": "A B", "context": "unknown",
+         "category": "AI & retrieval"},
+        _contact("contact-nel", "location", "Example\u0085City"),
+    ],
+)  # fmt: skip
+def test_unsafe_items_fail_before_publication(tmp_path: Path, fact: dict) -> None:
+    profile, reviews = _with_facts([fact])
+    plan = compile_baseline(profile, as_of=date(2026, 11, 15), reviews=reviews)
+    with pytest.raises(PdfRenderError, match="no visible text, contains a control"):
+        build_pdf(plan, profile, reviews=reviews, data_root=tmp_path)
+    assert not (tmp_path / "outputs" / "baseline.pdf").exists()
+
+
+@renderer
+def test_text_spelling_a_placeholder_renders_as_literal_text(tmp_path: Path) -> None:
+    names = ["JAECLAIM_05_000", "JAECLAIM\\_04\\_000", "JAE_HEADER_NAME", "JAE_HEADER_CONTACTS"]
+    profile, reviews = _with_facts(
+        [{"fact_id": f"skill-p{i}", "kind": "skill", "name": name, "context": "unknown",
+          "category": "AI & retrieval"} for i, name in enumerate(names)]
+    )  # fmt: skip
+    plan = compile_baseline(profile, as_of=date(2026, 11, 15), reviews=reviews)
+    pdf = build_pdf(plan, profile, reviews=reviews, data_root=tmp_path)
+    expected = render_text(plan, profile, reviews=reviews)
+    assert all(name in expected for name in names)
+    _assert_complete_extraction(pdf, expected)

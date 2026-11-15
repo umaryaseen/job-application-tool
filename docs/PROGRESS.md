@@ -116,8 +116,8 @@ employment headers and dates are sticky blocks; languages display as
 
 | Command | Result |
 | --- | --- |
-| `uv run pytest tests/test_m1_fix009.py` | Exit 0; 26 passed |
-| `uv run pytest` | Exit 0; 873 passed, no skips |
+| `uv run pytest tests/test_m1_fix009.py` | Exit 0; 44 passed |
+| `uv run pytest` | Exit 0; 891 passed, no skips |
 | `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 93 files formatted |
 | `uv run mypy src` | Exit 0; 56 source files |
 
