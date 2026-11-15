@@ -23,7 +23,8 @@ CI and awaits merge.
 | Publication state correction | APPROVED, documentation only | [Scoped review](reviews/TASK-009-PUBLICATION-STATE.md); no runtime or approval-policy changes |
 | TASK-011 | Reviewed and merged into main through PR #4 | [Implementation review](reviews/TASK-011.md), [guide](JOB_EXTRACTION.md), merge `f6a3bf0` |
 | TASK-012 | APPROVED — AWAITING MERGE | [Fixture review](reviews/TASK-012-FIXTURES.md) APPROVED; [implementation review](reviews/TASK-012.md) rounds 1–10 CHANGES REQUIRED (F-01–F-20), round 11 APPROVED on `07375b1`; CI 43628074843: 458 passed |
-| TASK-013–020 | NOT IMPLEMENTED | Skill aliases, review versions, matching and tailoring |
+| TASK-013 | IMPLEMENTED — AWAITING REVIEW | [Fixture review](reviews/TASK-013-FIXTURES.md) round 1 CHANGES REQUIRED, contract amended; implementation on `task/013-skill-aliases` |
+| TASK-014–020 | NOT IMPLEMENTED | Review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
 
