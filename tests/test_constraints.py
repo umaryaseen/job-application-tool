@@ -328,3 +328,49 @@ def test_cefr_and_out_of_range_thresholds_do_not_convert() -> None:
     for threshold in (cefr, zero):
         with pytest.raises(ConstraintError):
             months_from_threshold(threshold)
+
+
+# Implementation review round 1, F-01: only exact language concepts (or names no
+# alias covers) identify a language; ambiguous and technology aliases never do.
+@pytest.mark.parametrize(
+    "surface", ["Spark", "AWS", "Amazon Web Services", "Python", "Deep Learning"]
+)
+def test_non_language_surfaces_are_rejected_as_language_constraints(surface: str) -> None:
+    profile, reviews = build_profile(
+        [{"fact_id": "lang-x", "kind": "language", "status": "approved", "language": surface,
+          "assessment": {"assessment": "cefr", "level": "C2"}}]
+    )  # fmt: skip
+    constraint = CONSTRAINT.validate_json(
+        json.dumps({"type": "language", "language": surface, "min_level": "B2"})
+    )
+    with pytest.raises(ConstraintError, match="not a language"):
+        evaluate_constraints(profile, [constraint], as_of=date(2026, 11, 15), reviews=reviews)
+
+
+def test_non_language_fact_never_matches_a_language() -> None:
+    facts = [
+        {"fact_id": "lang-spark", "kind": "language", "status": "approved", "language": "Spark",
+         "assessment": {"assessment": "cefr", "level": "C2"}},
+        {"fact_id": "lang-aws", "kind": "language", "status": "approved",
+         "language": "Amazon Web Services", "assessment": {"assessment": "cefr", "level": "C2"}},
+    ]  # fmt: skip
+    profile, reviews = build_profile(facts)
+    for surface in ("German", "Portuguese", "Sparkish"):
+        constraint = CONSTRAINT.validate_json(
+            json.dumps({"type": "language", "language": surface, "min_level": "A1"})
+        )
+        [result] = evaluate_constraints(
+            profile, [constraint], as_of=date(2026, 11, 15), reviews=reviews
+        )
+        assert (result.state, result.fact_refs) == ("no_evidence", [])
+
+
+def test_language_concept_is_not_a_duration_skill_scope() -> None:
+    profile, reviews = build_profile(ORACLE["base_facts"])
+    constraint = CONSTRAINT.validate_json(
+        json.dumps(
+            {"type": "duration", "months": 1, "scope": {"kind": "skill", "concept": "lang-german"}}
+        )
+    )
+    with pytest.raises(ConstraintError, match="language"):
+        evaluate_constraints(profile, [constraint], as_of=date(2026, 11, 15), reviews=reviews)

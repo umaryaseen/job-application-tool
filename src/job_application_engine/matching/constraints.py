@@ -32,8 +32,8 @@ from ..domain.fact import (
 )
 from ..domain.profile import ProfileRevision
 from ..domain.requirement import CefrLevel, Threshold
-from ..normalization.aliases import normalize_surface, relations_of
-from ..normalization.dictionary import ConceptId
+from ..normalization.aliases import normalize_surface
+from ..normalization.dictionary import CONCEPTS, ConceptId
 from ..profile.review import LocalReviewReceipt
 from ..profile.validation import validate_profile
 from ..verification.support import EvidenceKey
@@ -171,11 +171,27 @@ def _name(text: str) -> str:
     return " ".join(unicodedata.normalize("NFC", text).split()).casefold()
 
 
-def _language_key(text: str) -> tuple[str, str]:
+_CONCEPT_KINDS = {concept.concept_id: concept.kind for concept in CONCEPTS}
+
+
+def _language_key(text: str) -> tuple[str, str] | None:
+    """Identity of a language surface, or None if it is not a language.
+
+    An exact (non-ambiguous) TASK-013 language concept gives concept identity;
+    a surface no alias covers compares by normalized name. An ambiguous alias or
+    a technology/field concept is not a language and never matches.
+    """
+
     mention = normalize_surface(text)
-    if mention.status == "matched" and mention.concept_id is not None:
+    if mention.status == "unmatched":
+        return "name", _name(text)
+    if (
+        mention.status == "matched"
+        and mention.concept_id is not None
+        and _CONCEPT_KINDS.get(mention.concept_id) == "language"
+    ):
         return "concept", mention.concept_id
-    return "name", _name(text)
+    return None
 
 
 def _expired(value: CredentialValue | AuthorizationValue, as_of: date) -> bool:
@@ -201,6 +217,8 @@ def _result(
 
 def _language(constraint: LanguageConstraint, facts: list[Any], as_of: date) -> ConstraintResult:
     key = _language_key(constraint.language)
+    if key is None:
+        raise ConstraintError("language constraint names a term that is not a language")
     matching = [
         fact
         for fact in facts
@@ -360,10 +378,11 @@ def _duration(constraint: DurationConstraint, facts: list[Any], as_of: date) -> 
             if isinstance(fact, EmploymentFact) and _name(fact.title) == title
         ]
     else:
-        try:
-            relations_of(scope.concept)
-        except ValueError:
-            raise ConstraintError("duration scope names an unknown concept") from None
+        kind = _CONCEPT_KINDS.get(scope.concept)
+        if kind is None:
+            raise ConstraintError("duration scope names an unknown concept")
+        if kind == "language":
+            raise ConstraintError("a language is not a duration skill scope")
         candidates = []
         for fact in facts:
             if not isinstance(fact, ProjectFact):

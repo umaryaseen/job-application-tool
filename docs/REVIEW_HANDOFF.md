@@ -21,3 +21,13 @@ extreme years and many intervals); multi-fact precedence and `fact_ids`;
 expiry in UTC; validation of the profile before evaluation; and that unknown
 data is never turned into a negative. Record findings and one verdict in
 `docs/reviews/TASK-015.md` without modifying implementation.
+
+## Round 2 request
+
+Round 1 ([report](reviews/TASK-015.md)) found F-01: language identity accepted
+any TASK-013 concept, including ambiguous and technology aliases. Identity now
+comes only from an exact concept of kind `language`, or from the normalized
+name of a surface no alias covers; a constraint naming an ambiguous or
+non-language term raises `ConstraintError`, and such a fact never matches. A
+duration skill scope may not name a language concept. Review the delta from
+`4cc18ef`.

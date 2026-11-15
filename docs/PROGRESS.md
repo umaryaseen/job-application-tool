@@ -120,8 +120,8 @@ Implementer verification on macOS (Python 3.12, locked environment):
 
 | Command | Result |
 | --- | --- |
-| `uv run pytest tests/test_constraints.py` | Exit 0; 115 passed |
-| `uv run pytest` | Exit 0; 840 passed, no skips |
+| `uv run pytest tests/test_constraints.py` | Exit 0; 122 passed |
+| `uv run pytest` | Exit 0; 847 passed, no skips |
 | `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 92 files formatted |
 | `uv run mypy src` | Exit 0; 56 source files |
 
