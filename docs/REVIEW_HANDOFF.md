@@ -1,7 +1,7 @@
 # Review handoff: M1-FIX-006 expected completion, specialization, display headings
 
-**Status: APPROVED** in round 2 on `591b339` (tree `c4799dea`); hosted CI
-43666629755 passed. See [the review](reviews/M1-FIX-006.md).
+**Status: APPROVED — AWAITING MERGE** (round 2 on `591b339`, tree
+`c4799dea`); hosted CI 43666629755 passed. See [the review](reviews/M1-FIX-006.md).
 
 ## Scoped closure check (pending)
 

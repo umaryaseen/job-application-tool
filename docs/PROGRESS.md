@@ -4,8 +4,8 @@ Last reconciled: 2026-11-15 against main `ee590699` (merged PR #5). TASK-011
 and TASK-012 are integrated. TASK-009 personal acceptance remains open: the
 applicant has supplied content decisions for the pending private revision, and
 M1-FIX-006 (expected completion, specialization, display headings) is
-implemented on `task/009-m1-fix-006` and awaits independent review before any
-new personal baseline is generated.
+independently approved on `task/009-m1-fix-006` and awaits merge before any new
+personal baseline is generated.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
