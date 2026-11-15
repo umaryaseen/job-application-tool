@@ -1,11 +1,11 @@
 # Current implementation state
 
-Last reconciled: 2026-11-15 against main `68aa5369` (merged PR #6). TASK-011,
-TASK-012 and M1-FIX-006 are integrated; TASK-013 is independently approved on
-PR #7 and awaits merge. TASK-009 personal acceptance remains open: the
-applicant's content decisions are applied privately and a first corrected
-baseline was generated for content review; a renderer fix for slash-joined
-terms (M1-FIX-007) is under review on its own branch.
+Last reconciled: 2026-11-15 against main `9c1d5580` (merged PR #7). TASK-011,
+TASK-012, M1-FIX-006 and TASK-013 are integrated; M1-FIX-007 is independently
+approved on PR #8 and awaits merge. TASK-009 personal acceptance remains open:
+the applicant's content decisions are applied privately and a corrected private
+baseline is in applicant review; its QA findings and pending applicant
+decisions are recorded in the private data root.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -22,7 +22,8 @@ terms (M1-FIX-007) is under review on its own branch.
 | TASK-011 | Reviewed and merged into main through PR #4 | [Implementation review](reviews/TASK-011.md), [guide](JOB_EXTRACTION.md), merge `f6a3bf0` |
 | TASK-012 | Reviewed and merged into main through PR #5 | [Review](reviews/TASK-012.md) round 11 APPROVED on `07375b1`; documentation closure `065d89e` scoped review APPROVED (Codex session `01a1db73-cb5f-7501-8cc2-4e2f10a55c05`); merge `ee59069` |
 | M1-FIX-006 | Reviewed and merged into main through PR #6 | [Review](reviews/M1-FIX-006.md) round 2 APPROVED on `591b339`; closure scoped review APPROVED; merge `68aa536` |
-| TASK-013 | APPROVED — AWAITING MERGE | [Fixture review](reviews/TASK-013-FIXTURES.md) round 1 resolved; [implementation review](reviews/TASK-013.md) round 2 APPROVED on `f26da14` |
+| TASK-013 | Reviewed and merged into main through PR #7 | [Review](reviews/TASK-013.md) round 2 APPROVED on `f26da14`; closure scoped review APPROVED; merge `9c1d558` |
+| M1-FIX-007 | APPROVED WITH FOLLOW-UP — AWAITING MERGE | [Task](tasks/M1-FIX-007.md); [review](reviews/M1-FIX-007.md) round 2 on `b906a7f`; low documentation follow-ups F-03/F-04 closed in this closure |
 | TASK-014–020 | NOT IMPLEMENTED | Review versions, matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -99,7 +100,7 @@ regressions fail on `ae6c461` and pass now. Full suite: 474 passed. Review
 round 2 on `591b339` returned APPROVED with no unresolved findings; hosted CI
 43666629755 passed on that head.
 
-## TASK-013 implementation (approved, awaiting merge)
+## TASK-013 implementation (merged)
 
 Adds a reviewed EN/DE skill-alias dictionary (`skill-aliases-v1`, rationale per
 concept) and an exact matcher: longest alias wins, no overlaps, Unicode
@@ -258,12 +259,9 @@ not interpreted.
 
 ## Next action
 
-Merge reviewed TASK-013 (PR #7). Complete M1-FIX-007 review, regenerate the
-corrected private baseline and present it with QA for applicant content review
-and a page-fit decision. Then TASK-014 (source-bound requirement review and
-correction versions). Then TASK-013
-(reviewed skill aliases, separate from lexical extraction) and TASK-014
-(source-bound correction/review versions). Separately, TASK-009 waits on
+Merge reviewed M1-FIX-007 (PR #8), regenerate the corrected private baseline
+and present it with QA for applicant review. Then TASK-014 (source-bound
+requirement review and correction versions). Separately, TASK-009 waits on
 applicant review of the private content revision; appearance-only approval
 keeps its scope. Before any downstream feature makes `source_url`
 clickable or fetchable, validate allowed URL schemes (F-02). Personal records

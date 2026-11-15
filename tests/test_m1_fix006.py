@@ -172,7 +172,8 @@ def test_display_headings_keep_internal_categories_and_order() -> None:
 
 
 def test_template_identity_changed() -> None:
-    assert TEMPLATE_VERSION == "baseline-v4-m1-fix006-expected-completion-display-headings"
+    # M1-FIX-006 introduced v4; M1-FIX-007 superseded it with the exact v5 identity.
+    assert TEMPLATE_VERSION == "baseline-v5-m1-fix007-slash-compounds"
 
 
 def test_real_pdf_extracts_expected_completion_specialization_and_headings(tmp_path: Path) -> None:

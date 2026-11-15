@@ -33,7 +33,7 @@ from .presentation import present_plan
 RENDERCV_VERSION = "2.8"
 TYPST_VERSION = "0.15.0"
 FONTS_VERSION = "0.5.1"
-TEMPLATE_VERSION = "baseline-v4-m1-fix006-expected-completion-display-headings"
+TEMPLATE_VERSION = "baseline-v5-m1-fix007-slash-compounds"
 NETWORK_DENY_PROFILE = "(version 1) (allow default) (deny network*)"
 MAX_PDF_BYTES = 2_000_000
 DEFAULT_TIMEOUT_SECONDS = 60
@@ -42,10 +42,14 @@ CONTACT_URL_WIDTH_ERROR = (
     "use an approved shorter URL or omit this contact"
 )
 HYPHENATED_COMPOUND_WIDTH_ERROR = (
-    "hyphenated compound exceeds the fixed A4 content width at the approved typography; "
+    "hyphenated or slash-joined compound exceeds the fixed A4 content width at the "
+    "approved typography; "
     "use an approved shorter wording"
 )
-_HYPHENATED_TOKEN = re.compile(r"(?<!\S)(?P<token>\S*-\S+)")
+# Whitespace-delimited tokens containing a hyphen or slash anywhere ("full-stack",
+# "CI/CD", "ISO/DIN", "trailing/", a lone "/") are atomic: a line break inside
+# them would change the extracted text that applicant-tracking systems read.
+_HYPHENATED_TOKEN = re.compile(r"(?<!\S)(?P<token>\S*[-/]\S*)")
 
 
 class PdfRenderError(RuntimeError):
@@ -146,7 +150,7 @@ def _contact_url_width_guard(contact_text: str) -> str:
 
 
 def _literal_text_expression(text_value: str) -> str:
-    """Emit escaped literal text with atomic ASCII-hyphenated compounds."""
+    """Emit escaped literal text with atomic hyphen- or slash-joined compounds."""
 
     parts: list[str] = []
     cursor = 0

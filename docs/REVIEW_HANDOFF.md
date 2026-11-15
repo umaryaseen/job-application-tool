@@ -1,14 +1,14 @@
-# Review handoff: TASK-013 skill-alias normalization
+# Review handoff: M1-FIX-007 slash-joined compounds
 
-**Status: APPROVED — AWAITING MERGE** (implementation review round 2 on
-`f26da14`). See [the review](reviews/TASK-013.md) and
-[fixture review](reviews/TASK-013-FIXTURES.md).
+**Status: APPROVED WITH FOLLOW-UP — AWAITING MERGE** (round 2 on `b906a7f`).
+See [the review](reviews/M1-FIX-007.md). TASK-013 and M1-FIX-006 are merged.
 
 ## Scoped closure check (pending)
 
-After `f26da14` the branch only (1) merges main (`68aa5369`, already reviewed
-M1-FIX-006 and TASK-012 closure) with a PROGRESS conflict resolution and
-(2) adds this documentation closure (round-2 report appended verbatim, PROGRESS
-and this handoff). Confirm the merge introduces no unreviewed code, the
-conflict resolution is faithful, and the records are accurate. Do not repeat
-runtime reviews; inspect hosted CI for the merged head.
+After `b906a7f` the branch only (1) merges main (`9c1d5580`, already reviewed
+TASK-013) with PROGRESS/REVIEW_HANDOFF conflict resolutions and (2) adds a
+documentation closure: the round-2 report appended, follow-up F-03 closed by
+describing the sweep accurately in the task (a bounded offset sweep with a
+line-start witness), F-04 closed by removing the trailing blank line, PROGRESS
+and this handoff. Confirm the merge introduces no unreviewed code and the
+records are accurate; do not repeat runtime reviews.
