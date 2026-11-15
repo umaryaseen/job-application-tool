@@ -152,3 +152,26 @@ for the exact source. That proves reproducibility, not that the posting was
 understood. An independently reviewed 30 EN / 29 DE synthetic oracle covers the
 documented grammar only. Requirement correction/review versions are TASK-014;
 nothing here approves a requirement, matches a career fact or authorizes export.
+
+## Normalize skill mentions
+
+TASK-013 adds a library (no CLI yet) that maps explicit technology, field and
+language mentions to internal concept IDs using a small reviewed dictionary
+(`normalization/dictionary.py`, version `skill-aliases-v1`). Each concept has
+EN/DE aliases and a recorded rationale. Matching is exact: the longest alias
+wins, mentions never overlap, and word aliases need letter/digit/combining-mark
+boundaries. Collision-prone abbreviations (C, R, ML, DL, JS, NLP, AI, KI, AWS,
+GCP, LLM/LLMs, k8s, React) are case-sensitive; C and R need strict neighbours,
+so "R&D", "C-level" and "Objective-C" yield nothing. Symbolic names (C++, C#,
+.NET, ASP.NET, Node.js, CI/CD) keep their distinctions. "Spark" alone is only an
+`ambiguous` candidate. Go, TS, Rust, Swift and Objective-C are deliberately not
+aliases.
+
+Broader/related links (SageMaker → AWS, PyTorch → deep learning, Azure
+Pipelines → Azure DevOps) are typed relations, never equivalence. A whole
+surface (for example a skill name) matches only when one alias covers it; any
+other surface stays `unmatched` with its literal text. Polarity and context
+come from the caller: `normalize_classification` annotates TASK-012 condition
+terms and marks terms in requirement-negated rows as negated. Nothing records
+possession, approval or a career fact. Matching evidence against requirements
+is TASK-015.
