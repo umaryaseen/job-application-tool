@@ -69,3 +69,70 @@ The renderer failures are environmental limitations of this checkout, not TASK-0
 ## Required next gate
 
 Fix F-01 and F-02, add regression tests for missing-tail/empty-history and metadata-only re-sign tampering, then rerun the focused suite, full suite in hosted renderer-capable CI, Ruff, format, mypy, diff check and the adversarial probes. Fix F-03 in the same narrow correction or record it as an explicit documented follow-up if the project intentionally treats the direct library API as offset-normalizing input. Return the corrected commit for independent review; this report does not approve the candidate.
+
+## Round 2 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning
+  `xhigh`, sandbox `workspace-write` on a throwaway detached checkout of
+  `5d034b9` plus a dedicated temporary directory, no network, session
+  `01a1dfe2-1c85-7aa0-a182-70ddfc7d04c4`. Tracked files unchanged; exit 0.
+- Hosted CI on `5d034b9`: run `43731564313` success (the reviewer did not query it).
+- The report below is verbatim. F-04 and F-05 are addressed by the next commit
+  for round 3.
+
+## Round 2 report
+
+VERDICT: CHANGES REQUIRED
+
+# TASK-014 independent implementation review — round 2
+
+- Reviewer: Codex, independent implementation reviewer in a separate session; implementation authored by Claude Code.
+- Date: 2026-11-15
+- Base: `18bd7824d364aa5634fac638fda485e8798a125e`; tree `edd0c9147d24c2a353cff01160e5054ee2f34ec5`
+- Candidate: `5d034b9607648900dbb114596651e0dd8793f905`; tree `1dbc9f6e80983c989979c14a6bb661fd0eb729f3`
+- Checkout: supplied detached checkout; tracked files remained unchanged during review.
+- Scope: cumulative base-to-candidate TASK-014 delta, A20, ADR-007/012, review handoff, replay/head protocol, tests and related documentation. Synthetic data only; no network or private applicant data.
+
+## Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `git status --short --branch` | 0 | Clean detached candidate. |
+| `git rev-parse HEAD HEAD^{tree} 18bd7824d364aa5634fac638fda485e8798a125e 18bd7824d364aa5634fac638fda485e8798a125e^{tree}` | 0 | IDs matched the supplied candidate and base. |
+| `git diff --stat 18bd7824d364aa5634fac638fda485e8798a125e..5d034b9607648900dbb114596651e0dd8793f905` and `git diff --name-status ...` | 0 | 7 paths; 347 insertions and 29 deletions. Complete changed-file diff inspected; no dependency or lockfile change. |
+| `.venv/bin/python -m pytest tests/test_requirement_review.py tests/test_requirement_classification.py -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r2-tmp/pytest` | 0 | 298 passed, 0 failed, 0 skipped (44 review tests and 254 classification tests). |
+| `PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r2-tmp/pytest-full` | 1 | 637 passed, 27 failed, 0 skipped. The 27 failures were renderer/ATS-QA tests: 10 in `tests/rendering/test_pdf_qa.py`, 2 in `tests/test_m1_fix.py`, 5 in `tests/test_m1_fix004.py`, 1 in `tests/test_m1_fix006.py`, 3 in `tests/test_m1_fix007.py`, and 6 in `tests/test_rendering.py`. Renderer workers and QA measurement subprocesses fail with nested `sandbox-exec` exit 71 in this checkout. |
+| `sandbox-exec -p '(version 1) (allow default) (deny network*)' true` | 71 | `sandbox_apply: Operation not permitted`; confirms the renderer limitation. |
+| `.venv/bin/python -m pytest tests/rendering/test_pdf_qa.py -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r2-tmp/pytest-pdfqa` | 1 | 24 passed, 10 failed; failures report unavailable Poppler verification or measurement exit 71 from the same nested sandbox limitation. |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed. |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 87 files already formatted. |
+| `.venv/bin/mypy src --cache-dir=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r2-tmp/mypy` | 0 | No issues in 53 source files. |
+| `git diff --check 18bd7824d364aa5634fac638fda485e8798a125e..5d034b9607648900dbb114596651e0dd8793f905` | 0 | No whitespace errors. |
+| `probe_crash_clean.py` | 0 | Crash after folder stage -> revision 0 draft; after link -> revision 1 replay; before head advance -> revision 1 replay; two unacknowledged links -> hard replay failure. |
+| `probe_integrity_clean.py` | 0 | Head ahead, revision symlink, revision oversize and head oversize were rejected. Focused tests also rejected missing head, edited/re-signed head metadata and renamed head. |
+| `probe_utc_clean.py` | 0 | Naive and non-UTC offset timestamps were rejected at the apply and stored-record model boundaries. |
+| `probe_connective.py` | 0 | A corrected condition with a raw-mismatching connective span was rejected; corrected child/group spans remained source-bound. |
+| `probe_lag_tail.py` | 0 | Valid crash-lag state had head 1 and files 1/2; deleting v2 was accepted as review revision 1. |
+| `probe_lag_reopen.py` | 0 | A lagged v2 `reopen` removed a gate, but deleting v2 replayed revision 1 and restored the stale Python hard gate. |
+| `probe_race_only.py` | 0 | Controlled concurrent writers left files v1/v2 with final head revision 1 after it had reached 2; writer B succeeded and slow writer A failed after publication with “stored requirement review does not reproduce its result.” |
+
+The first focused-test invocation was accidentally overlapped with a second invocation using the same pytest base directory and ended with one temporary-directory setup error (297 passed); the single, clean invocation above is authoritative.
+
+## Probes and assessment
+
+The round-1 F-01/F-02/F-03 cases pass in the ordinary acknowledged state: deleting an acknowledged newest or only revision, deleting or editing the head, re-signing the last revision metadata, and naive/offset review times are rejected. A one-revision head lag is accepted and a next correction catches it up; a second unacknowledged publication fails closed. Static foreign entries, symlinks, oversize JSON, head-ahead state, duplicate correction keys, stale digests, changed source, invalid spans, and raw posting immutability were also exercised. Whole-review-folder deletion returns an all-draft view with no hard gates, as documented. The source-bound condition, role/acceptance, negation and hard-gate tests pass.
+
+Two blocking integrity defects remain.
+
+## Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-04 | blocking | `src/job_application_engine/snapshots/requirements.py:247-255` | The one-revision crash-lag exception makes tail deletion indistinguishable from a valid shorter history. When head revision `n-1` points to its digest and files `v1..vn` exist, deleting `vn` leaves count `n-1` and the exact head digest expected by `_history`; replay accepts the rollback. The same occurs for the only revision when a crash leaves head 0 and v1, then v1 is deleted. This contradicts the documented “missing tail ... fails” guarantee and can restore a stale hard gate: in the probe, v1 accepted “Python is required.”, lagged v2 reopened it (zero gates), deleting v2 replayed v1 and returned the Python hard gate. | `probe_lag_tail.py`: before deletion, head=1, files v1/v2, replay revision=2; after unlinking v2, `load_review` returns revision 1. `probe_lag_reopen.py`: after unlinking lagged v2, `hard_gates` contains “Python is required.”. |
+| F-05 | blocking | `src/job_application_engine/snapshots/requirements.py:303-314` | `_write_head` reads the current head, checks `current.review_revision >= target`, then later uses unconditional `os.replace`. Two writers can both read head 0; writer B publishes v2 and replaces head with 2, then slow writer A replaces it with stale head 1. The head moves backwards, violating the explicit monotonic-head requirement. A’s publication remains on disk but its post-publication verification fails because replay now includes B’s newer view, leaving a confusing failed writer and a deliberately lagging head. | `probe_race_only.py` pauses A after its head-1 read, lets B publish and acknowledge v2, then resumes A. Output: files `head.json,v000001.json,v000002.json`, final head revision 1, replay revision 2, writer B succeeds, writer A raises `ReviewError: stored requirement review does not reproduce its result`. |
+
+The head, hash chain, replay, source binding, UTC validation, privacy path checks and hard-gate derivation otherwise match the reviewed requirements. The full-suite renderer failures are environmental in this checkout and require hosted renderer-capable CI; they do not exercise TASK-014 behavior.
+
+## Required next gate
+
+Fix F-04 with a durable, independent publication anchor or equivalent protocol that both preserves the allowed one-revision crash recovery and detects deletion of the newest/only revision from a lagged state. Fix F-05 by serializing or compare-and-swapping head advancement so a stale writer cannot replace a higher head. Add regression tests for both races and lagged-tail/only-file deletion, then rerun the focused suite, full hosted suite, Ruff, format, mypy, diff check and these probes. This review remains changes required until those invariants are demonstrated.
