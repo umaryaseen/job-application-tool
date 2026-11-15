@@ -1,0 +1,2607 @@
+{
+  "as_of_default": "2026-11-15",
+  "subject": "synthetic-person",
+  "base_facts": [
+    {
+      "fact_id": "emp-a",
+      "kind": "employment",
+      "status": "approved",
+      "employer_id": "synthetic-employer",
+      "title": "Data Analyst",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2018,
+          "month": 1
+        },
+        "start_state": "known",
+        "end": {
+          "precision": "month",
+          "year": 2019,
+          "month": 6
+        },
+        "end_state": "known"
+      }
+    },
+    {
+      "fact_id": "emp-b",
+      "kind": "employment",
+      "status": "approved",
+      "employer_id": "synthetic-employer",
+      "title": "Software Engineer",
+      "period": {
+        "start": {
+          "precision": "day",
+          "year": 2019,
+          "month": 3,
+          "day": 15
+        },
+        "start_state": "known",
+        "end": {
+          "precision": "day",
+          "year": 2021,
+          "month": 12,
+          "day": 31
+        },
+        "end_state": "known"
+      }
+    },
+    {
+      "fact_id": "emp-c",
+      "kind": "employment",
+      "status": "approved",
+      "employer_id": "synthetic-employer",
+      "title": "Working Student",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2023,
+          "month": 10
+        },
+        "start_state": "known",
+        "end": null,
+        "end_state": "ongoing"
+      }
+    },
+    {
+      "fact_id": "emp-d",
+      "kind": "employment",
+      "status": "approved",
+      "employer_id": "synthetic-employer",
+      "title": "Consultant",
+      "period": {
+        "start": null,
+        "start_state": "unknown",
+        "end": {
+          "precision": "year",
+          "year": 2017
+        },
+        "end_state": "known"
+      }
+    },
+    {
+      "fact_id": "emp-x",
+      "kind": "employment",
+      "status": "draft",
+      "employer_id": "synthetic-employer",
+      "title": "Ghost Engineer",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2010,
+          "month": 1
+        },
+        "start_state": "known",
+        "end": {
+          "precision": "month",
+          "year": 2015,
+          "month": 12
+        },
+        "end_state": "known"
+      }
+    },
+    {
+      "fact_id": "proj-1",
+      "kind": "project",
+      "status": "approved",
+      "project_entity_id": "synthetic-project",
+      "project_name": "Synthetic proj-1",
+      "role": "Contributor",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2019,
+          "month": 4
+        },
+        "start_state": "known",
+        "end": {
+          "precision": "month",
+          "year": 2020,
+          "month": 3
+        },
+        "end_state": "known"
+      },
+      "technologies": [
+        "Python",
+        "SQL"
+      ]
+    },
+    {
+      "fact_id": "proj-2",
+      "kind": "project",
+      "status": "approved",
+      "project_entity_id": "synthetic-project",
+      "project_name": "Synthetic proj-2",
+      "role": "Contributor",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2020,
+          "month": 1
+        },
+        "start_state": "known",
+        "end": {
+          "precision": "month",
+          "year": 2020,
+          "month": 12
+        },
+        "end_state": "known"
+      },
+      "technologies": [
+        "PyTorch"
+      ]
+    },
+    {
+      "fact_id": "proj-3",
+      "kind": "project",
+      "status": "approved",
+      "project_entity_id": "synthetic-project",
+      "project_name": "Synthetic proj-3",
+      "role": "Contributor",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2020,
+          "month": 1
+        },
+        "start_state": "known",
+        "end": {
+          "precision": "month",
+          "year": 2020,
+          "month": 6
+        },
+        "end_state": "known"
+      },
+      "technologies": [
+        "Python"
+      ]
+    },
+    {
+      "fact_id": "proj-4",
+      "kind": "project",
+      "status": "approved",
+      "project_entity_id": "synthetic-project",
+      "project_name": "Synthetic proj-4",
+      "role": "Contributor",
+      "period": {
+        "start": null,
+        "start_state": "unknown",
+        "end": null,
+        "end_state": "unknown"
+      },
+      "technologies": [
+        "Python"
+      ]
+    },
+    {
+      "fact_id": "proj-5",
+      "kind": "project",
+      "status": "approved",
+      "project_entity_id": "synthetic-project",
+      "project_name": "Synthetic proj-5",
+      "role": "Contributor",
+      "period": {
+        "start": null,
+        "start_state": "unknown",
+        "end": null,
+        "end_state": "unknown"
+      },
+      "technologies": [
+        "Docker"
+      ]
+    },
+    {
+      "fact_id": "proj-6",
+      "kind": "project",
+      "status": "approved",
+      "project_entity_id": "synthetic-project",
+      "project_name": "Synthetic proj-6",
+      "role": "Contributor",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2021,
+          "month": 1
+        },
+        "start_state": "known",
+        "end": null,
+        "end_state": "unknown"
+      },
+      "technologies": [
+        "SQL"
+      ]
+    },
+    {
+      "fact_id": "lang-de",
+      "kind": "language",
+      "status": "approved",
+      "language": "German",
+      "assessment": {
+        "assessment": "cefr",
+        "level": "A2"
+      }
+    },
+    {
+      "fact_id": "lang-en",
+      "kind": "language",
+      "status": "approved",
+      "language": "English",
+      "assessment": {
+        "assessment": "test_score",
+        "test_name": "IELTS",
+        "score": "7.5",
+        "scale": "9"
+      }
+    },
+    {
+      "fact_id": "lang-fr",
+      "kind": "language",
+      "status": "approved",
+      "language": "French",
+      "assessment": {
+        "assessment": "self_description",
+        "description": "C1"
+      }
+    },
+    {
+      "fact_id": "lang-es",
+      "kind": "language",
+      "status": "approved",
+      "language": "Spanish",
+      "assessment": {
+        "assessment": "cefr",
+        "level": "C1"
+      }
+    },
+    {
+      "fact_id": "lang-it",
+      "kind": "language",
+      "status": "draft",
+      "language": "Italian",
+      "assessment": {
+        "assessment": "cefr",
+        "level": "C2"
+      }
+    },
+    {
+      "fact_id": "cred-cloud",
+      "kind": "credential",
+      "status": "approved",
+      "value": {
+        "name": "Synthetic Cloud Practitioner",
+        "status": "awarded",
+        "expires_at": "2025-06-30T23:59:59+00:00"
+      }
+    },
+    {
+      "fact_id": "cred-scrum",
+      "kind": "credential",
+      "status": "approved",
+      "value": {
+        "name": "Synthetic Scrum Master",
+        "status": "awarded"
+      }
+    },
+    {
+      "fact_id": "cred-de",
+      "kind": "credential",
+      "status": "approved",
+      "value": {
+        "name": "Synthetic Data Engineer",
+        "status": "in_progress"
+      }
+    },
+    {
+      "fact_id": "cred-audit",
+      "kind": "credential",
+      "status": "approved",
+      "value": {
+        "name": "Synthetic Auditor",
+        "status": "awarded",
+        "valid_through": {
+          "precision": "month",
+          "year": 2026,
+          "month": 10
+        }
+      }
+    },
+    {
+      "fact_id": "cred-old",
+      "kind": "credential",
+      "status": "approved",
+      "value": {
+        "name": "Synthetic Legacy Admin",
+        "status": "expired",
+        "valid_through": {
+          "precision": "year",
+          "year": 2020
+        }
+      }
+    },
+    {
+      "fact_id": "cred-unk",
+      "kind": "credential",
+      "status": "approved",
+      "value": {
+        "name": "Synthetic Unknown Cert",
+        "status": "unknown"
+      }
+    },
+    {
+      "fact_id": "edu-msc",
+      "kind": "education",
+      "status": "approved",
+      "institution_id": "synthetic-school",
+      "program": "Synthetic Studies",
+      "degree_name": "M.Sc.",
+      "degree_status": "ongoing",
+      "period": {
+        "start": {
+          "precision": "month",
+          "year": 2023,
+          "month": 4
+        },
+        "start_state": "known",
+        "end": null,
+        "end_state": "ongoing"
+      },
+      "expected_completion_date": {
+        "precision": "month",
+        "year": 2027,
+        "month": 3
+      }
+    },
+    {
+      "fact_id": "edu-bsc",
+      "kind": "education",
+      "status": "approved",
+      "institution_id": "synthetic-school",
+      "program": "Synthetic Studies",
+      "degree_name": "B.Sc.",
+      "degree_status": "completed",
+      "period": {
+        "start": {
+          "precision": "year",
+          "year": 2013
+        },
+        "start_state": "known",
+        "end": {
+          "precision": "year",
+          "year": 2017
+        },
+        "end_state": "known"
+      },
+      "completion_date": {
+        "precision": "year",
+        "year": 2017
+      }
+    },
+    {
+      "fact_id": "auth-de",
+      "kind": "authorization",
+      "status": "approved",
+      "value": {
+        "status": "known",
+        "country": "Germany",
+        "scope": "work as a working student",
+        "as_of": {
+          "precision": "month",
+          "year": 2026,
+          "month": 1
+        },
+        "valid_through": {
+          "precision": "month",
+          "year": 2027,
+          "month": 3
+        }
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "lang-german-b2-below",
+      "constraint": {
+        "type": "language",
+        "language": "German",
+        "min_level": "B2"
+      },
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "cefr_below",
+        "fact_ids": [
+          "lang-de"
+        ]
+      }
+    },
+    {
+      "id": "lang-german-a1-meets",
+      "constraint": {
+        "type": "language",
+        "language": "German",
+        "min_level": "A1"
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "cefr_meets",
+        "fact_ids": [
+          "lang-de"
+        ]
+      }
+    },
+    {
+      "id": "lang-german-a2-equal",
+      "constraint": {
+        "type": "language",
+        "language": "German",
+        "min_level": "A2"
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "cefr_meets",
+        "fact_ids": [
+          "lang-de"
+        ]
+      }
+    },
+    {
+      "id": "lang-german-level-unstated",
+      "constraint": {
+        "type": "language",
+        "language": "German",
+        "min_level": null
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "required_level_unspecified",
+        "fact_ids": [
+          "lang-de"
+        ]
+      }
+    },
+    {
+      "id": "lang-deutsch-same-concept",
+      "constraint": {
+        "type": "language",
+        "language": "Deutsch",
+        "min_level": "B2"
+      },
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "cefr_below",
+        "fact_ids": [
+          "lang-de"
+        ]
+      }
+    },
+    {
+      "id": "lang-english-ielts-not-converted",
+      "constraint": {
+        "type": "language",
+        "language": "English",
+        "min_level": "C1"
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "assessment_not_comparable",
+        "fact_ids": [
+          "lang-en"
+        ]
+      }
+    },
+    {
+      "id": "lang-french-self-description-c1-not-parsed",
+      "constraint": {
+        "type": "language",
+        "language": "French",
+        "min_level": "B2"
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "assessment_not_comparable",
+        "fact_ids": [
+          "lang-fr"
+        ]
+      }
+    },
+    {
+      "id": "lang-spanish-c1-meets",
+      "constraint": {
+        "type": "language",
+        "language": "Spanish",
+        "min_level": "C1"
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "cefr_meets",
+        "fact_ids": [
+          "lang-es"
+        ]
+      }
+    },
+    {
+      "id": "lang-spanish-c2-below",
+      "constraint": {
+        "type": "language",
+        "language": "Spanish",
+        "min_level": "C2"
+      },
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "cefr_below",
+        "fact_ids": [
+          "lang-es"
+        ]
+      }
+    },
+    {
+      "id": "lang-italian-draft-ignored",
+      "constraint": {
+        "type": "language",
+        "language": "Italian",
+        "min_level": "B1"
+      },
+      "expected": {
+        "state": "no_evidence",
+        "rationale": "no_language_fact",
+        "fact_ids": []
+      }
+    },
+    {
+      "id": "lang-german-mixed-below-and-self-description",
+      "constraint": {
+        "type": "language",
+        "language": "German",
+        "min_level": "B2"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "lang-de2",
+          "kind": "language",
+          "status": "approved",
+          "language": "German",
+          "assessment": {
+            "assessment": "self_description",
+            "description": "fluent"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "assessment_not_comparable",
+        "fact_ids": [
+          "lang-de",
+          "lang-de2"
+        ]
+      }
+    },
+    {
+      "id": "lang-german-one-of-several-meets",
+      "constraint": {
+        "type": "language",
+        "language": "German",
+        "min_level": "B2"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "lang-de3",
+          "kind": "language",
+          "status": "approved",
+          "language": "Deutsch",
+          "assessment": {
+            "assessment": "cefr",
+            "level": "B2"
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "cefr_meets",
+        "fact_ids": [
+          "lang-de3"
+        ]
+      }
+    },
+    {
+      "id": "lang-native-is-not-c2",
+      "constraint": {
+        "type": "language",
+        "language": "Portuguese",
+        "min_level": "C2"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "lang-pt",
+          "kind": "language",
+          "status": "approved",
+          "language": "Portuguese",
+          "assessment": {
+            "assessment": "self_description",
+            "description": "Native"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "assessment_not_comparable",
+        "fact_ids": [
+          "lang-pt"
+        ]
+      }
+    },
+    {
+      "id": "lang-revoked-ignored",
+      "constraint": {
+        "type": "language",
+        "language": "Spanish",
+        "min_level": "C2"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "lang-es2",
+          "kind": "language",
+          "status": "revoked",
+          "language": "Spanish",
+          "assessment": {
+            "assessment": "cefr",
+            "level": "C2"
+          }
+        }
+      ],
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "cefr_below",
+        "fact_ids": [
+          "lang-es"
+        ]
+      }
+    },
+    {
+      "id": "cred-expired-at-as-of",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Cloud Practitioner"
+      },
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "credential_expired",
+        "fact_ids": [
+          "cred-cloud"
+        ]
+      }
+    },
+    {
+      "id": "cred-valid-on-expiry-day",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Cloud Practitioner"
+      },
+      "as_of": "2025-06-30",
+      "expected": {
+        "state": "direct",
+        "rationale": "credential_valid",
+        "fact_ids": [
+          "cred-cloud"
+        ]
+      }
+    },
+    {
+      "id": "cred-expired-day-after",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Cloud Practitioner"
+      },
+      "as_of": "2025-07-01",
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "credential_expired",
+        "fact_ids": [
+          "cred-cloud"
+        ]
+      }
+    },
+    {
+      "id": "cred-no-expiry-valid",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Scrum Master"
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "credential_valid",
+        "fact_ids": [
+          "cred-scrum"
+        ]
+      }
+    },
+    {
+      "id": "cred-name-normalized",
+      "constraint": {
+        "type": "credential",
+        "name": "  synthetic   SCRUM master "
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "credential_valid",
+        "fact_ids": [
+          "cred-scrum"
+        ]
+      }
+    },
+    {
+      "id": "cred-in-progress",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Data Engineer"
+      },
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "credential_in_progress",
+        "fact_ids": [
+          "cred-de"
+        ]
+      }
+    },
+    {
+      "id": "cred-valid-through-month-passed",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Auditor"
+      },
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "credential_expired",
+        "fact_ids": [
+          "cred-audit"
+        ]
+      }
+    },
+    {
+      "id": "cred-valid-through-month-last-day",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Auditor"
+      },
+      "as_of": "2026-10-31",
+      "expected": {
+        "state": "direct",
+        "rationale": "credential_valid",
+        "fact_ids": [
+          "cred-audit"
+        ]
+      }
+    },
+    {
+      "id": "cred-status-expired",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Legacy Admin"
+      },
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "credential_expired",
+        "fact_ids": [
+          "cred-old"
+        ]
+      }
+    },
+    {
+      "id": "cred-status-unknown",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Unknown Cert"
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "credential_status_unknown",
+        "fact_ids": [
+          "cred-unk"
+        ]
+      }
+    },
+    {
+      "id": "cred-missing",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Security Specialist"
+      },
+      "expected": {
+        "state": "no_evidence",
+        "rationale": "no_credential_fact",
+        "fact_ids": []
+      }
+    },
+    {
+      "id": "cred-expiry-converted-to-utc",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic TZ Cert"
+      },
+      "as_of": "2025-07-01",
+      "extra_facts": [
+        {
+          "fact_id": "cred-tz",
+          "kind": "credential",
+          "status": "approved",
+          "value": {
+            "name": "Synthetic TZ Cert",
+            "status": "awarded",
+            "expires_at": "2025-07-01T01:00:00+02:00"
+          }
+        }
+      ],
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "credential_expired",
+        "fact_ids": [
+          "cred-tz"
+        ]
+      }
+    },
+    {
+      "id": "cred-expiry-converted-to-utc-valid",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic TZ Cert"
+      },
+      "as_of": "2025-06-30",
+      "extra_facts": [
+        {
+          "fact_id": "cred-tz",
+          "kind": "credential",
+          "status": "approved",
+          "value": {
+            "name": "Synthetic TZ Cert",
+            "status": "awarded",
+            "expires_at": "2025-07-01T01:00:00+02:00"
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "credential_valid",
+        "fact_ids": [
+          "cred-tz"
+        ]
+      }
+    },
+    {
+      "id": "cred-one-valid-of-two",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Cloud Practitioner"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "cred-cloud2",
+          "kind": "credential",
+          "status": "approved",
+          "value": {
+            "name": "Synthetic Cloud Practitioner",
+            "status": "awarded"
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "credential_valid",
+        "fact_ids": [
+          "cred-cloud2"
+        ]
+      }
+    },
+    {
+      "id": "degree-in-progress",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "M.Sc."
+      },
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "degree_in_progress",
+        "fact_ids": [
+          "edu-msc"
+        ]
+      }
+    },
+    {
+      "id": "degree-name-normalized",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "m.sc."
+      },
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "degree_in_progress",
+        "fact_ids": [
+          "edu-msc"
+        ]
+      }
+    },
+    {
+      "id": "degree-completed",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "B.Sc."
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "degree_completed",
+        "fact_ids": [
+          "edu-bsc"
+        ]
+      }
+    },
+    {
+      "id": "degree-completion-year-contains-as-of",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "B.Sc."
+      },
+      "as_of": "2017-06-01",
+      "expected": {
+        "state": "unknown",
+        "rationale": "completion_precision",
+        "fact_ids": [
+          "edu-bsc"
+        ]
+      }
+    },
+    {
+      "id": "degree-completed-after-as-of",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "B.Sc."
+      },
+      "as_of": "2016-12-31",
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "completed_after_as_of",
+        "fact_ids": [
+          "edu-bsc"
+        ]
+      }
+    },
+    {
+      "id": "degree-completion-year-ended",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "B.Sc."
+      },
+      "as_of": "2017-12-31",
+      "expected": {
+        "state": "direct",
+        "rationale": "degree_completed",
+        "fact_ids": [
+          "edu-bsc"
+        ]
+      }
+    },
+    {
+      "id": "degree-missing",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "Ph.D."
+      },
+      "expected": {
+        "state": "no_evidence",
+        "rationale": "no_degree_fact",
+        "fact_ids": []
+      }
+    },
+    {
+      "id": "degree-withdrawn",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "MBA"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "edu-mba",
+          "kind": "education",
+          "status": "approved",
+          "institution_id": "synthetic-school",
+          "program": "Synthetic Studies",
+          "degree_name": "MBA",
+          "degree_status": "withdrawn",
+          "period": {
+            "start": {
+              "precision": "year",
+              "year": 2015
+            },
+            "start_state": "known",
+            "end": {
+              "precision": "year",
+              "year": 2016
+            },
+            "end_state": "known"
+          }
+        }
+      ],
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "degree_withdrawn",
+        "fact_ids": [
+          "edu-mba"
+        ]
+      }
+    },
+    {
+      "id": "degree-status-unknown",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "Diploma"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "edu-dip",
+          "kind": "education",
+          "status": "approved",
+          "institution_id": "synthetic-school",
+          "program": "Synthetic Studies",
+          "degree_name": "Diploma",
+          "degree_status": "unknown",
+          "period": {
+            "start": null,
+            "start_state": "unknown",
+            "end": null,
+            "end_state": "unknown"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "degree_status_unknown",
+        "fact_ids": [
+          "edu-dip"
+        ]
+      }
+    },
+    {
+      "id": "auth-country-matches",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "authorization_statement_matches",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-scope-normalized",
+      "constraint": {
+        "type": "authorization",
+        "country": "germany",
+        "scope": "Work as a  working student"
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "authorization_statement_matches",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-scope-mismatch",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": "unrestricted work"
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "no_matching_authorization_statement",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-other-country",
+      "constraint": {
+        "type": "authorization",
+        "country": "France",
+        "scope": null
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "no_matching_authorization_statement",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-expired-needs-review",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "as_of": "2027-04-01",
+      "expected": {
+        "state": "unknown",
+        "rationale": "authorization_expired_needs_review",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-valid-through-last-day",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "as_of": "2027-03-31",
+      "expected": {
+        "state": "direct",
+        "rationale": "authorization_statement_matches",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-statement-after-as-of",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "as_of": "2025-12-01",
+      "expected": {
+        "state": "unknown",
+        "rationale": "statement_after_as_of",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-missing-no-residence-inference",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "remove_fact_ids": [
+        "auth-de"
+      ],
+      "extra_facts": [
+        {
+          "fact_id": "contact-loc",
+          "kind": "contact",
+          "status": "approved",
+          "value": {
+            "kind": "location",
+            "value": "Berlin, Germany"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "authorization_not_recorded",
+        "fact_ids": []
+      }
+    },
+    {
+      "id": "auth-status-unknown",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "remove_fact_ids": [
+        "auth-de"
+      ],
+      "extra_facts": [
+        {
+          "fact_id": "auth-unk",
+          "kind": "authorization",
+          "status": "approved",
+          "value": {
+            "status": "unknown"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "authorization_status_unknown",
+        "fact_ids": [
+          "auth-unk"
+        ]
+      }
+    },
+    {
+      "id": "auth-known-statement-beats-unknown",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "extra_facts": [
+        {
+          "fact_id": "auth-unk",
+          "kind": "authorization",
+          "status": "approved",
+          "value": {
+            "status": "unknown"
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "authorization_statement_matches",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "dur-overall-5y",
+      "constraint": {
+        "type": "duration",
+        "months": 60,
+        "scope": {
+          "kind": "overall"
+        }
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "emp-a",
+          "emp-b",
+          "emp-c"
+        ],
+        "lower_months": 83,
+        "upper_months": 86,
+        "excluded": {
+          "emp-d": "unknown_start"
+        }
+      }
+    },
+    {
+      "id": "dur-overall-7y-overlap-counted-once",
+      "constraint": {
+        "type": "duration",
+        "months": 84,
+        "scope": {
+          "kind": "overall"
+        }
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "precision_insufficient",
+        "fact_ids": [
+          "emp-a",
+          "emp-b",
+          "emp-c"
+        ],
+        "lower_months": 83,
+        "upper_months": 86,
+        "excluded": {
+          "emp-d": "unknown_start"
+        }
+      }
+    },
+    {
+      "id": "dur-overall-8y-below",
+      "constraint": {
+        "type": "duration",
+        "months": 96,
+        "scope": {
+          "kind": "overall"
+        }
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "below_threshold_with_unknown_intervals",
+        "fact_ids": [
+          "emp-a",
+          "emp-b",
+          "emp-c"
+        ],
+        "lower_months": 83,
+        "upper_months": 86,
+        "excluded": {
+          "emp-d": "unknown_start"
+        }
+      }
+    },
+    {
+      "id": "dur-overall-pinned-as-of",
+      "constraint": {
+        "type": "duration",
+        "months": 12,
+        "scope": {
+          "kind": "overall"
+        }
+      },
+      "as_of": "2019-01-31",
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "emp-a"
+        ],
+        "lower_months": 12,
+        "upper_months": 13,
+        "excluded": {
+          "emp-b": "starts_after_as_of",
+          "emp-c": "starts_after_as_of",
+          "emp-d": "unknown_start"
+        }
+      }
+    },
+    {
+      "id": "dur-overall-only-unknown-dates",
+      "constraint": {
+        "type": "duration",
+        "months": 1,
+        "scope": {
+          "kind": "overall"
+        }
+      },
+      "as_of": "2017-06-01",
+      "expected": {
+        "state": "unknown",
+        "rationale": "only_unknown_dates",
+        "fact_ids": [],
+        "lower_months": 0,
+        "upper_months": 0,
+        "excluded": {
+          "emp-a": "starts_after_as_of",
+          "emp-b": "starts_after_as_of",
+          "emp-c": "starts_after_as_of",
+          "emp-d": "unknown_start"
+        }
+      }
+    },
+    {
+      "id": "dur-python-meets",
+      "constraint": {
+        "type": "duration",
+        "months": 12,
+        "scope": {
+          "kind": "skill",
+          "concept": "python"
+        }
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "proj-1",
+          "proj-3"
+        ],
+        "lower_months": 13,
+        "upper_months": 15,
+        "excluded": {
+          "proj-4": "unknown_start"
+        }
+      }
+    },
+    {
+      "id": "dur-python-below",
+      "constraint": {
+        "type": "duration",
+        "months": 24,
+        "scope": {
+          "kind": "skill",
+          "concept": "python"
+        }
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "below_threshold_with_unknown_intervals",
+        "fact_ids": [
+          "proj-1",
+          "proj-3"
+        ],
+        "lower_months": 13,
+        "upper_months": 15,
+        "excluded": {
+          "proj-4": "unknown_start"
+        }
+      }
+    },
+    {
+      "id": "dur-sql-meets-unknown-end-excluded",
+      "constraint": {
+        "type": "duration",
+        "months": 6,
+        "scope": {
+          "kind": "skill",
+          "concept": "sql"
+        }
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "proj-1"
+        ],
+        "lower_months": 10,
+        "upper_months": 12,
+        "excluded": {
+          "proj-6": "unknown_end"
+        }
+      }
+    },
+    {
+      "id": "dur-sql-precision",
+      "constraint": {
+        "type": "duration",
+        "months": 12,
+        "scope": {
+          "kind": "skill",
+          "concept": "sql"
+        }
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "precision_insufficient",
+        "fact_ids": [
+          "proj-1"
+        ],
+        "lower_months": 10,
+        "upper_months": 12,
+        "excluded": {
+          "proj-6": "unknown_end"
+        }
+      }
+    },
+    {
+      "id": "dur-pytorch-precision",
+      "constraint": {
+        "type": "duration",
+        "months": 12,
+        "scope": {
+          "kind": "skill",
+          "concept": "pytorch"
+        }
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "precision_insufficient",
+        "fact_ids": [
+          "proj-2"
+        ],
+        "lower_months": 10,
+        "upper_months": 12,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-deep-learning-is-not-pytorch",
+      "constraint": {
+        "type": "duration",
+        "months": 1,
+        "scope": {
+          "kind": "skill",
+          "concept": "deep-learning"
+        }
+      },
+      "expected": {
+        "state": "no_evidence",
+        "rationale": "no_scoped_interval",
+        "fact_ids": [],
+        "lower_months": 0,
+        "upper_months": 0,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-kubernetes-none",
+      "constraint": {
+        "type": "duration",
+        "months": 1,
+        "scope": {
+          "kind": "skill",
+          "concept": "kubernetes"
+        }
+      },
+      "expected": {
+        "state": "no_evidence",
+        "rationale": "no_scoped_interval",
+        "fact_ids": [],
+        "lower_months": 0,
+        "upper_months": 0,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-docker-only-unknown",
+      "constraint": {
+        "type": "duration",
+        "months": 1,
+        "scope": {
+          "kind": "skill",
+          "concept": "docker"
+        }
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "only_unknown_dates",
+        "fact_ids": [],
+        "lower_months": 0,
+        "upper_months": 0,
+        "excluded": {
+          "proj-5": "unknown_start"
+        }
+      }
+    },
+    {
+      "id": "dur-role-exact",
+      "constraint": {
+        "type": "duration",
+        "months": 24,
+        "scope": {
+          "kind": "role",
+          "title": "Software Engineer"
+        }
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "emp-b"
+        ],
+        "lower_months": 33,
+        "upper_months": 34,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-role-normalized",
+      "constraint": {
+        "type": "duration",
+        "months": 24,
+        "scope": {
+          "kind": "role",
+          "title": " software   ENGINEER "
+        }
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "emp-b"
+        ],
+        "lower_months": 33,
+        "upper_months": 34,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-role-senior-not-inferred",
+      "constraint": {
+        "type": "duration",
+        "months": 12,
+        "scope": {
+          "kind": "role",
+          "title": "Senior Software Engineer"
+        }
+      },
+      "expected": {
+        "state": "no_evidence",
+        "rationale": "no_scoped_interval",
+        "fact_ids": [],
+        "lower_months": 0,
+        "upper_months": 0,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-role-starts-after-as-of",
+      "constraint": {
+        "type": "duration",
+        "months": 1,
+        "scope": {
+          "kind": "role",
+          "title": "Working Student"
+        }
+      },
+      "as_of": "2023-06-01",
+      "expected": {
+        "state": "no_evidence",
+        "rationale": "no_scoped_interval",
+        "fact_ids": [],
+        "lower_months": 0,
+        "upper_months": 0,
+        "excluded": {
+          "emp-c": "starts_after_as_of"
+        }
+      }
+    },
+    {
+      "id": "dur-part-time-is-calendar-time",
+      "constraint": {
+        "type": "duration",
+        "months": 36,
+        "scope": {
+          "kind": "role",
+          "title": "Working Student"
+        }
+      },
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "emp-c"
+        ],
+        "lower_months": 36,
+        "upper_months": 38,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-day-start-after-as-of-same-month",
+      "constraint": {
+        "type": "duration",
+        "months": 1,
+        "scope": {
+          "kind": "role",
+          "title": "Intern"
+        }
+      },
+      "extra_facts": [
+        {
+          "fact_id": "emp-intern",
+          "kind": "employment",
+          "status": "approved",
+          "employer_id": "synthetic-employer",
+          "title": "Intern",
+          "period": {
+            "start": {
+              "precision": "day",
+              "year": 2026,
+              "month": 11,
+              "day": 20
+            },
+            "start_state": "known",
+            "end": null,
+            "end_state": "ongoing"
+          }
+        }
+      ],
+      "expected": {
+        "state": "no_evidence",
+        "rationale": "no_scoped_interval",
+        "fact_ids": [],
+        "lower_months": 0,
+        "upper_months": 0,
+        "excluded": {
+          "emp-intern": "starts_after_as_of"
+        }
+      }
+    },
+    {
+      "id": "dur-day-start-before-as-of-same-month",
+      "constraint": {
+        "type": "duration",
+        "months": 1,
+        "scope": {
+          "kind": "role",
+          "title": "Trainee"
+        }
+      },
+      "extra_facts": [
+        {
+          "fact_id": "emp-trainee",
+          "kind": "employment",
+          "status": "approved",
+          "employer_id": "synthetic-employer",
+          "title": "Trainee",
+          "period": {
+            "start": {
+              "precision": "day",
+              "year": 2026,
+              "month": 11,
+              "day": 10
+            },
+            "start_state": "known",
+            "end": null,
+            "end_state": "ongoing"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "precision_insufficient",
+        "fact_ids": [
+          "emp-trainee"
+        ],
+        "lower_months": 0,
+        "upper_months": 1,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-known-end-after-as-of-is-cut",
+      "constraint": {
+        "type": "duration",
+        "months": 2,
+        "scope": {
+          "kind": "role",
+          "title": "Contractor"
+        }
+      },
+      "extra_facts": [
+        {
+          "fact_id": "emp-contract",
+          "kind": "employment",
+          "status": "approved",
+          "employer_id": "synthetic-employer",
+          "title": "Contractor",
+          "period": {
+            "start": {
+              "precision": "day",
+              "year": 2026,
+              "month": 9,
+              "day": 1
+            },
+            "start_state": "known",
+            "end": {
+              "precision": "day",
+              "year": 2026,
+              "month": 11,
+              "day": 30
+            },
+            "end_state": "known"
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "emp-contract"
+        ],
+        "lower_months": 2,
+        "upper_months": 3,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-year-precision-short",
+      "constraint": {
+        "type": "duration",
+        "months": 12,
+        "scope": {
+          "kind": "role",
+          "title": "Research Assistant"
+        }
+      },
+      "extra_facts": [
+        {
+          "fact_id": "emp-ra",
+          "kind": "employment",
+          "status": "approved",
+          "employer_id": "synthetic-employer",
+          "title": "Research Assistant",
+          "period": {
+            "start": {
+              "precision": "year",
+              "year": 2012
+            },
+            "start_state": "known",
+            "end": {
+              "precision": "year",
+              "year": 2013
+            },
+            "end_state": "known"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "precision_insufficient",
+        "fact_ids": [
+          "emp-ra"
+        ],
+        "lower_months": 0,
+        "upper_months": 24,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-year-precision-meets",
+      "constraint": {
+        "type": "duration",
+        "months": 36,
+        "scope": {
+          "kind": "role",
+          "title": "Lab Engineer"
+        }
+      },
+      "extra_facts": [
+        {
+          "fact_id": "emp-le",
+          "kind": "employment",
+          "status": "approved",
+          "employer_id": "synthetic-employer",
+          "title": "Lab Engineer",
+          "period": {
+            "start": {
+              "precision": "year",
+              "year": 2010
+            },
+            "start_state": "known",
+            "end": {
+              "precision": "year",
+              "year": 2014
+            },
+            "end_state": "known"
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "emp-le"
+        ],
+        "lower_months": 36,
+        "upper_months": 60,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-year-precision-uncertain",
+      "constraint": {
+        "type": "duration",
+        "months": 48,
+        "scope": {
+          "kind": "role",
+          "title": "Lab Engineer"
+        }
+      },
+      "extra_facts": [
+        {
+          "fact_id": "emp-le",
+          "kind": "employment",
+          "status": "approved",
+          "employer_id": "synthetic-employer",
+          "title": "Lab Engineer",
+          "period": {
+            "start": {
+              "precision": "year",
+              "year": 2010
+            },
+            "start_state": "known",
+            "end": {
+              "precision": "year",
+              "year": 2014
+            },
+            "end_state": "known"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "precision_insufficient",
+        "fact_ids": [
+          "emp-le"
+        ],
+        "lower_months": 36,
+        "upper_months": 60,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-python-periodless-facts-never-add-time",
+      "constraint": {
+        "type": "duration",
+        "months": 12,
+        "scope": {
+          "kind": "skill",
+          "concept": "python"
+        }
+      },
+      "extra_facts": [
+        {
+          "fact_id": "resp-py",
+          "kind": "responsibility",
+          "status": "approved",
+          "employment_ref": {
+            "fact_id": "emp-b",
+            "revision": 1
+          },
+          "text": "Built services in Python."
+        },
+        {
+          "fact_id": "skill-py-used",
+          "kind": "skill",
+          "status": "approved",
+          "name": "Python",
+          "context": "used"
+        },
+        {
+          "fact_id": "skill-py-exposure",
+          "kind": "skill",
+          "status": "approved",
+          "name": "Python",
+          "context": "exposure"
+        },
+        {
+          "fact_id": "skill-py-study",
+          "kind": "skill",
+          "status": "approved",
+          "name": "Python",
+          "context": "study"
+        },
+        {
+          "fact_id": "edu-py",
+          "kind": "education",
+          "status": "approved",
+          "institution_id": "synthetic-school",
+          "program": "Synthetic Studies",
+          "degree_name": "Certificate",
+          "degree_status": "completed",
+          "period": {
+            "start": {
+              "precision": "year",
+              "year": 2008
+            },
+            "start_state": "known",
+            "end": {
+              "precision": "year",
+              "year": 2009
+            },
+            "end_state": "known"
+          },
+          "coursework": [
+            "Python"
+          ]
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "proj-1",
+          "proj-3"
+        ],
+        "lower_months": 13,
+        "upper_months": 15,
+        "excluded": {
+          "proj-4": "unknown_start"
+        }
+      }
+    },
+    {
+      "id": "dur-exposure-skill-is-not-duration",
+      "constraint": {
+        "type": "duration",
+        "months": 1,
+        "scope": {
+          "kind": "skill",
+          "concept": "kubernetes"
+        }
+      },
+      "extra_facts": [
+        {
+          "fact_id": "skill-k8s",
+          "kind": "skill",
+          "status": "approved",
+          "name": "Kubernetes",
+          "context": "exposure"
+        }
+      ],
+      "expected": {
+        "state": "no_evidence",
+        "rationale": "no_scoped_interval",
+        "fact_ids": [],
+        "lower_months": 0,
+        "upper_months": 0,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-pytorch-documented-below",
+      "constraint": {
+        "type": "duration",
+        "months": 24,
+        "scope": {
+          "kind": "skill",
+          "concept": "pytorch"
+        }
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "documented_below_threshold",
+        "fact_ids": [
+          "proj-2"
+        ],
+        "lower_months": 10,
+        "upper_months": 12,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "dur-role-documented-below",
+      "constraint": {
+        "type": "duration",
+        "months": 48,
+        "scope": {
+          "kind": "role",
+          "title": "Software Engineer"
+        }
+      },
+      "expected": {
+        "state": "unknown",
+        "rationale": "documented_below_threshold",
+        "fact_ids": [
+          "emp-b"
+        ],
+        "lower_months": 33,
+        "upper_months": 34,
+        "excluded": {}
+      }
+    },
+    {
+      "id": "degree-completed-beats-ongoing",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "M.Sc."
+      },
+      "extra_facts": [
+        {
+          "fact_id": "edu-msc2",
+          "kind": "education",
+          "status": "approved",
+          "institution_id": "synthetic-school",
+          "program": "Synthetic Studies",
+          "degree_name": "M.Sc.",
+          "degree_status": "completed",
+          "period": {
+            "start": {
+              "precision": "year",
+              "year": 2013
+            },
+            "start_state": "known",
+            "end": {
+              "precision": "year",
+              "year": 2015
+            },
+            "end_state": "known"
+          },
+          "completion_date": {
+            "precision": "year",
+            "year": 2015
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "degree_completed",
+        "fact_ids": [
+          "edu-msc2"
+        ]
+      }
+    },
+    {
+      "id": "degree-unknown-beats-ongoing",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "M.Sc."
+      },
+      "extra_facts": [
+        {
+          "fact_id": "edu-msc3",
+          "kind": "education",
+          "status": "approved",
+          "institution_id": "synthetic-school",
+          "program": "Synthetic Studies",
+          "degree_name": "M.Sc.",
+          "degree_status": "unknown",
+          "period": {
+            "start": null,
+            "start_state": "unknown",
+            "end": null,
+            "end_state": "unknown"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "degree_status_unknown",
+        "fact_ids": [
+          "edu-msc",
+          "edu-msc3"
+        ]
+      }
+    },
+    {
+      "id": "degree-in-progress-beats-withdrawn",
+      "constraint": {
+        "type": "degree",
+        "degree_name": "M.Sc."
+      },
+      "extra_facts": [
+        {
+          "fact_id": "edu-msc4",
+          "kind": "education",
+          "status": "approved",
+          "institution_id": "synthetic-school",
+          "program": "Synthetic Studies",
+          "degree_name": "M.Sc.",
+          "degree_status": "withdrawn",
+          "period": {
+            "start": {
+              "precision": "year",
+              "year": 2015
+            },
+            "start_state": "known",
+            "end": {
+              "precision": "year",
+              "year": 2016
+            },
+            "end_state": "known"
+          }
+        }
+      ],
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "degree_in_progress",
+        "fact_ids": [
+          "edu-msc",
+          "edu-msc4"
+        ]
+      }
+    },
+    {
+      "id": "lang-cefr-meets-beats-test-score",
+      "constraint": {
+        "type": "language",
+        "language": "English",
+        "min_level": "C1"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "lang-en2",
+          "kind": "language",
+          "status": "approved",
+          "language": "English",
+          "assessment": {
+            "assessment": "cefr",
+            "level": "C1"
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "cefr_meets",
+        "fact_ids": [
+          "lang-en2"
+        ]
+      }
+    },
+    {
+      "id": "cred-unknown-beats-expired",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Cloud Practitioner"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "cred-cloud3",
+          "kind": "credential",
+          "status": "approved",
+          "value": {
+            "name": "Synthetic Cloud Practitioner",
+            "status": "unknown"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "credential_status_unknown",
+        "fact_ids": [
+          "cred-cloud",
+          "cred-cloud3"
+        ]
+      }
+    },
+    {
+      "id": "cred-in-progress-beats-expired",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Cloud Practitioner"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "cred-cloud4",
+          "kind": "credential",
+          "status": "approved",
+          "value": {
+            "name": "Synthetic Cloud Practitioner",
+            "status": "in_progress"
+          }
+        }
+      ],
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "credential_in_progress",
+        "fact_ids": [
+          "cred-cloud",
+          "cred-cloud4"
+        ]
+      }
+    },
+    {
+      "id": "auth-expired-beats-status-unknown",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "as_of": "2027-04-01",
+      "extra_facts": [
+        {
+          "fact_id": "auth-unk",
+          "kind": "authorization",
+          "status": "approved",
+          "value": {
+            "status": "unknown"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "authorization_expired_needs_review",
+        "fact_ids": [
+          "auth-de",
+          "auth-unk"
+        ]
+      }
+    },
+    {
+      "id": "auth-status-unknown-beats-no-match",
+      "constraint": {
+        "type": "authorization",
+        "country": "France",
+        "scope": null
+      },
+      "extra_facts": [
+        {
+          "fact_id": "auth-unk",
+          "kind": "authorization",
+          "status": "approved",
+          "value": {
+            "status": "unknown"
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "authorization_status_unknown",
+        "fact_ids": [
+          "auth-de",
+          "auth-unk"
+        ]
+      }
+    },
+    {
+      "id": "cred-awarded-after-as-of",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Future Cert"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "cred-fut",
+          "kind": "credential",
+          "status": "approved",
+          "value": {
+            "name": "Synthetic Future Cert",
+            "status": "awarded",
+            "awarded_on": {
+              "precision": "day",
+              "year": 2026,
+              "month": 12,
+              "day": 1
+            }
+          }
+        }
+      ],
+      "expected": {
+        "state": "explicitly_unmet",
+        "rationale": "awarded_after_as_of",
+        "fact_ids": [
+          "cred-fut"
+        ]
+      }
+    },
+    {
+      "id": "cred-award-month-contains-as-of",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Future Cert"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "cred-fut",
+          "kind": "credential",
+          "status": "approved",
+          "value": {
+            "name": "Synthetic Future Cert",
+            "status": "awarded",
+            "awarded_on": {
+              "precision": "month",
+              "year": 2026,
+              "month": 11
+            }
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "award_date_precision",
+        "fact_ids": [
+          "cred-fut"
+        ]
+      }
+    },
+    {
+      "id": "cred-award-year-contains-as-of",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Future Cert"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "cred-fut",
+          "kind": "credential",
+          "status": "approved",
+          "value": {
+            "name": "Synthetic Future Cert",
+            "status": "awarded",
+            "awarded_on": {
+              "precision": "year",
+              "year": 2026
+            }
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "award_date_precision",
+        "fact_ids": [
+          "cred-fut"
+        ]
+      }
+    },
+    {
+      "id": "cred-award-month-before-as-of",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Future Cert"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "cred-fut",
+          "kind": "credential",
+          "status": "approved",
+          "value": {
+            "name": "Synthetic Future Cert",
+            "status": "awarded",
+            "awarded_on": {
+              "precision": "month",
+              "year": 2026,
+              "month": 10
+            }
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "credential_valid",
+        "fact_ids": [
+          "cred-fut"
+        ]
+      }
+    },
+    {
+      "id": "cred-awarded-on-as-of-day",
+      "constraint": {
+        "type": "credential",
+        "name": "Synthetic Future Cert"
+      },
+      "extra_facts": [
+        {
+          "fact_id": "cred-fut",
+          "kind": "credential",
+          "status": "approved",
+          "value": {
+            "name": "Synthetic Future Cert",
+            "status": "awarded",
+            "awarded_on": {
+              "precision": "day",
+              "year": 2026,
+              "month": 11,
+              "day": 15
+            }
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "credential_valid",
+        "fact_ids": [
+          "cred-fut"
+        ]
+      }
+    },
+    {
+      "id": "auth-statement-month-contains-as-of",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "as_of": "2026-01-15",
+      "expected": {
+        "state": "unknown",
+        "rationale": "statement_date_precision",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-statement-month-last-day",
+      "constraint": {
+        "type": "authorization",
+        "country": "Germany",
+        "scope": null
+      },
+      "as_of": "2026-01-31",
+      "expected": {
+        "state": "direct",
+        "rationale": "authorization_statement_matches",
+        "fact_ids": [
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-statement-year-contains-as-of",
+      "constraint": {
+        "type": "authorization",
+        "country": "Austria",
+        "scope": null
+      },
+      "as_of": "2026-06-01",
+      "extra_facts": [
+        {
+          "fact_id": "auth-at",
+          "kind": "authorization",
+          "status": "approved",
+          "value": {
+            "status": "known",
+            "country": "Austria",
+            "as_of": {
+              "precision": "year",
+              "year": 2026
+            }
+          }
+        }
+      ],
+      "expected": {
+        "state": "unknown",
+        "rationale": "statement_date_precision",
+        "fact_ids": [
+          "auth-at",
+          "auth-de"
+        ]
+      }
+    },
+    {
+      "id": "auth-statement-year-ended",
+      "constraint": {
+        "type": "authorization",
+        "country": "Austria",
+        "scope": null
+      },
+      "as_of": "2027-01-01",
+      "extra_facts": [
+        {
+          "fact_id": "auth-at",
+          "kind": "authorization",
+          "status": "approved",
+          "value": {
+            "status": "known",
+            "country": "Austria",
+            "as_of": {
+              "precision": "year",
+              "year": 2026
+            }
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "authorization_statement_matches",
+        "fact_ids": [
+          "auth-at"
+        ]
+      }
+    },
+    {
+      "id": "dur-known-end-non-last-day-after-as-of",
+      "constraint": {
+        "type": "duration",
+        "months": 3,
+        "scope": {
+          "kind": "role",
+          "title": "Seasonal"
+        }
+      },
+      "extra_facts": [
+        {
+          "fact_id": "emp-season",
+          "kind": "employment",
+          "status": "approved",
+          "employer_id": "synthetic-employer",
+          "title": "Seasonal",
+          "period": {
+            "start": {
+              "precision": "day",
+              "year": 2026,
+              "month": 8,
+              "day": 1
+            },
+            "start_state": "known",
+            "end": {
+              "precision": "day",
+              "year": 2026,
+              "month": 11,
+              "day": 20
+            },
+            "end_state": "known"
+          }
+        }
+      ],
+      "expected": {
+        "state": "direct",
+        "rationale": "duration_meets",
+        "fact_ids": [
+          "emp-season"
+        ],
+        "lower_months": 3,
+        "upper_months": 4,
+        "excluded": {}
+      }
+    }
+  ]
+}
