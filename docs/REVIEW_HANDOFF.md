@@ -19,7 +19,7 @@ compact line and do not loosen checks; template identity; no typography,
 selection or provenance change. Record findings and one verdict in
 `docs/reviews/M1-FIX-008.md` without modifying implementation. Renderer tests
 need macOS `sandbox-exec`: inspect hosted CI for the exact head. Implementer
-full suite: 669 passed, no skips.
+full suite: 676 passed, no skips.
 
 ## Round 3 request
 
@@ -28,3 +28,13 @@ missing heading passed the text-level checks. The correction adds a separate
 mandatory `heading_presentation` QA check from Poppler `-bbox-layout` word
 heights (task item 5), a real adversarial PDF mutation with identical text and
 body-sized headings, and synthetic XML cases. Review the delta from `a1e5d36`.
+
+## Round 4 request
+
+Round 3 (CHANGES REQUIRED) found that zero-height boxes could pass or crash the
+presentation check (F-01) and that a document-wide median failed short valid
+documents (F-02); F-03 (heading-sized non-heading lines, no rotation signal) was
+a follow-up. The correction measures each heading against its own section body,
+fails closed on any non-finite or non-positive word box (and catches arithmetic
+errors at the caller), and states the F-03 limit in task item 5. Review the
+delta from `2422eac`.

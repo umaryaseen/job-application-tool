@@ -369,6 +369,51 @@ def test_presentation_fails_closed(lines: list[tuple[str, float, float]]) -> Non
 def test_presentation_order_spans_pages_and_reports_measurements() -> None:
     assert _presented(BODY, pages=2)
     passed, measured = _heading_presentation(_xml(BODY), _oracle())
-    assert passed and measured["body_word_height_pt"] == 12.9
+    assert passed and measured["invalid_word_boxes"] == 0
     assert [h["label"] for h in measured["headings"]] == ["Skills", "Languages"]
-    assert all(h["ratio"] > 1.2 for h in measured["headings"])
+    assert all(
+        h["section_body_height_pt"] == 12.9 and h["ratio"] > 1.2 for h in measured["headings"]
+    )
+
+
+# Round 3 F-01: invalid geometry fails closed, never crashes; F-02: the reference
+# is each heading's own section body, so short documents and a large name pass.
+@pytest.mark.parametrize("height", [0.0, -1.0, "nan", "inf"])
+def test_invalid_word_boxes_fail_closed(height) -> None:
+    xml = _xml(BODY).replace(
+        'yMax="52.9"', f'yMax="{height}"' if isinstance(height, str) else f'yMax="{40 + height}"'
+    )
+    assert 'yMax="52.9"' not in xml
+    passed, measured = _heading_presentation(xml, _oracle())
+    assert not passed and measured["invalid_word_boxes"] >= 1
+
+
+def test_all_zero_geometry_does_not_raise() -> None:
+    flat = [(text, top, 0.0) for text, top, _ in BODY]
+    assert _heading_presentation(_xml(flat), _oracle())[0] is False
+
+
+def _one_section() -> ExpectedDocument:
+    return ExpectedDocument(
+        required_identity="Synthetic Example",
+        sections=[
+            ExpectedSection(label="Contact", heading_visible=False,
+                            entries=[ExpectedEntry(entry_id="name", text="Synthetic Example")]),
+            ExpectedSection(label="Skills", entries=[ExpectedEntry(entry_id="g", text="Alpha")]),
+        ],
+        expected_pages=1,
+    )  # fmt: skip
+
+
+def test_sparse_documents_and_a_large_name_pass() -> None:
+    sparse = [("Synthetic Example", 40, 35.2), ("Skills", 80, 18.1), ("Alpha", 110, 12.9),
+              ("Languages", 140, 18.1), ("German", 170, 12.9)]  # fmt: skip
+    assert _presented(sparse)
+    one = [("Synthetic Example", 40, 35.2), ("Skills", 80, 18.1), ("Alpha", 110, 12.9)]
+    assert _heading_presentation(_xml(one), _one_section())[0]
+
+
+def test_heading_without_a_section_body_fails() -> None:
+    assert not _heading_presentation(_xml([("Skills", 80, 18.1)]), _one_section())[0]
+    tail = [line for line in BODY if line[0] != "German (A1-A2)"]
+    assert not _presented(tail)

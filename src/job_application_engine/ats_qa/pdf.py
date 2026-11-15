@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import shutil
 import statistics
 import subprocess
@@ -208,11 +209,19 @@ def _tag(element: ET.Element) -> str:
 
 
 def _heading_presentation(xml: str, expected: ExpectedDocument) -> tuple[bool, dict[str, Any]]:
-    """Each visible heading: one whole Poppler line, heading-sized, in order."""
+    """Each visible heading: one whole Poppler line, in order, larger than its section body.
+
+    The reference is the median word height of the lines between a heading and
+    the next one (every expected section has at least one entry), so a large
+    name line or a short document cannot skew it. Any word box that is not
+    finite and positive fails the check. This proves heading-sized presentation
+    of the exact label, not semantic identity: in the trusted template only the
+    heading style produces such a line (and Poppler reports no rotation).
+    """
 
     root = ET.fromstring(xml)
-    lines: list[tuple[int, float, str, float]] = []
-    heights: list[float] = []
+    lines: list[tuple[int, float, str, list[float]]] = []
+    invalid = 0
     pages = [element for element in root.iter() if _tag(element) == "page"]
     for page_number, page in enumerate(pages, 1):
         for line in page.iter():
@@ -221,41 +230,53 @@ def _heading_presentation(xml: str, expected: ExpectedDocument) -> tuple[bool, d
             words = [word for word in line if _tag(word) == "word"]
             if not words:
                 continue
-            sizes = [float(w.attrib["yMax"]) - float(w.attrib["yMin"]) for w in words]
-            heights.extend(sizes)
+            sizes = []
+            for word in words:
+                top, bottom = float(word.attrib["yMin"]), float(word.attrib["yMax"])
+                height = bottom - top
+                if not (math.isfinite(top) and math.isfinite(height) and height > 0):
+                    invalid += 1
+                sizes.append(height)
             text = normalize_extracted_text(" ".join(word.text or "" for word in words))
             top = min(float(word.attrib["yMin"]) for word in words)
-            lines.append((page_number, top, text, min(sizes)))
-    body = statistics.median(heights) if heights else 0.0
-    passed = body > 0
-    previous: tuple[int, float] | None = None
+            lines.append((page_number, top, text, sizes))
+    lines.sort(key=lambda line: (line[0], line[1]))
+    passed = invalid == 0
+    visible = [s.label for s in expected.sections if s.heading_visible]
+    positions: list[int | None] = []
+    for label in visible:
+        wanted = normalize_extracted_text(label)
+        matches = [index for index, line in enumerate(lines) if line[2] == wanted]
+        positions.append(matches[0] if len(matches) == 1 else None)
     found: list[dict[str, Any]] = []
-    for section in expected.sections:
-        if not section.heading_visible:
-            continue
-        label = normalize_extracted_text(section.label)
-        matches = [
-            line
-            for line in lines
-            if line[2] == label and line[3] >= HEADING_MIN_HEIGHT_RATIO * body
-        ]
-        if len(matches) != 1:
+    for number, (label, position) in enumerate(zip(visible, positions, strict=True)):
+        if position is None:
             passed = False
-            found.append({"label": section.label, "heading_sized_lines": len(matches)})
+            found.append({"label": label, "whole_lines": "absent or not unique"})
             continue
-        page_number, top, _, size = matches[0]
-        if previous is not None and (page_number, top) <= previous:
+        later = [p for p in positions[number + 1 :] if p is not None]
+        end = min(later) if later else len(lines)
+        body = [size for line in lines[position + 1 : end] for size in line[3]]
+        heading = min(lines[position][3])
+        previous = positions[number - 1] if number else -1
+        in_order = previous is not None and previous < position
+        if not body or not in_order or invalid:
             passed = False
-        previous = (page_number, top)
+            found.append({"label": label, "page": lines[position][0], "section_body": bool(body)})
+            continue
+        reference = statistics.median(body)
+        ratio = heading / reference
+        passed = passed and ratio >= HEADING_MIN_HEIGHT_RATIO
         found.append(
             {
-                "label": section.label,
-                "page": page_number,
-                "word_height_pt": round(size, 2),
-                "ratio": round(size / body, 3),
+                "label": label,
+                "page": lines[position][0],
+                "word_height_pt": round(heading, 2),
+                "section_body_height_pt": round(reference, 2),
+                "ratio": round(ratio, 3),
             }
         )
-    return passed, {"body_word_height_pt": round(body, 2), "headings": found}
+    return passed, {"invalid_word_boxes": invalid, "headings": found}
 
 
 def _geometry(xml: str) -> dict[str, object]:
@@ -505,7 +526,7 @@ def run_pdf_qa(
         if bbox.status == "pass":
             try:
                 presentation = _heading_presentation(bbox.output, expected)
-            except (ET.ParseError, KeyError, ValueError):
+            except (ET.ParseError, KeyError, ValueError, ArithmeticError):
                 presentation = None
         add(
             "heading_presentation",
@@ -516,7 +537,8 @@ def run_pdf_qa(
             {
                 "visible_headings": [s.label for s in expected.sections if s.heading_visible],
                 "rule": "exactly one whole line per heading, in order, word height at least "
-                f"{HEADING_MIN_HEIGHT_RATIO}x the median word height",
+                f"{HEADING_MIN_HEIGHT_RATIO}x the median word height of its section body; "
+                "every word box finite and positive",
             },
             "pdftotext -bbox-layout",
             bbox_version,
