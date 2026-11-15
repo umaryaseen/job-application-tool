@@ -17,7 +17,7 @@ Synthetic research on bounded optimization.
 Coursework: Synthetic Algorithms | Synthetic Systems
 
 Skills
-Data processing & analysis
+Data Engineering & Analytics
 Größe Ä Ö Ü ß (study, recent experience)
 
 Languages

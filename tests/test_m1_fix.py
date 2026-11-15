@@ -38,7 +38,12 @@ from job_application_engine.verification.document import (
     profile_digest,
     validate_document_plan,
 )
-from job_application_engine.verification.support import canonical_json, evidence_digest, fact_digest
+from job_application_engine.verification.support import (
+    canonical_fact_payload,
+    canonical_json,
+    evidence_digest,
+    fact_digest,
+)
 from tests.test_document_plan import approved_baseline
 
 NOW = datetime(2026, 9, 14, 12, 0, tzinfo=UTC)
@@ -316,7 +321,7 @@ def supported_project_profile() -> tuple[
             target_type="fact",
             target_id=fact.fact_id,
             target_revision=1,
-            displayed_content=canonical_json(fact.model_dump(mode="json", exclude={"approval"})),
+            displayed_content=canonical_json(canonical_fact_payload(fact)),
             review_id=f"review-{fact.fact_id}",
             reviewer_id="synthetic-reviewer",
             reviewed_at=NOW,
@@ -467,7 +472,7 @@ def test_m1_real_pdf_qa_and_snapshot_export_preserve_claims(tmp_path: Path) -> N
         "Education",
         ("Synthetic MSc — Synthetic Computing, Example University"),
         "Skills",
-        "Data processing & analysis",
+        "Data Engineering & Analytics",
         "Größe Ä Ö Ü ß (study, recent experience)",
         "Languages",
         "German (CEFR B2)",

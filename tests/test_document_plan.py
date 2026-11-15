@@ -21,17 +21,26 @@ from job_application_engine.verification.document import (
     DocumentValidationError,
     document_plan_digest,
 )
-from job_application_engine.verification.support import canonical_json, evidence_digest, fact_digest
+from job_application_engine.verification.support import (
+    canonical_fact_payload,
+    canonical_json,
+    evidence_digest,
+    fact_digest,
+)
 
 PROFILE_FIXTURE = Path(__file__).parent / "fixtures" / "profiles" / "compact.json"
 EXPECTED_TEXT = Path(__file__).parent / "fixtures" / "documents" / "baseline.txt"
 REVIEWED_AT = datetime(2026, 9, 12, 13, 0, tzinfo=UTC)
 
 
-def approved_baseline() -> tuple[ProfileRevision, list[object]]:
+def approved_baseline(
+    education_update: dict[str, object] | None = None,
+) -> tuple[ProfileRevision, list[object]]:
     data = json.loads(PROFILE_FIXTURE.read_text(encoding="utf-8"))
     facts = data["facts"]
     assert isinstance(facts, list)
+    if education_update:
+        next(f for f in facts if f["fact_id"] == "education-one").update(education_update)
     facts.append(
         {
             "fact_id": "skill-german",
@@ -134,7 +143,7 @@ def approved_baseline() -> tuple[ProfileRevision, list[object]]:
     for fact in profile.facts:
         if fact.fact_id not in selected_ids:
             continue
-        displayed = canonical_json(fact.model_dump(mode="json", exclude={"approval"}))
+        displayed = canonical_json(canonical_fact_payload(fact))
         receipt = record_human_review(
             profile,
             target_type="fact",

@@ -62,7 +62,7 @@ def test_explicit_skill_categories_are_grouped_without_inventing_qualifiers() ->
     sections = present_plan(plan, profile)
     skills = next(section for section in sections if section.label == "Skills")
     assert [line.text for line in skills.lines] == [
-        "Data processing & analysis",
+        "Data Engineering & Analytics",
         "Größe Ä Ö Ü ß (study, recent experience)",
     ]
     assert "expert" not in skills.lines[-1].text
@@ -95,7 +95,7 @@ def test_duplicate_skill_names_keep_distinct_fact_qualifiers() -> None:
     )
     skills = next(s for s in present_plan(plan, profile) if s.label == "Skills")
     assert [line.text for line in skills.lines] == [
-        "Data processing & analysis",
+        "Data Engineering & Analytics",
         "Größe Ä Ö Ü ß (study, recent experience)",
         "Größe Ä Ö Ü ß (study, basic exposure)",
     ]
@@ -146,7 +146,13 @@ def test_empty_presentation_fields_keep_legacy_fact_payload_and_nonempty_fields_
     )
     legacy_payload = canonical_fact_payload(legacy)
     raw = legacy.model_dump(mode="json", exclude={"approval"})
-    for key in ("thesis_title", "thesis_description", "coursework"):
+    for key in (
+        "thesis_title",
+        "thesis_description",
+        "coursework",
+        "expected_completion_date",
+        "specialization",
+    ):
         raw.pop(key, None)
     assert legacy_payload == raw
     assert fact_digest(legacy) == "9bb7dc2ae507218b901b1df3380d77da080222e07b7278654f419c030183c639"
