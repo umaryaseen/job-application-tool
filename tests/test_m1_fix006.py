@@ -173,8 +173,8 @@ def test_display_headings_keep_internal_categories_and_order() -> None:
 
 
 def test_template_identity_changed() -> None:
-    # M1-FIX-006 introduced v4; M1-FIX-007 (v5) and M1-FIX-008 (v6) superseded it.
-    assert TEMPLATE_VERSION == "baseline-v6-m1-fix008-display-labels"
+    # M1-FIX-006 introduced v4; M1-FIX-007 (v5), M1-FIX-008 (v6) and M1-FIX-009 (v7) followed.
+    assert TEMPLATE_VERSION == "baseline-v7-m1-fix009-compact-contacts"
 
 
 def test_real_pdf_extracts_expected_completion_specialization_and_headings(tmp_path: Path) -> None:

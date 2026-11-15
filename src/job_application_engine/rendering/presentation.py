@@ -9,6 +9,7 @@ from ..domain.document import DocumentPlan
 from ..domain.fact import (
     ContactFact,
     ContactName,
+    ContactUrl,
     EducationFact,
     EmploymentFact,
     LanguageFact,
@@ -41,6 +42,10 @@ class DisplayLine:
     # A "skill-group" line is "<lead>: <skills>"; ``lead`` is the static,
     # allowlisted group heading that the PDF renders in bold.
     lead: str = ""
+    # Skill-group and contact lines are "<item> | <item> ..."; the PDF keeps each
+    # item (with its trailing separator) unbroken, so wrapping happens only
+    # between items and never starts a line with "|".
+    items: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -143,6 +148,12 @@ def present_plan(plan: DocumentPlan, profile: ProfileRevision) -> tuple[DisplayS
     for section in plan.sections:
         lines: list[DisplayLine] = []
         if section.section_id == "contact":
+            # One compact line of location, phone and email values (in that
+            # order), then each URL on its own labelled line; URLs stay
+            # indivisible extraction tokens.
+            names: list[DisplayLine] = []
+            compact: dict[str, list[str]] = {"location": [], "phone": [], "email": []}
+            urls: list[str] = []
             for line in section.lines:
                 fact = (
                     facts.get((line.fact_ref.fact_id, line.fact_ref.revision))
@@ -151,13 +162,18 @@ def present_plan(plan: DocumentPlan, profile: ProfileRevision) -> tuple[DisplayS
                 )
                 if isinstance(fact, ContactFact):
                     if isinstance(fact.value, ContactName):
-                        lines.append(DisplayLine(fact.value.value, style="name"))
+                        names.append(DisplayLine(fact.value.value, style="name"))
+                    elif isinstance(fact.value, ContactUrl):
+                        urls.append(f"{contact_label(fact.value)}: {fact.value.value}")
                     else:
-                        # Keep each contact scalar on its own compact line so
-                        # long URLs remain an indivisible extraction token.
-                        lines.append(
-                            DisplayLine(f"{contact_label(fact.value)}: {fact.value.value}")
-                        )
+                        compact[fact.value.kind].append(fact.value.value)
+            lines.extend(names)
+            values = tuple(
+                value for kind in ("location", "phone", "email") for value in compact[kind]
+            )
+            if values:
+                lines.append(DisplayLine(" | ".join(values), style="contact-items", items=values))
+            lines.extend(DisplayLine(url, style="contact-items", items=(url,)) for url in urls)
         elif section.section_id == "experience":
             for line in section.lines:
                 fact = (
@@ -175,7 +191,9 @@ def present_plan(plan: DocumentPlan, profile: ProfileRevision) -> tuple[DisplayS
                     )
                     period = _date_range(fact.period)
                     if period:
-                        lines.append(DisplayLine(period))
+                        # Its own style so the PDF keeps it with the header and
+                        # the first following line (never alone at a page foot).
+                        lines.append(DisplayLine(period, style="period"))
                 elif isinstance(fact, ResponsibilityFact):
                     lines.append(DisplayLine(fact.text, style="bullet"))
                 elif isinstance(fact, ProjectFact):
@@ -229,14 +247,19 @@ def present_plan(plan: DocumentPlan, profile: ProfileRevision) -> tuple[DisplayS
             for category, heading in _SKILL_HEADINGS:
                 if category not in grouped:
                     continue
-                joined = " | ".join(
+                labels = tuple(
                     _skill_label(fact)
                     for fact in sorted(
                         grouped[category],
                         key=lambda item: (item.name.casefold(), item.fact_id, item.revision),
                     )
                 )
-                lines.append(DisplayLine(f"{heading}: {joined}", style="skill-group", lead=heading))
+                joined = " | ".join(labels)
+                lines.append(
+                    DisplayLine(
+                        f"{heading}: {joined}", style="skill-group", lead=heading, items=labels
+                    )
+                )
             lines.extend(
                 DisplayLine(_skill_label(fact))
                 for fact in sorted(
@@ -258,7 +281,7 @@ def present_plan(plan: DocumentPlan, profile: ProfileRevision) -> tuple[DisplayS
                         detail = f"{assessment.test_name} score {assessment.score}"
                     else:
                         detail = assessment.description
-                    lines.append(DisplayLine(f"{fact.language} ({detail})"))
+                    lines.append(DisplayLine(f"{fact.language}: {detail}"))
         else:
             lines = [DisplayLine(line.text) for line in section.lines]
         if lines:

@@ -92,5 +92,5 @@ def test_unbreakable_slash_compound_fails_before_publication(tmp_path: Path) -> 
 
 
 def test_template_identity_changed_for_slash_compounds() -> None:
-    # Superseded by M1-FIX-008 (v6); the slash rule is unchanged.
-    assert TEMPLATE_VERSION == "baseline-v6-m1-fix008-display-labels"
+    # Superseded by M1-FIX-008 (v6) and M1-FIX-009 (v7); the slash rule is unchanged.
+    assert TEMPLATE_VERSION == "baseline-v7-m1-fix009-compact-contacts"

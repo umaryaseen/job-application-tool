@@ -17,9 +17,11 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unicodedata
 from collections.abc import Mapping, Sequence
 from importlib.resources import files
 from pathlib import Path
+from typing import Any
 
 from ..config import ConfigurationError, private_data_root, safe_private_path
 from ..domain.document import DocumentPlan
@@ -34,13 +36,21 @@ from .presentation import SKILL_GROUP_HEADINGS, present_plan
 RENDERCV_VERSION = "2.8"
 TYPST_VERSION = "0.15.0"
 FONTS_VERSION = "0.5.1"
-TEMPLATE_VERSION = "baseline-v6-m1-fix008-display-labels"
+TEMPLATE_VERSION = "baseline-v7-m1-fix009-compact-contacts"
 NETWORK_DENY_PROFILE = "(version 1) (allow default) (deny network*)"
 MAX_PDF_BYTES = 2_000_000
 DEFAULT_TIMEOUT_SECONDS = 60
 CONTACT_URL_WIDTH_ERROR = (
     "contact URL exceeds the fixed A4 20 mm margin and 11 pt contact width; "
     "use an approved shorter URL or omit this contact"
+)
+ITEM_CONTENT_ERROR = (
+    "a skill or contact item has no visible text, contains a control or line-break "
+    "character, or begins with the | separator; use an approved corrected wording"
+)
+ITEM_WIDTH_ERROR = (
+    "a skill or contact item exceeds the fixed A4 content width at the approved "
+    "typography; use an approved shorter wording"
 )
 HYPHENATED_COMPOUND_WIDTH_ERROR = (
     "hyphenated or slash-joined compound exceeds the fixed A4 content width at the "
@@ -71,18 +81,20 @@ def template_sha256() -> str:
 
 def _yaml_for_plan(
     plan: DocumentPlan, profile: ProfileRevision
-) -> tuple[str, dict[str, dict[str, str]]]:
+) -> tuple[str, dict[str, dict[str, Any]]]:
     """Build the fixed RenderCV input and a token map from a validated plan."""
 
-    tokens: dict[str, dict[str, str]] = {}
+    tokens: dict[str, dict[str, Any]] = {}
     section_lines: list[str] = []
     header_name: str | None = None
     header_contacts: str | None = None
+    header_lines: list[list[str]] = []
     for section_index, section in enumerate(present_plan(plan, profile)):
         if not section.label:
             if section.lines:
                 header_name = section.lines[0].text
                 header_contacts = "\n".join(line.text for line in section.lines[1:])
+                header_lines = [list(line.items) for line in section.lines[1:]]
             continue
         # RenderCV wraps each section body in a container where Typst's
         # pagebreak operator is forbidden.  A trusted section-name marker
@@ -98,6 +110,7 @@ def _yaml_for_plan(
             tokens[token] = {"text": line.text, "style": line.style}
             if line.style == "skill-group":
                 tokens[token]["lead"] = line.lead
+                tokens[token]["items"] = list(line.items)
             section_lines.append(f"      - {json.dumps(token, ensure_ascii=False)}")
     template = _template_text().replace("    __JAE_SECTIONS__", "\n".join(section_lines))
     if header_name is not None:
@@ -105,6 +118,7 @@ def _yaml_for_plan(
         tokens["JAE_HEADER_CONTACTS"] = {
             "text": header_contacts or "",
             "style": "header-contacts",
+            "lines": header_lines,
         }
         template = template.replace("  name: null", '  name: "JAE_HEADER_NAME"')
         template = template.replace("  headline: null", '  headline: "JAE_HEADER_CONTACTS"')
@@ -209,17 +223,48 @@ _TOKEN_STYLES = frozenset(
         "bullet",
         "project",
         "skill-group",
+        "period",
         "header-name",
         "header-contacts",
     }
 )
 
 
+def item_problem(item: object) -> str | None:
+    """Why ``item`` cannot be one unbreakable skill or contact box, or None.
+
+    An item must contain visible text, no control, line- or paragraph-separator
+    character (any of which would break the box), and must not begin with the
+    "|" separator (which would then start a line).
+    """
+
+    if not isinstance(item, str):
+        return "not text"
+    if any(unicodedata.category(char) in {"Cc", "Zl", "Zp"} for char in item):
+        return "contains a control or line-break character"
+    visible = [char for char in item if unicodedata.category(char)[0] not in {"Z", "C"}]
+    if not visible:
+        return "has no visible text"
+    if visible[0] == "|":
+        return "begins with the | separator"
+    return None
+
+
+def _valid_items(items: object) -> bool:
+    return (
+        isinstance(items, list)
+        and bool(items)
+        and all(item_problem(item) is None for item in items)
+    )
+
+
 def _valid_token_value(value: object) -> bool:
     """Accept only the exact token shapes the trusted parent writes.
 
-    A skill-group token also carries ``lead``: one allowlisted static group
-    heading that its text must start with, followed by ": ".
+    A skill-group token carries ``lead`` (one allowlisted static heading) and
+    ``items``; its text must be exactly ``lead + ": " + " | ".join(items)``. The
+    header-contacts token carries ``lines`` (items per line); its text must be
+    exactly those lines joined. Every other token has only text and style.
     """
 
     if not isinstance(value, dict):
@@ -227,15 +272,55 @@ def _valid_token_value(value: object) -> bool:
     text_value, style = value.get("text"), value.get("style")
     if not isinstance(text_value, str) or style not in _TOKEN_STYLES:
         return False
-    if style != "skill-group":
-        return set(value) == {"text", "style"}
-    lead = value.get("lead")
-    return (
-        set(value) == {"text", "style", "lead"}
-        and isinstance(lead, str)
-        and lead in SKILL_GROUP_HEADINGS
-        and text_value.startswith(f"{lead}: ")
+    if style == "skill-group":
+        lead, items = value.get("lead"), value.get("items")
+        return (
+            set(value) == {"text", "style", "lead", "items"}
+            and isinstance(lead, str)
+            and lead in SKILL_GROUP_HEADINGS
+            and _valid_items(items)
+            and text_value == f"{lead}: " + " | ".join(items)  # type: ignore[arg-type]
+        )
+    if style == "header-contacts":
+        lines = value.get("lines")
+        return (
+            set(value) == {"text", "style", "lines"}
+            and isinstance(lines, list)
+            and all(_valid_items(items) for items in lines)
+            and text_value == "\n".join(" | ".join(items) for items in lines)
+        )
+    return set(value) == {"text", "style"}
+
+
+def _items_expression(items: Sequence[str]) -> str:
+    """Unbreakable boxes, each item keeping its trailing separator."""
+
+    last = len(items) - 1
+    return " ".join(
+        f"#box[#text({json.dumps(item + ('' if index == last else ' |'), ensure_ascii=False)})]"
+        for index, item in enumerate(items)
     )
+
+
+def _item_width_guard(boxes: Sequence[tuple[str, bool]]) -> str:
+    """Fail before layout can overflow if an unbreakable item cannot fit a line."""
+
+    checks: list[str] = []
+    for text_value, bold in dict.fromkeys(boxes):
+        encoded = json.dumps(text_value, ensure_ascii=False)
+        weight = ', weight: "bold"' if bold else ""
+        error = json.dumps(ITEM_WIDTH_ERROR)
+        checks.append(
+            "#context {\n"
+            f'  let jae_item = text(font: "Raleway", size: 11pt{weight}, {encoded})\n'
+            "  layout(size => {\n"
+            "    if measure(jae_item).width > size.width {\n"
+            f"      panic({error})\n"
+            "    }\n"
+            "  })\n"
+            "}\n"
+        )
+    return "".join(checks)
 
 
 def _worker(stage_argument: str) -> int:
@@ -301,6 +386,8 @@ def _worker(stage_argument: str) -> int:
         if not isinstance(tokens, dict):
             return 24
         compound_tokens: list[tuple[str, str]] = []
+        item_boxes: list[tuple[str, bool]] = []
+        replacements: dict[str, str] = {}
         for token, value in tokens.items():
             if not isinstance(token, str) or not _valid_token_value(value):
                 return 25
@@ -315,18 +402,29 @@ def _worker(stage_argument: str) -> int:
             if style == "header-name":
                 replacement = json.dumps(text_value, ensure_ascii=False)[1:-1]
             elif style == "header-contacts":
-                contact_lines = text_value.splitlines()
+                contact_lines = value["lines"]
+                for items in contact_lines:
+                    last = len(items) - 1
+                    item_boxes.extend(
+                        (item + ("" if i == last else " |"), False) for i, item in enumerate(items)
+                    )
                 replacement = (
                     "#linebreak()".join(
-                        f"#block(breakable: false)[#text({json.dumps(line, ensure_ascii=False)})]"
-                        for line in contact_lines
-                        if line
+                        f"#block(breakable: false)[{_items_expression(items)}]"
+                        for items in contact_lines
                     )
                     or '#text("")'
                 )
             elif style == "employment":
+                # Sticky: an employment header never ends a page without its dates.
                 expression = _literal_text_expression(text_value)
-                replacement = f'#block(breakable: false)[#text(weight: "bold")[{expression}]]'
+                replacement = (
+                    f'#block(breakable: false, sticky: true)[#text(weight: "bold")[{expression}]]'
+                )
+            elif style == "period":
+                # Sticky: the dates stay with the first responsibility or project line.
+                expression = _literal_text_expression(text_value)
+                replacement = f"#block(breakable: false, sticky: true)[{expression}]"
             elif style == "bullet":
                 replacement = (
                     "#block(inset: (left: 0.4cm))["
@@ -343,17 +441,40 @@ def _worker(stage_argument: str) -> int:
                 replacement = f'#text(weight: "bold")[{_literal_text_expression(text_value)}]'
             elif style == "skill-group":
                 assert isinstance(lead, str)
-                rest = text_value[len(lead) + 2 :]
+                items = value["items"]
+                last = len(items) - 1
+                item_boxes.append((lead + ":", True))
+                item_boxes.extend(
+                    (item + ("" if i == last else " |"), False) for i, item in enumerate(items)
+                )
+                encoded_lead = json.dumps(lead + ":", ensure_ascii=False)
                 replacement = (
-                    f'#text(weight: "bold")[{_literal_text_expression(lead + ":")}]'
-                    f'#text(" "){_literal_text_expression(rest)}'
+                    f'#box[#text(weight: "bold", {encoded_lead})] {_items_expression(items)}'
                 )
             else:
                 replacement = _literal_text_expression(text_value)
-            typ_text = typ_text.replace(token, replacement).replace(
-                token.replace("_", r"\_"), replacement
-            )
-        if "JAECLAIM_" in typ_text:
+            replacements[token] = replacement
+        # One pass over the generated source: inserted candidate text is never
+        # scanned again, so text that happens to spell a placeholder stays text.
+        spellings = {token: token for token in replacements}
+        spellings |= {token.replace("_", r"\_"): token for token in replacements}
+        placeholder = re.compile(
+            "|".join(re.escape(text) for text in sorted(spellings, key=len, reverse=True))
+        )
+        used: set[str] = set()
+
+        def substitute(match: re.Match[str]) -> str:
+            token = spellings[match.group(0)]
+            used.add(token)
+            return replacements[token]
+
+        claims_before = len(re.findall(r"JAECLAIM", typ_text))
+        claims_matched = sum(
+            spellings[match.group(0)].startswith("JAECLAIM")
+            for match in placeholder.finditer(typ_text)
+        )
+        typ_text = placeholder.sub(substitute, typ_text)
+        if used != set(replacements) or claims_before != claims_matched:
             return 26
         compound_guard = _compound_width_guard(compound_tokens)
         contact_text = next(
@@ -371,6 +492,12 @@ def _worker(stage_argument: str) -> int:
             if heading is None:
                 return 26
             typ_text = typ_text[: heading.start()] + compound_guard + typ_text[heading.start() :]
+        item_guard = _item_width_guard(item_boxes)
+        if item_guard:
+            heading = re.search(r"^= [^\n]*$", typ_text, flags=re.MULTILINE)
+            if heading is None:
+                return 26
+            typ_text = typ_text[: heading.start()] + item_guard + typ_text[heading.start() :]
         safe_typ_path.write_text(typ_text, encoding="utf-8")
         import rendercv  # type: ignore[import-untyped]
         import rendercv_fonts  # type: ignore[import-untyped]
@@ -391,13 +518,10 @@ def _worker(stage_argument: str) -> int:
         )
         compiler.compile(output=str(output_path))
     except Exception as error:
-        if CONTACT_URL_WIDTH_ERROR in str(error) or HYPHENATED_COMPOUND_WIDTH_ERROR in str(error):
+        known = (CONTACT_URL_WIDTH_ERROR, HYPHENATED_COMPOUND_WIDTH_ERROR, ITEM_WIDTH_ERROR)
+        if any(message in str(error) for message in known):
             try:
-                diagnostic = (
-                    CONTACT_URL_WIDTH_ERROR
-                    if CONTACT_URL_WIDTH_ERROR in str(error)
-                    else HYPHENATED_COMPOUND_WIDTH_ERROR
-                )
+                diagnostic = next(message for message in known if message in str(error))
                 (stage / "error.txt").write_text(diagnostic, encoding="utf-8")
             except OSError:
                 pass
@@ -435,6 +559,11 @@ def build_pdf(
     final_path.parent.mkdir(parents=True, exist_ok=True)
 
     yaml_text, tokens = _yaml_for_plan(plan, profile)
+    item_lists = [value["items"] for value in tokens.values() if "items" in value] + [
+        items for value in tokens.values() for items in value.get("lines", [])
+    ]
+    if any(item_problem(item) is not None for items in item_lists for item in items):
+        raise PdfRenderError(ITEM_CONTENT_ERROR)
     with tempfile.TemporaryDirectory(prefix=".jae-pdf-", dir=root) as temporary:
         stage = Path(temporary)
         _private_stage(root, stage)
@@ -473,6 +602,7 @@ def build_pdf(
             if diagnostic not in {
                 CONTACT_URL_WIDTH_ERROR,
                 HYPHENATED_COMPOUND_WIDTH_ERROR,
+                ITEM_WIDTH_ERROR,
             }:
                 diagnostic = f"RenderCV PDF build failed (worker exit {result.returncode})"
             raise PdfRenderError(diagnostic)

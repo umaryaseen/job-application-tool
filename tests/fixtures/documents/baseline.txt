@@ -1,5 +1,5 @@
 Synthetic Example
-Email: synthetic@example.com
+synthetic@example.com
 
 Professional Summary
 Synthetic Engineer
@@ -20,4 +20,4 @@ Skills
 Data Engineering & Analytics: Größe Ä Ö Ü ß (study, recent experience)
 
 Languages
-German (CEFR B2)
+German: CEFR B2

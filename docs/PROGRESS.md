@@ -1,11 +1,11 @@
 # Current implementation state
 
-Last reconciled: 2026-11-15 against main `e88546e` (merged PR #10). TASK-011,
-TASK-012, M1-FIX-006, TASK-013, M1-FIX-007, M1-FIX-008 and TASK-014 are
-integrated. TASK-015 (scoped constraints and experience intervals) is
-independently approved and awaits merge. TASK-009 personal acceptance
-remains open: a baseline candidate built from merged code awaits applicant
-review; details stay in the private data root.
+Last reconciled: 2026-11-15 against main `deee9aa` (merged PR #11). TASK-011
+to TASK-015 and M1-FIX-006 to M1-FIX-008 are integrated. M1-FIX-009 (compact
+contact block, unbroken skill items, kept-together entries) is implemented and
+awaits independent review; TASK-016 is in progress on its own branch. TASK-009
+personal acceptance remains open: the applicant asked for final presentation
+changes before the final candidate; details stay in the private data root.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -26,7 +26,8 @@ review; details stay in the private data root.
 | M1-FIX-007 | Reviewed and merged into main through PR #8 | [Task](tasks/M1-FIX-007.md); [review](reviews/M1-FIX-007.md) round 2 APPROVED WITH FOLLOW-UP on `b906a7f`; follow-ups closed; merge `01f3a40` |
 | M1-FIX-008 | Reviewed and merged into main through PR #9 | [Task](tasks/M1-FIX-008.md); [review](reviews/M1-FIX-008.md) round 4 APPROVED WITH FOLLOW-UP on `1f380f7`; follow-ups closed; closure check APPROVED; merge `5cdc022` |
 | TASK-014 | Reviewed and merged into main through PR #10 | [Review](reviews/TASK-014.md) round 5 APPROVED on `1aa8221`; closure check APPROVED; merge `e88546e`; [guide](JOB_EXTRACTION.md#review-and-correct-requirements) |
-| TASK-015 | APPROVED — AWAITING MERGE | [Review](reviews/TASK-015.md) round 2 APPROVED on `223eeff`, hosted CI `43747494384`; [fixture review](reviews/TASK-015-FIXTURES.md) round 2 APPROVED WITH FOLLOW-UP, follow-ups applied and checked; [guide](MATCHING.md) |
+| TASK-015 | Reviewed and merged into main through PR #11 | [Review](reviews/TASK-015.md) round 2 APPROVED on `223eeff`; [fixture review](reviews/TASK-015-FIXTURES.md); closure check APPROVED; merge `deee9aa`; [guide](MATCHING.md) |
+| M1-FIX-009 | IMPLEMENTED — AWAITING REVIEW | [Task](tasks/M1-FIX-009.md); branch `task/009-m1-fix-009-compact-contacts` |
 | TASK-016–020 | NOT IMPLEMENTED | Match states, coverage and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -104,7 +105,23 @@ regressions fail on `ae6c461` and pass now. Full suite: 474 passed. Review
 round 2 on `591b339` returned APPROVED with no unresolved findings; hosted CI
 43666629755 passed on that head.
 
-## TASK-015 implementation (approved, awaiting merge)
+## M1-FIX-009 implementation (awaiting review)
+
+Location, phone and email display on one " | " line and each URL on its own
+labelled line; skill groups and contact lines render each item with its
+trailing separator as one unbreakable box, so no line starts with "|" and no
+item splits (extraction unchanged; over-wide items fail before publication);
+employment headers and dates are sticky blocks; languages display as
+`<language>: <detail>`. Identity `baseline-v7-m1-fix009-compact-contacts`.
+
+| Command | Result |
+| --- | --- |
+| `uv run pytest tests/test_m1_fix009.py` | Exit 0; 44 passed |
+| `uv run pytest` | Exit 0; 891 passed, no skips |
+| `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 93 files formatted |
+| `uv run mypy src` | Exit 0; 56 source files |
+
+## TASK-015 implementation (merged)
 
 Adds the `matching` library: typed language, credential, degree, authorization
 and duration constraints evaluated against approved facts at a pinned `as_of`
@@ -339,10 +356,10 @@ not interpreted.
 
 ## Next action
 
-Merge reviewed TASK-015 (PR #11) after its scoped closure check and final-head
-CI. Then TASK-016 (match states, coverage and mapping of reviewed
-requirements). TASK-009 waits on the applicant's review of the candidate built
-from merged code; final artifact approval and export stay separate. Before any
-downstream feature makes `source_url` clickable or fetchable, validate allowed
-URL schemes (F-02). Personal records stay outside Git and CI; no matching,
-tailoring, export or application occurs.
+Independent review of M1-FIX-009; after merge, build the final private
+baseline candidate with QA and visual inspection for applicant review (final
+artifact approval and export stay separate). TASK-016 (match states, coverage
+and mapping of reviewed requirements) proceeds on its own branch with its
+fixture oracle first. Before any downstream feature makes `source_url`
+clickable or fetchable, validate allowed URL schemes (F-02). Personal records
+stay outside Git and CI; no matching, tailoring, export or application occurs.

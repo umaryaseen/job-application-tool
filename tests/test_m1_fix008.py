@@ -199,7 +199,11 @@ def test_tokens_carry_static_leads_only_for_skill_groups() -> None:
     groups = [v for v in tokens.values() if v["style"] == "skill-group"]
     assert {v["lead"] for v in groups} == SKILL_GROUP_HEADINGS
     assert all(v["text"].startswith(f"{v['lead']}: ") for v in groups)
-    assert all(set(v) == {"text", "style"} for v in tokens.values() if v["style"] != "skill-group")
+    assert all(
+        set(v) == {"text", "style"}
+        for v in tokens.values()
+        if v["style"] not in {"skill-group", "header-contacts"}
+    )
     assert all(_valid_token_value(v) for v in tokens.values())
 
 
@@ -208,7 +212,7 @@ def test_tokens_carry_static_leads_only_for_skill_groups() -> None:
     [
         ({"text": "Body", "style": "body"}, True),
         ({"text": "Programming Languages: Python", "style": "skill-group",
-          "lead": "Programming Languages"}, True),
+          "lead": "Programming Languages", "items": ["Python"]}, True),
         ({"text": "Programming Languages: Python", "style": "skill-group"}, False),
         ({"text": "Python", "style": "skill-group", "lead": "Programming Languages"}, False),
         ({"text": "Programming LanguagesX: Python", "style": "skill-group",
@@ -227,7 +231,8 @@ def test_worker_accepts_only_exact_token_shapes(value: object, valid: bool) -> N
 
 
 def test_template_identity_changed() -> None:
-    assert TEMPLATE_VERSION == "baseline-v6-m1-fix008-display-labels"
+    # Superseded by M1-FIX-009 (v7).
+    assert TEMPLATE_VERSION == "baseline-v7-m1-fix009-compact-contacts"
 
 
 @renderer

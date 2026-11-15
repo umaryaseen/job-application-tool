@@ -13,7 +13,7 @@
         },
         {
           "entry_id": "Contact-1",
-          "text": "Email: synthetic@example.com",
+          "text": "synthetic@example.com",
           "fields": {
             "email": "synthetic@example.com"
           }
@@ -131,7 +131,7 @@
       "entries": [
         {
           "entry_id": "Languages-0",
-          "text": "German (CEFR B2)",
+          "text": "German: CEFR B2",
           "fields": {
             "language": "German",
             "cefr": "B2"
