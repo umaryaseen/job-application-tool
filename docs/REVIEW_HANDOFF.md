@@ -19,7 +19,7 @@ foreign or temporary files, re-signed tampering, time order, changed JD text or
 rules output); newer JD revisions starting unreviewed; private, bounded,
 duplicate-key-free correction input; sanitized errors; no raw posting change.
 Record findings and one verdict in `docs/reviews/TASK-014.md` without modifying
-implementation. Implementer full suite: 666 passed, no skips (after the round-2 correction).
+implementation. Implementer full suite: 668 passed, no skips (after the round-3 correction).
 
 ## Round 2 request
 
@@ -42,3 +42,13 @@ missing newest file is taken from the head and rewritten by the next
 correction; files beyond the head or a larger shortfall fail. Writers hold an
 OS `flock` on `requirement-reviews/r<job revision>.lock` for the whole
 load–check–commit–publish sequence. Review the delta from `5d034b9`.
+
+## Round 4 request
+
+Round 3 confirmed F-04/F-05 fixed and found F-06: a valid correction under the
+input limit could serialize to a revision and head above the read limits and was
+published before the size failure, leaving the history unreadable. The
+correction serializes the record and head first and refuses before any folder,
+head or file write if either exceeds what loading accepts (head limit is the
+revision limit plus a fixed overhead, shared by writer and reader). Review the
+delta from `026922a`.

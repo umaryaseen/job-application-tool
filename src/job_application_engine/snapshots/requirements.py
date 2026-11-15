@@ -48,6 +48,8 @@ REVIEW_FOLDER = "requirement-reviews"
 HEAD_NAME = "head.json"
 MAX_REVISION_BYTES = 2_000_000
 MAX_CORRECTION_BYTES = 2_000_000
+# The head embeds the newest revision plus a few identity fields.
+HEAD_OVERHEAD_BYTES = 4_000
 _REVISION_NAME = re.compile(r"v([0-9]{6})\.json")
 # An interrupted write can leave only such a private temporary file; it is
 # never part of the chain because publication is the exclusive link.
@@ -218,7 +220,7 @@ def _read_head(root: Path, folder: Path, job: JobRevision) -> RequirementReviewH
         raise ReviewError("requirement review head is missing")
     try:
         head = RequirementReviewHead.model_validate_json(
-            _bounded_json(path, MAX_REVISION_BYTES + 4_000)
+            _bounded_json(path, MAX_REVISION_BYTES + HEAD_OVERHEAD_BYTES)
         )
     except ValueError as error:
         if isinstance(error, ReviewError):
@@ -287,6 +289,10 @@ def _head_bytes(head: RequirementReviewHead) -> bytes:
     return (canonical_json(head) + "\n").encode("utf-8")
 
 
+def _record_bytes(record: RequirementReviewRevision) -> bytes:
+    return (canonical_json(record) + "\n").encode("utf-8")
+
+
 def _create_folder(root: Path, job: JobRevision, folder: Path) -> None:
     """Create the review folder and its empty head in one atomic rename."""
 
@@ -314,7 +320,7 @@ def _publish(folder: Path, number: int, record: RequirementReviewRevision) -> Pa
     """Write a committed revision's file once; an existing file is never replaced."""
 
     final = folder / f"v{number:06d}.json"
-    temporary = _private_file(folder, (canonical_json(record) + "\n").encode("utf-8"))
+    temporary = _private_file(folder, _record_bytes(record))
     try:
         os.link(temporary, final)
     except FileExistsError:
@@ -422,13 +428,21 @@ def _apply_locked(
     record = record.model_copy(
         update={"revision_digest": model_digest(record, exclude={"revision_digest"})}
     )
+    # Refuse before writing anything if either stored form would exceed what a
+    # later load accepts; otherwise a valid correction could poison the history.
+    head = _head(state.job, record)
+    if (
+        len(_record_bytes(record)) > MAX_REVISION_BYTES
+        or len(_head_bytes(head)) > MAX_REVISION_BYTES + HEAD_OVERHEAD_BYTES
+    ):
+        raise ReviewError("correction is too large to store; split it into smaller corrections")
     folder = _folder(root, state.job.job_id, state.job.revision)
     if not folder.exists():
         _create_folder(root, state.job, folder)
     if history and not (folder / f"v{len(history):06d}.json").exists():
         # A committed revision whose file was not written yet (crash) or was removed.
         _publish(folder, len(history), history[-1])
-    _commit_head(folder, _head(state.job, record))
+    _commit_head(folder, head)
     path = _publish(folder, number, record)
     stored = load_review(state.job.job_id, revision=state.job.revision, data_root=root)
     if stored.view.view_digest != result.view_digest:

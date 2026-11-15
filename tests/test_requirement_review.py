@@ -683,6 +683,30 @@ def test_crash_between_head_commit_and_file_write_is_recovered(root: Path, monke
     assert load_review("synthetic-role", data_root=root).view.review_revision == 3
 
 
+# Review round 3, F-06: a correction whose stored form exceeds the read limits is
+# refused before anything is written, so it cannot poison the history.
+def test_oversized_first_correction_writes_nothing(root: Path, monkeypatch) -> None:
+    state = load_review("synthetic-role", data_root=root)
+    monkeypatch.setattr(store, "MAX_REVISION_BYTES", 200)
+    with pytest.raises(ReviewError, match="too large"):
+        apply(root, correction(state, accept(rows_by_quote(state)["Docker."])))
+    assert not _stored(root).parent.exists()
+
+
+def test_oversized_correction_leaves_existing_history_readable(root: Path, monkeypatch) -> None:
+    _accept_docker_then_terraform(root)
+    before = load_review("synthetic-role", data_root=root)
+    folder = _stored(root).parent
+    files = {path.name: path.read_bytes() for path in folder.iterdir()}
+    largest = max(len(_stored(root, n).read_bytes()) for n in (1, 2))
+    monkeypatch.setattr(store, "MAX_REVISION_BYTES", largest + 50)
+    reopen = [{"op": "reopen", "candidate_id": row.candidate_id} for row in before.view.rows]
+    with pytest.raises(ReviewError, match="too large"):
+        apply(root, correction(before, *reopen), minutes=2)
+    assert {path.name: path.read_bytes() for path in folder.iterdir()} == files
+    assert load_review("synthetic-role", data_root=root).view == before.view
+
+
 def test_removing_the_whole_review_store_returns_the_ungated_draft(root: Path) -> None:
     _accept_docker_then_terraform(root)
     import shutil
