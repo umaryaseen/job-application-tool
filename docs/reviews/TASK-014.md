@@ -283,3 +283,73 @@ F-04 and F-05 are resolved by this candidate. F-07 remains blocking because a va
 ## Required next gate
 
 Before `_publish(folder, len(history), history[-1])`, reject or otherwise safely handle an embedded missing revision whose canonical serialized form exceeds `MAX_REVISION_BYTES`; alternatively reject such a head during reconciliation so no oversized materialization can occur. Add a regression that constructs a head-only lag with an oversized embedded revision, verifies the correction refuses before any file/head mutation, and confirms the resulting state remains fail-closed or otherwise readable according to the chosen contract. Then rerun the focused suite, full renderer-capable suite, Ruff, format, mypy, diff check, and the F-04/F-05/crash/size probes.
+
+## Round 5 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning
+  `xhigh`, sandbox `workspace-write` on a throwaway detached checkout of
+  `1aa8221` plus a dedicated temporary directory, no network, session
+  `01a1e02c-ed40-73a0-a930-f3e527b49594`. Tracked files unchanged; exit 0.
+- Hosted CI did not run on `f448ae7` or `1aa8221` because the pull request
+  conflicted with main after PR #9 merged; it runs on the head that merges main.
+- The report below is verbatim.
+
+## Round 5 report
+
+VERDICT: APPROVED
+
+# TASK-014 independent implementation review — round 5
+
+Reviewer: Codex, independent implementation reviewer. The implementation was authored by Claude Code and was not written by this reviewer.
+
+Date: 2026-11-15
+
+Base: \`f448ae75752e857daaa23c6d3d27a6c1c8b4e2b5\`; base tree \`031a98e42ac7939784ff5ed0b9c2b6d818e4b9cf\`
+
+Candidate: \`1aa8221425d798be581e6ae9e2c89cecb9da9755\`; candidate tree \`2ea92af9d018b6a22b38997b9e864c813fd1c681\`
+
+Checkout: supplied detached checkout. Tracked files remained unchanged during this review.
+
+Scope: the round-4-to-round-5 delta, cumulative TASK-014/A20 behavior, embedded-revision read-limit validation, missing-newest-file recovery, all normal publication paths, crash recovery, replay/locking/deletion invariants, and the relevant architecture, ADR, acceptance and security requirements.
+
+Artifacts inspected: \`AGENTS.md\`, \`docs/PROGRESS.md\`, \`docs/IMPLEMENTATION_PLAN.md\`, \`docs/APPLICATION_WORKFLOW.md\`, \`docs/REVIEW_HANDOFF.md\`, \`docs/REVIEW_PROTOCOL.md\`, \`docs/tasks/TASK-014.md\`, A20 in \`docs/ACCEPTANCE_CRITERIA.md\`, relevant \`docs/ARCHITECTURE.md\` and \`docs/SECURITY_AND_PRIVACY.md\` sections, \`docs/adr/ADR-007.md\`, \`docs/adr/ADR-012.md\`, \`docs/JOB_EXTRACTION.md\`, the complete base-to-candidate diff, \`src/job_application_engine/snapshots/requirements.py\`, and \`tests/test_requirement_review.py\`.
+
+Data and network: synthetic reserved-example posting text only. I did not read \`$JAE_DATA_DIR\`, the home directory, another worktree, or private/personal data. No network request was made. Probe code and temporary roots were under the permitted \`codex-014-r5-tmp\` directory.
+
+## Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| \`git rev-parse f448ae75752e857daaa23c6d3d27a6c1c8b4e2b5^{tree} && git rev-parse 1aa8221425d798be581e6ae9e2c89cecb9da9755^{tree}\` | 0 | Base tree \`031a98e42ac7939784ff5ed0b9c2b6d818e4b9cf\`; candidate tree \`2ea92af9d018b6a22b38997b9e864c813fd1c681\`. |
+| \`git diff --stat f448ae75752e857daaa23c6d3d27a6c1c8b4e2b5..1aa8221425d798be581e6ae9e2c89cecb9da9755\` and \`git diff --name-status f448ae75752e857daaa23c6d3d27a6c1c8b4e2b5..1aa8221425d798be581e6ae9e2c89cecb9da9755\` | 0 | Six modified paths; 112 insertions and 6 deletions. Changes are limited to the documented source, regression test, progress/handoff/review documentation, and extraction guide. |
+| \`.venv/bin/python -m pytest tests/test_requirement_review.py -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r5-tmp/pytest\` | 0 | **49 passed**, 0 failed, 0 skipped, 57.92 s. |
+| \`PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r5-tmp/pytest-full\` | 1 | **642 passed**, **27 failed**, 0 skipped, 112.15 s. The 27 failures are renderer/QA environment checks: 19 production-renderer cases failed when the worker attempted unavailable nested macOS \`sandbox-exec\` (worker exit 71), and 8 Poppler/pypdf/visual-QA prerequisite checks failed in the managed checkout. File counts: \`tests/rendering/test_pdf_qa.py\` 10, \`tests/test_m1_fix.py\` 2, \`tests/test_m1_fix004.py\` 5, \`tests/test_m1_fix006.py\` 1, \`tests/test_m1_fix007.py\` 3, \`tests/test_rendering.py\` 6. These paths are outside TASK-014 and require the hosted renderer-capable environment. |
+| \`.venv/bin/ruff check --no-cache .\` | 0 | All checks passed; 0 violations. |
+| \`.venv/bin/ruff format --no-cache --check .\` | 0 | 87 files already formatted. |
+| \`.venv/bin/mypy src --cache-dir=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r5-tmp/mypy\` | 0 | No issues in 53 source files. |
+| \`git diff --check f448ae75752e857daaa23c6d3d27a6c1c8b4e2b5..1aa8221425d798be581e6ae9e2c89cecb9da9755\` | 0 | No whitespace errors. |
+| Focused regression selection: \`.venv/bin/python -m pytest tests/test_requirement_review.py -k 'test_edit_priority_and_accept_is_preserved_and_replayed or test_invalid_quote_or_offsets_are_rejected_and_nothing_is_stored or test_stale_jd_digest_is_rejected or test_concurrent_reviews_from_the_same_base_cannot_both_land or test_a_second_writer_is_refused_while_one_holds_the_lock or test_missing_head_or_unexplained_history_fails or test_replay_rejects_tampered_or_incomplete_history or test_deleted_newest_file_is_restored_from_the_head or test_deleting_a_reopen_cannot_restore_an_old_hard_gate or test_crash_between_head_commit_and_file_write_is_recovered or test_oversized_first_correction_writes_nothing or test_oversized_correction_leaves_existing_history_readable or test_head_embedding_an_oversized_revision_is_invalid or test_review_time_must_be_utc or test_review_time_must_not_go_backwards' -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r5-tmp/pytest-regressions\` | 0 | **32 passed**, 17 deselected. This covers the prior F-01–F-06 regressions plus the round-5 regression and core A20 edit, stale-digest, replay and gate behavior. |
+| \`.venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r5-tmp/probe_r5.py\` | 0 | Six synthetic probe groups completed: exact/over-limit embedded revisions, normal publication paths, restore, and crash recovery; all assertions passed. |
+| \`git status --short --branch && git diff --name-only\` | 0 | Detached candidate checkout remained clean; no tracked files changed. |
+
+## Probe outcomes
+
+The controlled legacy state had a newest revision of 886 bytes and a head of 1,064 bytes. After deleting the newest revision file, the head-only state loaded at the default 2,000,000-byte revision limit. With the limit set exactly to 886 bytes, load accepted the embedded revision and the next correction restored the missing file; the restored file was exactly 886 bytes and the resulting revision-3 history reloaded successfully.
+
+With the limit set to 885 bytes, the same head remained within the larger head limit (1,064 bytes <= 4,885 bytes), but both load and apply refused with \`requirement review head is invalid\`. The review-folder bytes (head and existing revision) were byte-identical before and after the refused apply; no head or revision was published.
+
+The normal write-path matrix passed independently: first correction (folder creation, initial head and revision), second correction (head commit and new revision), and correction after deleting the newest file (restore, head commit and new revision) each reloaded successfully. Audited stored revision sizes were [800], then [800, 886], then [800, 886, 836] bytes; each head remained within the shared read limit. A simulated crash after head commit and before newest-file publication left a head-only lag that loaded and replayed successfully at the embedded revision.
+
+The focused suite confirms the earlier fixes remain intact: source-bound correction spans and exact acceptance reasons; F-01 chain-tail/gap and replay checks; F-02 last-revision metadata tamper detection; F-03 UTC and monotonic review times; F-04 deletion/recovery without restoring an old hard gate; F-05 concurrent-writer and stale-base serialization; F-06 pre-publication size refusal; and A20 negation, ambiguity, gate, newer-JD, raw-source and private bounded-correction behavior.
+
+The round-5 source change is correctly placed in \`_read_head\` and the restore branch of \`_apply_locked\`. It uses the same canonical \`_record_bytes\` representation and \`MAX_REVISION_BYTES\` read limit as revision loading, while retaining the separate head overhead allowance. No new dependency, network path, raw-posting mutation, or applicant-data path was introduced.
+
+## Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| — | None | — | No unresolved findings. The embedded revision is now rejected before recovery can materialize a form that revision loading would reject, and valid boundary/normal/crash paths remain readable. | \`probe_r5.py\`: exact 886-byte embedded revision accepted and restored; one-byte-over 885-byte limit rejected on load and apply with unchanged review-folder bytes; normal publication and crash-recovery loads all passed. |
+
+## Architecture, security and acceptance assessment
+
+The candidate satisfies the round-5 repair contract and the TASK-014/A20 acceptance boundary. A head whose embedded revision exceeds the revision read limit fails closed, and recovery checks the same canonical serialized size before writing a missing committed file. Existing immutable hash-chain, head-first publication, writer-lock, source/digest binding, review-state/gate, bounded private-input and sanitized-error behavior remains covered by the focused suite. The documented renderer failures are environmental and unrelated to this task; they are not claimed as local passes.
