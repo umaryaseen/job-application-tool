@@ -213,3 +213,37 @@ def test_classification_terms_are_normalized_with_row_polarity(tmp_path: Path) -
 )
 def test_combining_marks_join_letters_and_underscore_is_a_boundary(text, quotes) -> None:
     assert [m.span.quote for m in find_mentions(text)] == quotes
+
+
+# Regressions for implementation review round 1 (docs/reviews/TASK-013.md).
+@pytest.mark.parametrize("text", ["GİT", "GıT", "lınux", "JAVASCRİPT", "PYTHON\u0130"])
+def test_f05_dotted_and_dotless_i_are_not_case_fold_equivalent(text) -> None:
+    assert find_mentions(text) == []
+
+
+@pytest.mark.parametrize(
+    ("text", "concept"),
+    [("GIT", "git"), ("LINUX", "linux"), ("\u212aubernetes", "kubernetes"), ("\u017fql", "sql")],
+)
+def test_f05_true_case_fold_equivalents_still_match(text, concept) -> None:
+    assert [m.concept_id for m in find_mentions(text)] == [concept]
+
+
+def test_f05_aliases_with_multi_character_folds_are_rejected() -> None:
+    bad = (
+        *CONCEPTS,
+        Concept(
+            concept_id="strasse",
+            label="x",
+            kind="technology",
+            aliases=(Alias(text="Straße"),),
+            rationale="multi-char fold",
+        ),
+    )
+    with pytest.raises(NormalizationError, match="single-character folds"):
+        validate_dictionary(bad)
+
+
+def test_f06_oversized_surface_is_rejected_before_trimming() -> None:
+    with pytest.raises(NormalizationError, match="200,000"):
+        normalize_surface("Python" + " " * 200_001)

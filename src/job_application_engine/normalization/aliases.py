@@ -36,18 +36,26 @@ _LETTER_AFTER = r"(?=$|[\s),/;:]|\.(?![^\W_]))"
 
 
 @lru_cache(maxsize=1)
-def _boundaries() -> tuple[str, str]:
-    """A letter or digit is a Unicode word character other than underscore; a
-    combining mark (any Unicode category M) belongs to the preceding letter, so
-    it is never a boundary. The mark class is built from the Unicode database.
+def _unicode_tables() -> tuple[str, dict[str, tuple[str, ...]]]:
+    """Combining-mark class and case-fold equivalents, from the Unicode database.
+
+    A combining mark (any category M) belongs to the preceding letter, so it is
+    never a boundary. Case-insensitive matching means per-character Unicode
+    ``casefold()`` equality, not ``re.IGNORECASE`` (which also equates dotted
+    and dotless I with i).
     """
     ranges: list[tuple[int, int]] = []
+    folds: dict[str, list[str]] = {}
     for code in range(sys.maxunicode + 1):
-        if unicodedata.category(chr(code)).startswith("M"):
+        char = chr(code)
+        if unicodedata.category(char).startswith("M"):
             if ranges and ranges[-1][1] == code - 1:
                 ranges[-1] = (ranges[-1][0], code)
             else:
                 ranges.append((code, code))
+        folded = char.casefold()
+        if len(folded) == 1 and (folded != char or char.lower() != char or char.upper() != char):
+            folds.setdefault(folded, []).append(char)
     marks = (
         "["
         + "".join(
@@ -56,7 +64,30 @@ def _boundaries() -> tuple[str, str]:
         )
         + "]"
     )
+    return marks, {key: tuple(sorted(set(value))) for key, value in folds.items()}
+
+
+def _boundaries() -> tuple[str, str]:
+    marks, _ = _unicode_tables()
     return rf"(?<![^\W_])(?<!{marks})", rf"(?![^\W_]|{marks})"
+
+
+def _casefold_text(text: str) -> str:
+    """Regex for ``text`` matching exactly the case-fold-equivalent spellings."""
+    _, folds = _unicode_tables()
+    pieces = []
+    for char in text:
+        folded = char.casefold()
+        if len(folded) != 1:
+            raise NormalizationError(f"alias character {char!r} folds to several characters")
+        variants = sorted({char, folded, *folds.get(folded, ())})
+        variants = [v for v in variants if v.casefold() == folded]
+        pieces.append(
+            re.escape(variants[0])
+            if len(variants) == 1
+            else "[" + "".join(re.escape(v) for v in variants) + "]"
+        )
+    return "".join(pieces)
 
 
 class NormalizationError(ValueError):
@@ -85,14 +116,15 @@ class ClassificationNormalization(StrictModel):
 
 def _alias_pattern(alias: Alias) -> str:
     """Style-specific part only; the shared letter/digit/mark boundary wraps all."""
-    body = r"\s+".join(re.escape(part) for part in alias.text.split())
-    if alias.style == "word":
-        return f"(?i:{body})"
-    if alias.style == "abbreviation":
+    if alias.style in {"word", "symbol"}:
+        body = r"\s+".join(_casefold_text(part) for part in alias.text.split())
+    else:
+        body = r"\s+".join(re.escape(part) for part in alias.text.split())
+    if alias.style == "word" or alias.style == "abbreviation":
         return body
     if alias.style == "letter":
         return f"{_LETTER_BEFORE}{body}{_LETTER_AFTER}"
-    return rf"(?<!\.)(?i:{body})"
+    return rf"(?<!\.){body}"
 
 
 def validate_dictionary(concepts: tuple[Concept, ...] = CONCEPTS) -> None:
@@ -107,6 +139,12 @@ def validate_dictionary(concepts: tuple[Concept, ...] = CONCEPTS) -> None:
         for alias in concept.aliases:
             if alias.style == "letter" and len(alias.text) != 1:
                 raise NormalizationError(f"letter alias must be one character: {alias.text}")
+            if alias.style in {"word", "symbol"} and any(
+                len(char.casefold()) != 1 for char in alias.text if not char.isspace()
+            ):
+                raise NormalizationError(
+                    f"case-insensitive alias needs single-character folds: {alias.text}"
+                )
             key = " ".join(alias.text.split())
             key = key if alias.style in {"abbreviation", "letter"} else key.casefold()
             for other_key in (key, key.casefold()):
@@ -169,6 +207,8 @@ def normalize_surface(
     surface: str, *, polarity: Polarity = "unknown", context: MentionContext = "other"
 ) -> SkillMention:
     """Normalize one whole surface; anything but a single full alias stays unmatched."""
+    if len(surface) > MAX_TEXT:
+        raise NormalizationError("surface exceeds the 200,000-character normalization limit")
     stripped = surface.strip()
     if not stripped:
         raise NormalizationError("surface is empty")

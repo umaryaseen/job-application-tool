@@ -30,7 +30,10 @@ with ordinary words or are distinct languages); such text yields no mention.
 1. Only explicit dictionary aliases create mentions. At each position the
    longest alias wins; mentions never overlap. Text outside aliases is not a
    skill mention and is not guessed.
-2. Word aliases match case-insensitively at word boundaries: no letter or digit
+2. Word aliases match case-insensitively at word boundaries. Case-insensitive
+   means per-character Unicode case-fold equality (`casefold()`), so dotted or
+   dotless I ("İ", "ı") does not match "i"; an alias character whose fold is
+   several characters (such as "ß") is not allowed. No letter or digit
    immediately before or after. "Letter or digit" means a Unicode alphanumeric
    character; a combining mark (Unicode category M) belongs to the preceding
    letter, so it is not a boundary. Underscore, punctuation, symbols and
