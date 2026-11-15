@@ -1,14 +1,22 @@
-# Review handoff: M1-FIX-007 slash-joined compounds
+# Review handoff: TASK-014 requirement review and correction versions
 
-**Status: APPROVED WITH FOLLOW-UP — AWAITING MERGE** (round 2 on `b906a7f`).
-See [the review](reviews/M1-FIX-007.md). TASK-013 and M1-FIX-006 are merged.
+Implementer: Claude Code. Independent reviewer: a separate Codex session.
+Base: main `01f3a40a`. Branch: `task/014-requirement-review`. TASK-012 and
+TASK-013 (dependencies) are merged.
 
-## Scoped closure check (pending)
+Read AGENTS, PROGRESS, [the task](tasks/TASK-014.md), A20 in
+ACCEPTANCE_CRITERIA, ADR-007, ADR-012, REVIEW_PROTOCOL, SECURITY_AND_PRIVACY and
+the new section of [JOB_EXTRACTION](JOB_EXTRACTION.md#review-and-correct-requirements).
 
-After `b906a7f` the branch only (1) merges main (`9c1d5580`, already reviewed
-TASK-013) with PROGRESS/REVIEW_HANDOFF conflict resolutions and (2) adds a
-documentation closure: the round-2 report appended, follow-up F-03 closed by
-describing the sweep accurately in the task (a bounded offset sweep with a
-line-start witness), F-04 closed by removing the trailing blank line, PROGRESS
-and this handoff. Confirm the merge introduces no unreviewed code and the
-records are accurate; do not repeat runtime reviews.
+Focus: that every corrected span is verified against the raw JD and confined to
+its clause (and connectives to their group); that a row reaches `reviewed` only
+through `accept` naming exactly its review reasons and any edit returns it to
+draft; that only reviewed, unnegated, structured, mandatory rows are hard gates
+(ambiguous, negated or unreviewed rows never are); binding of a correction to
+JD revision, record/raw digests and the exact base view; immutable exclusive
+publication and concurrent writers; replay (hash chain, result digests, gaps,
+foreign or temporary files, re-signed tampering, time order, changed JD text or
+rules output); newer JD revisions starting unreviewed; private, bounded,
+duplicate-key-free correction input; sanitized errors; no raw posting change.
+Record findings and one verdict in `docs/reviews/TASK-014.md` without modifying
+implementation. Implementer full suite: 651 passed, no skips.
