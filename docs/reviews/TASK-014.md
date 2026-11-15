@@ -136,3 +136,78 @@ The head, hash chain, replay, source binding, UTC validation, privacy path check
 ## Required next gate
 
 Fix F-04 with a durable, independent publication anchor or equivalent protocol that both preserves the allowed one-revision crash recovery and detects deletion of the newest/only revision from a lagged state. Fix F-05 by serializing or compare-and-swapping head advancement so a stale writer cannot replace a higher head. Add regression tests for both races and lagged-tail/only-file deletion, then rerun the focused suite, full hosted suite, Ruff, format, mypy, diff check and these probes. This review remains changes required until those invariants are demonstrated.
+
+## Round 3 provenance (recorded by the implementer, not part of the reviewer's text)
+
+- Reviewer: Codex `codex exec` v0.160.0, model `gpt-6.1-terra`, reasoning
+  `xhigh`, sandbox `workspace-write` on a throwaway detached checkout of
+  `026922a` plus a dedicated temporary directory, no network, session
+  `01a1e000-409e-7723-a4ae-dd6637ed7fd2`. Tracked files unchanged; exit 0.
+- The report below is verbatim. F-06 is addressed by the next commit for round 4.
+
+## Round 3 report
+
+VERDICT: CHANGES REQUIRED
+
+# TASK-014 independent implementation review — round 3
+
+Reviewer: Codex, independent implementation reviewer; the implementation was authored by Claude Code and was not written by this reviewer.
+Date: 2026-11-15
+Base: `5d034b9607648900dbb114596651e0dd8793f905`; base tree `1dbc9f6e80983c989979c14a6bb661fd0eb729f3`
+Candidate: `026922a3278be368cd4b5c7a18667facae43c91b`; candidate tree `c21563298f31c9b7436ce4035e7349ed9bb6a4be`
+Checkout: supplied detached checkout; tracked files were unchanged during this review.
+Scope: round-2-to-round-3 delta, cumulative TASK-014/A20 behavior, ADR-007/012, review handoff/protocol, source-bound correction replay, private bounded input, crash recovery, deletion behavior, and writer/read concurrency.
+Data and network: synthetic reserved example posting only; no private applicant data, home-directory data, JAE_DATA_DIR, other worktrees, or network access was used. All probes and temporary roots were under the permitted `codex-014-r3-tmp` directory.
+
+## Artifacts inspected
+
+`AGENTS.md`, `docs/PROGRESS.md`, `docs/REVIEW_HANDOFF.md`, `docs/REVIEW_PROTOCOL.md`, the review section of `docs/JOB_EXTRACTION.md`, `docs/adr/ADR-007.md`, `docs/adr/ADR-012.md`, `docs/tasks/TASK-014.md`, A20 in `docs/ACCEPTANCE_CRITERIA.md`, relevant `docs/ARCHITECTURE.md` and `docs/SECURITY_AND_PRIVACY.md` sections, the complete base-to-candidate diff, changed implementation modules, and `tests/test_requirement_review.py`.
+
+## Commands and results
+
+| Command | Exit | Result |
+|---|---:|---|
+| `pwd && git status --short --branch && git show -s --format='%H%n%P%n%s' HEAD` | 0 | Detached candidate; HEAD was `026922a`; working tree clean. |
+| `git rev-parse HEAD HEAD^{tree} 5d034b9607648900dbb114596651e0dd8793f905 5d034b9607648900dbb114596651e0dd8793f905^{tree} 026922a3278be368cd4b5c7a18667facae43c91b 026922a3278be368cd4b5c7a18667facae43c91b^{tree}` | 0 | Candidate/base commit and tree IDs matched the supplied handoff. |
+| `git diff --stat 5d034b9607648900dbb114596651e0dd8793f905..026922a3278be368cd4b5c7a18667facae43c91b && git diff --name-status 5d034b9607648900dbb114596651e0dd8793f905..026922a3278be368cd4b5c7a18667facae43c91b` | 0 | 7 paths; 244 insertions and 112 deletions. |
+| `git diff --no-ext-diff --unified=12 5d034b9607648900dbb114596651e0dd8793f905..026922a3278be368cd4b5c7a18667facae43c91b` (complete changed-source/test inspection) | 0 | Round-3 changes are confined to the documented head protocol, writer lock, tests, and related docs. |
+| `.venv/bin/python -m pytest tests/test_requirement_review.py tests/test_requirement_classification.py -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/pytest` | 0 | **300 passed**, 0 failed, 0 skipped, 94.80 s. |
+| `PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest -ra -p no:cacheprovider --basetemp=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/pytest-full` | 1 | **639 passed**, 27 failed, 0 skipped, 128.10 s. All failures were renderer/ATS-QA tests that require the nested macOS `sandbox-exec`/Poppler/pypdf environment unavailable in this checkout. |
+| `sandbox-exec -p '(version 1) (allow default) (deny network*)' true` | 71 | Nested sandbox application is prohibited here: `sandbox_apply: Operation not permitted`. |
+| `.venv/bin/ruff check --no-cache .` | 0 | All checks passed. |
+| `.venv/bin/ruff format --no-cache --check .` | 0 | 87 files already formatted. |
+| `.venv/bin/mypy src --cache-dir /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/mypy` | 0 | No issues in 53 source files. |
+| `git diff --check 5d034b9607648900dbb114596651e0dd8793f905..026922a3278be368cd4b5c7a18667facae43c91b` | 0 | No whitespace errors. |
+| `PROBE_TMP=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp .venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/probe_review_r3.py` | 0 | Round-2 reproductions, deletion matrix, head mutations, crash points, whole-folder deletion, stale lock and lock-symlink probes completed. |
+| `PROBE_TMP=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp .venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/probe_process_lock.py` | 0 | Two OS processes: second writer received `ConcurrentReviewError`; after holder exit the write succeeded and review revision was 1. |
+| `PROBE_TMP=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp .venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/probe_paused_writer.py` | 0 | A writer paused after committing its head held the OS lock; the other process was refused, then its stale correction was rejected after release; final revision remained 1. |
+| `PROBE_TMP=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp .venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/probe_reader.py` | 0 | Reader during the head-commit/file-write window reconstructed revision 1 from the embedded head; the writer then completed successfully. |
+| `PROBE_TMP=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp .venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/probe_head_delete.py` | 0 | Deleting the head failed closed with `ReviewError: requirement review head is missing`. |
+| `PROBE_TMP=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp .venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/probe_head_resign.py` | 0 | Head-only re-sign/edit failed; a coherent re-sign of an accepted row still failed result-digest replay. |
+| `PROBE_TMP=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp .venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/probe_coherent_reopen.py` | 0 | A coherent deliberate re-sign of a `reopen` record loaded; this is the documented ADR-012 limit for a local OS owner who rewrites all hashes. |
+| `PROBE_TMP=/private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp .venv/bin/python /private/tmp/claude-501/-Users-apple-Desktop-webapps-job-application-engine-handoff-job-application-engine/a06068fd-ae2e-442d-9995-10755a74803d/scratchpad/codex-014-r3-tmp/probe_bound.py` | 0 | Found F-06 below: a 1,972,322-byte valid correction produced a 2,000,537-byte revision and 2,000,710-byte head; apply and all later loads failed. |
+| final `git status --short --branch` | 0 | Tracked files remained unchanged. |
+
+The 27 full-suite failures were: 10 in `tests/rendering/test_pdf_qa.py`; 2 in `tests/test_m1_fix.py`; 5 in `tests/test_m1_fix004.py`; 1 in `tests/test_m1_fix006.py`; 3 in `tests/test_m1_fix007.py`; and 6 in `tests/test_rendering.py`. The renderer worker and QA subprocesses returned exit 71 because nested `sandbox-exec` cannot be applied here. Hosted renderer-capable CI is required for those checks; these failures did not exercise TASK-014 behavior.
+
+## Probes and assessment
+
+The round-2 F-04 reproduction is fixed. After accepting a synthetic mandatory Python row, reopening it, and deleting `v000002.json`, `load_review` returned review revision 2 with the row unreviewed and zero hard gates; the old hard gate was not restored. Deleting the newest file from a two-revision history and deleting the only revision file both reconstructed the committed newest revision from `head.json). A subsequent correction restored the missing file before adding its next revision.
+
+The round-2 F-05 reproduction is fixed. The per-history `flock` blocked a separate OS process and a paused slow writer for the entire load/check/commit/publish sequence. After release, the stale correction was rejected by the base view digest and the head did not move backwards. A stale lock file without a holder was reusable. A lock-path symlink was rejected by the private-path guard. Readers during the head-first publication window saw a valid embedded-head view.
+
+Crash probes covered folder staging, head commit before and after replacement, revision-file publication, and post-publication verification. They recovered to either the prior valid draft/history or the embedded newest revision; temporary `.review-*` files were ignored as documented. Deleting two files, deleting the head, deleting the head plus newest file, adding files beyond the head, changing the newest file so it differed from the embedded revision, and head edit/re-sign/symlink/oversize mutations failed closed. Removing the complete per-revision review folder returned an unreviewed revision-0 draft with zero hard gates, matching the documented fail-safe limitation.
+
+The source-bound span, exact accept-reason, negation, hard-gate, newer-JD, duplicate-key, stale-digest, raw-source immutability and replay checks passed in the focused suite. No network or personal-data path was used.
+
+## Findings
+
+| ID | Severity | File | Finding | Reproduction |
+|---|---|---|---|---|
+| F-06 | **Blocking** | `src/job_application_engine/snapshots/requirements.py:49-50, 313-435` | A valid correction below `MAX_CORRECTION_BYTES` can serialize to a stored revision larger than `MAX_REVISION_BYTES`. `_apply_locked` publishes the oversized head and revision before its verification reload, so the caller receives an error but the private history is left unreadable; subsequent `load_review` calls fail closed with the size-limit error. This violates the bounded-input/integrity contract and leaves no normal recovery path. Preflight the canonical record and embedded head sizes before any publication (or derive a lower correction limit), and add a regression that an under-limit correction either stores a readable history or is rejected without creating files. | `probe_bound.py`: synthetic 3,995-codepoint requirement; 30 valid `set_thresholds` operations, each with 16 valid source-bound thresholds. Correction JSON was 1,972,322 bytes (<2,000,000) and validated. `apply_correction` raised `ReviewError: review JSON exceeds its size limit` after writing `v000001.json` at 2,000,537 bytes and `head.json` at 2,000,710 bytes; a later `load_review` raised the same error. |
+
+F-04 and F-05 from round 2 are resolved by the candidate. F-06 is an additional cumulative implementation finding and remains blocking because a bounded, valid correction can permanently poison its review history.
+
+## Required next gate
+
+Fix F-06 with a pre-publication serialized-size check and a regression covering a valid correction just below the input limit. The check must occur before folder/head/file publication and must leave no committed or unreadable history when it rejects. Rerun the focused suite, full renderer-capable suite, Ruff, format, mypy, diff check and the concurrency/deletion/crash probes. Re-review the corrected head; this report does not approve the candidate.
