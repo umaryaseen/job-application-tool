@@ -3,10 +3,9 @@
 Last reconciled: 2026-11-15 against main `9c1d5580` (merged PR #7). TASK-011,
 TASK-012, M1-FIX-006 and TASK-013 are integrated; M1-FIX-007 is independently
 approved on PR #8 and awaits merge. TASK-009 personal acceptance remains open:
-the applicant's content decisions are applied privately and a first corrected
-baseline (artifact r0010) was generated; its independent QA found slash-joined
-terms wrapping in extracted text (fixed by M1-FIX-007) and a third page that
-needs an applicant content decision.
+the applicant's content decisions are applied privately and a corrected private
+baseline is in applicant review; its QA findings and pending applicant
+decisions are recorded in the private data root.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -261,10 +260,8 @@ not interpreted.
 ## Next action
 
 Merge reviewed M1-FIX-007 (PR #8), regenerate the corrected private baseline
-and present it with QA for applicant content review and a page-fit decision. Then TASK-014 (source-bound requirement review and
-correction versions). Then TASK-013
-(reviewed skill aliases, separate from lexical extraction) and TASK-014
-(source-bound correction/review versions). Separately, TASK-009 waits on
+and present it with QA for applicant review. Then TASK-014 (source-bound
+requirement review and correction versions). Separately, TASK-009 waits on
 applicant review of the private content revision; appearance-only approval
 keeps its scope. Before any downstream feature makes `source_url`
 clickable or fetchable, validate allowed URL schemes (F-02). Personal records
