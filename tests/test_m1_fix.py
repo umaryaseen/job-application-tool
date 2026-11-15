@@ -472,8 +472,7 @@ def test_m1_real_pdf_qa_and_snapshot_export_preserve_claims(tmp_path: Path) -> N
         "Education",
         ("Synthetic MSc — Synthetic Computing, Example University"),
         "Skills",
-        "Data Engineering & Analytics",
-        "Größe Ä Ö Ü ß (study, recent experience)",
+        "Data Engineering & Analytics: Größe Ä Ö Ü ß (study, recent experience)",
         "Languages",
         "German (CEFR B2)",
     ]
@@ -530,14 +529,11 @@ def test_m1_real_pdf_qa_and_snapshot_export_preserve_claims(tmp_path: Path) -> N
             ),
             ExpectedSection(
                 label="Skills",
-                entries=[
-                    ExpectedEntry(entry_id="skill-category", text=expected_lines[20]),
-                    ExpectedEntry(entry_id="skill", text=expected_lines[21]),
-                ],
+                entries=[ExpectedEntry(entry_id="skill-group", text=expected_lines[20])],
             ),
             ExpectedSection(
                 label="Languages",
-                entries=[ExpectedEntry(entry_id="language", text=expected_lines[23])],
+                entries=[ExpectedEntry(entry_id="language", text=expected_lines[22])],
             ),
         ],
         unicode_tokens=["Größe Ä Ö Ü ß"],

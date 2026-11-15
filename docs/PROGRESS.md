@@ -1,10 +1,11 @@
 # Current implementation state
 
-Last reconciled: 2026-11-15 against main `01f3a40` (merged PR #8). TASK-011,
-TASK-012, M1-FIX-006, TASK-013 and M1-FIX-007 are integrated. TASK-014
-(requirement review and correction versions) is implemented and awaits
-independent review. TASK-009 personal acceptance remains open; its private
-state is recorded in the private data root.
+Last reconciled: 2026-11-15 against main `5cdc022` (merged PR #9). TASK-011,
+TASK-012, M1-FIX-006, TASK-013, M1-FIX-007 and M1-FIX-008 are integrated.
+TASK-014 (requirement review and correction versions) is independently
+approved and awaits merge. TASK-009 personal acceptance remains open: a
+baseline candidate built from the merged code awaits applicant review; details
+stay in the private data root.
 
 | Work | State | Evidence / remaining gate |
 | --- | --- | --- |
@@ -12,7 +13,7 @@ state is recorded in the private data root.
 | TASK-005 | APPROVED WITH FOLLOW-UP | Renderer comparison remains unmeasured |
 | TASK-006–008 | APPROVED in prior history | Existing renderer/QA/snapshot reviews |
 | M1-FIX-001–005 and focused corrections | Approved implementations recorded locally | [Local baseline history](history/PROGRESS_LOCAL_TASK_009.md), individual review files |
-| TASK-009 / M1 | baseline-r0009 has technical QA and appearance-only approval; a later private content revision awaits applicant review | See [baseline state](#preserve-the-local-baseline-result); content approval, new baseline, final artifact acceptance and export pending |
+| TASK-009 / M1 | baseline-r0009 has technical QA and appearance-only approval; later applicant decisions are applied privately and a new candidate is built from merged code | See [baseline state](#preserve-the-local-baseline-result); applicant review, final artifact acceptance and export pending |
 | CLEANUP-001 | Reviewed and merged into main through PR #1 | [Review](reviews/CLEANUP-001.md), merge `0d81aa1` |
 | TASK-010 | Reviewed and merged into main through PR #2 | [Review](reviews/TASK-010.md), [intake guide](JOB_INTAKE.md), merge `0cc9119` |
 | Local integration | MERGE COMMITTED; CODE AND DOCUMENTATION REVIEWED | [Code review](reviews/MERGE-TASK-009-MAIN.md), [documentation review](reviews/MERGE-TASK-009-MAIN-DOCS.md); local merge `266e5ef3` |
@@ -23,7 +24,8 @@ state is recorded in the private data root.
 | M1-FIX-006 | Reviewed and merged into main through PR #6 | [Review](reviews/M1-FIX-006.md) round 2 APPROVED on `591b339`; closure scoped review APPROVED; merge `68aa536` |
 | TASK-013 | Reviewed and merged into main through PR #7 | [Review](reviews/TASK-013.md) round 2 APPROVED on `f26da14`; closure scoped review APPROVED; merge `9c1d558` |
 | M1-FIX-007 | Reviewed and merged into main through PR #8 | [Task](tasks/M1-FIX-007.md); [review](reviews/M1-FIX-007.md) round 2 APPROVED WITH FOLLOW-UP on `b906a7f`; follow-ups closed; merge `01f3a40` |
-| TASK-014 | IMPLEMENTED — AWAITING REVIEW | [Guide](JOB_EXTRACTION.md#review-and-correct-requirements); branch `task/014-requirement-review` |
+| M1-FIX-008 | Reviewed and merged into main through PR #9 | [Task](tasks/M1-FIX-008.md); [review](reviews/M1-FIX-008.md) round 4 APPROVED WITH FOLLOW-UP on `1f380f7`; follow-ups closed; closure check APPROVED; merge `5cdc022` |
+| TASK-014 | APPROVED — AWAITING MERGE | [Review](reviews/TASK-014.md) round 5 APPROVED on `1aa8221`; [guide](JOB_EXTRACTION.md#review-and-correct-requirements) |
 | TASK-015–020 | NOT IMPLEMENTED | Matching and tailoring |
 | TASK-021–024 | NOT IMPLEMENTED | Letters, tracker and DOCX |
 | Interview preparation and skill-demand analysis | PLANNED | [Requested workflow](APPLICATION_WORKFLOW.md) |
@@ -42,9 +44,10 @@ approve or regenerate private profiles, receipts, plans or artifacts.
 Reconciled 2026-11-15: the private records hold a later content revision, so
 r0009's content is not the current candidate for content approval. The
 applicant has now returned written content decisions; details stay in the
-private data root. Next: reviewed M1-FIX-006, a corrected private revision with
-receipts bound to those decisions, a new baseline with QA, then separate final
-artifact approval. No export is authorized.
+private data root. M1-FIX-006 and M1-FIX-007 are merged and those decisions
+are applied with receipts; after a further applicant decision round and the
+merged M1-FIX-008, the next candidate is built and QA'd and awaits review. Final
+artifact approval stays separate. No export is authorized.
 
 Pre-sync local progress and handoffs are archived under `history/`; their old
 task gates describe their historical candidates. Published documentation uses
@@ -100,7 +103,7 @@ regressions fail on `ae6c461` and pass now. Full suite: 474 passed. Review
 round 2 on `591b339` returned APPROVED with no unresolved findings; hosted CI
 43666629755 passed on that head.
 
-## TASK-014 implementation (awaiting review)
+## TASK-014 implementation (approved, awaiting merge)
 
 Adds `jae job-review` and `jae job-review-apply`. A correction is an explicit
 patch (`set_priority`, `set_condition`, `set_thresholds`, `set_role`, `accept`,
@@ -128,6 +131,32 @@ Implementer verification on macOS (Python 3.12, locked environment):
 | `uv run pytest` | Exit 0; 669 passed, no skips |
 | `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 87 files formatted |
 | `uv run mypy src` | Exit 0; 53 source files |
+
+## M1-FIX-008 implementation (merged)
+
+A URL contact on a `linkedin.com` host (or subdomain) is labelled `LinkedIn:`;
+other URLs keep `Url:`, and the contact-URL width guard covers both labels.
+Two internal skill categories get display headings ("Programming Languages"
+first, "Quality & Development" last), and every skill group now renders as one
+`<heading>: <skills>` line with a bold, allowlisted heading; TXT carries the
+same text. Fixtures that pinned the two-line layout or the v5 template identity
+are updated to the compact line. Identity: `baseline-v6-m1-fix008-display-labels`.
+PDF QA now finds a section heading only as a whole extracted line equal to its
+label (once, in order), so "Programming Languages:" no longer ends the Skills
+section early; a new mandatory `heading_presentation` check (Poppler word
+heights, at least 1.2× the heading's own section body; invalid boxes fail
+closed) rejects a body line that merely reads like a missing heading (review
+rounds 2–3). It proves heading-sized presentation, not semantic identity.
+
+Implementer verification on macOS (Python 3.12, locked environment, offline
+Typst assets):
+
+| Command | Result |
+| --- | --- |
+| `uv run pytest tests/test_m1_fix008.py` | Exit 0; 55 passed |
+| `uv run pytest` | Exit 0; 676 passed, no skips |
+| `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 84 files formatted |
+| `uv run mypy src` | Exit 0; 50 source files |
 
 ## TASK-013 implementation (merged)
 
@@ -288,8 +317,10 @@ not interpreted.
 
 ## Next action
 
-Independent review of TASK-014 against `docs/REVIEW_PROTOCOL.md` (M1-FIX-008 is
-reviewed separately on its own branch). Then TASK-015 (match states and
-experience intervals). Before any downstream feature makes `source_url`
-clickable or fetchable, validate allowed URL schemes (F-02). Personal records
-stay outside Git and CI; no matching, tailoring, export or application occurs.
+Merge reviewed TASK-014 (PR #10) after its scoped closure check and final-head
+CI. TASK-009 waits on the applicant's review of the candidate built from merged
+code; final artifact approval and export stay separate. Then TASK-015 (match
+states and experience intervals). Before any downstream feature makes
+`source_url` clickable or fetchable, validate allowed URL schemes (F-02).
+Personal records stay outside Git and CI; no matching, tailoring, export or
+application occurs.

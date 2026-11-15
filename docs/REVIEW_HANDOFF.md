@@ -1,62 +1,14 @@
 # Review handoff: TASK-014 requirement review and correction versions
 
-Implementer: Claude Code. Independent reviewer: a separate Codex session.
-Base: main `01f3a40a`. Branch: `task/014-requirement-review`. TASK-012 and
-TASK-013 (dependencies) are merged.
+**Status: APPROVED — AWAITING MERGE** (round 5 on `1aa8221`). See
+[the review](reviews/TASK-014.md).
 
-Read AGENTS, PROGRESS, [the task](tasks/TASK-014.md), A20 in
-ACCEPTANCE_CRITERIA, ADR-007, ADR-012, REVIEW_PROTOCOL, SECURITY_AND_PRIVACY and
-the new section of [JOB_EXTRACTION](JOB_EXTRACTION.md#review-and-correct-requirements).
+## Scoped closure check (pending)
 
-Focus: that every corrected span is verified against the raw JD and confined to
-its clause (and connectives to their group); that a row reaches `reviewed` only
-through `accept` naming exactly its review reasons and any edit returns it to
-draft; that only reviewed, unnegated, structured, mandatory rows are hard gates
-(ambiguous, negated or unreviewed rows never are); binding of a correction to
-JD revision, record/raw digests and the exact base view; immutable exclusive
-publication and concurrent writers; replay (hash chain, result digests, gaps,
-foreign or temporary files, re-signed tampering, time order, changed JD text or
-rules output); newer JD revisions starting unreviewed; private, bounded,
-duplicate-key-free correction input; sanitized errors; no raw posting change.
-Record findings and one verdict in `docs/reviews/TASK-014.md` without modifying
-implementation. Implementer full suite: 669 passed, no skips (after the round-4 correction).
-
-## Round 2 request
-
-Round 1 ([report](reviews/TASK-014.md)) returned CHANGES REQUIRED: F-01 missing
-tail undetected, F-02 re-signed last-revision metadata undetected, F-03 non-UTC
-times accepted. The correction adds `RequirementReviewHead` (`head.json`):
-created atomically with the review folder, advanced after each publication and
-never moved backwards; replay requires it to match the revision count and last
-digest, tolerating only a one-revision lag after a crash. Review times must be
-UTC. Whole-folder deletion is documented as undetectable and fail-safe (no
-hard gates). Review the delta from `18bd782`.
-
-## Round 3 request
-
-Round 2 (CHANGES REQUIRED) showed that the one-revision lag allowance let a
-deleted unacknowledged revision roll the review back (F-04) and that concurrent
-head advances could move the head backwards (F-05). The correction commits the
-head first, embedding the newest revision, then writes the revision file; a
-missing newest file is taken from the head and rewritten by the next
-correction; files beyond the head or a larger shortfall fail. Writers hold an
-OS `flock` on `requirement-reviews/r<job revision>.lock` for the whole
-load–check–commit–publish sequence. Review the delta from `5d034b9`.
-
-## Round 4 request
-
-Round 3 confirmed F-04/F-05 fixed and found F-06: a valid correction under the
-input limit could serialize to a revision and head above the read limits and was
-published before the size failure, leaving the history unreadable. The
-correction serializes the record and head first and refuses before any folder,
-head or file write if either exceeds what loading accepts (head limit is the
-revision limit plus a fixed overhead, shared by writer and reader). Review the
-delta from `026922a`.
-
-## Round 5 request
-
-Round 4 confirmed F-06 fixed and found F-07: restoring a committed-but-missing
-newest file from the head did not check its size, and a head within the head
-limit could embed a revision above the revision limit. A head whose embedded
-revision exceeds the revision limit is now invalid on read, and the restore
-step re-checks the size before writing. Review the delta from `f448ae7`.
+After `1aa8221` the branch only (1) records the verbatim round-5 report with
+provenance and (2) merges main (`5cdc022`, the already reviewed and merged
+M1-FIX-008) with PROGRESS/REVIEW_HANDOFF conflict resolutions: M1-FIX-008 is
+recorded as merged, TASK-014 as approved and awaiting merge, and both
+implementation sections are kept. Confirm the merge introduces no unreviewed
+code beyond reviewed main, that the combined tree passes, and that the records
+are accurate; do not repeat runtime reviews.

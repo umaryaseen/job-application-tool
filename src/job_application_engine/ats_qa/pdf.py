@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import shutil
+import statistics
 import subprocess
 import sys
 import tempfile
@@ -99,30 +101,47 @@ def _coverage(found: int, total: int) -> dict[str, int | float | None]:
     return {"found": found, "total": total, "fraction": found / total if total else None}
 
 
+def _heading_lines(lines: Sequence[str], expected: ExpectedDocument) -> list[int] | None:
+    """Line index of each visible heading, or None when any is absent or ambiguous.
+
+    A heading is a whole extracted line equal to its label, occurring exactly
+    once and after the previous heading. A label inside other text (such as a
+    skill-group heading ending in "Languages") is not a section heading.
+    """
+
+    normalized = [normalize_extracted_text(line) for line in lines]
+    found: list[int] = []
+    for section in expected.sections:
+        if not section.heading_visible:
+            continue
+        label = normalize_extracted_text(section.label)
+        matches = [index for index, line in enumerate(normalized) if line == label]
+        if len(matches) != 1 or (found and matches[0] <= found[-1]):
+            return None
+        found.append(matches[0])
+    return found
+
+
 def _text_checks(text: str, expected: ExpectedDocument) -> dict[str, tuple[bool, Any, Any]]:
     actual = normalize_extracted_text(text)
     wanted = normalize_extracted_text(expected.ordered_text)
-    positions: list[int] = []
-    for section in expected.sections:
-        if section.label == "Contact" and not section.heading_visible:
-            positions.append(0)
-        else:
-            positions.append(actual.find(section.label))
-    visible_positions = [
-        position
-        for position, section in zip(positions, expected.sections, strict=True)
-        if section.heading_visible
-    ]
-    headings_ok = all(p >= 0 for p in visible_positions) and visible_positions == sorted(
-        set(visible_positions)
-    )
+    lines = text.splitlines()
+    heading_lines = _heading_lines(lines, expected)
+    headings_ok = heading_lines is not None
+    blocks = [""] * len(expected.sections)
+    if heading_lines is not None:
+        # Each section spans from its heading line (or the start, for the hidden
+        # Contact heading) to the next visible heading line.
+        visible = iter(heading_lines)
+        starts = [next(visible) + 1 if s.heading_visible else 0 for s in expected.sections]
+        for index, start in enumerate(starts):
+            end = next((line for line in heading_lines if line >= start), len(lines))
+            blocks[index] = normalize_extracted_text("\n".join(lines[start:end]))
     entry_total = sum(len(section.entries) for section in expected.sections)
     found_entries = 0
     field_total = field_found = 0
     for index, section in enumerate(expected.sections):
-        end = positions[index + 1] if index + 1 < len(positions) else len(actual)
-        start = positions[index] + (len(section.label) if section.heading_visible else 0)
-        block = actual[start:end] if headings_ok else ""
+        block = blocks[index]
         cursor = 0
         for entry in section.entries:
             exact = normalize_extracted_text(entry.text)
@@ -148,8 +167,8 @@ def _text_checks(text: str, expected: ExpectedDocument) -> dict[str, tuple[bool,
         ),
         "standard_headings": (
             headings_ok,
-            positions,
-            [section.label for section in expected.sections],
+            heading_lines,
+            [section.label for section in expected.sections if section.heading_visible],
         ),
         "entry_claim_sequence": (
             found_entries == entry_total,
@@ -177,6 +196,87 @@ def _text_checks(text: str, expected: ExpectedDocument) -> dict[str, tuple[bool,
             "exact token multiplicity in normalized content",
         )
     return result
+
+
+# A visible section heading must also be presented as one: the template sets
+# headings well above body size (18.1 pt vs 12.9 pt word boxes at 11 pt body).
+# Text alone cannot tell a heading from a body line that reads the same.
+HEADING_MIN_HEIGHT_RATIO = 1.2
+
+
+def _tag(element: ET.Element) -> str:
+    return element.tag.rsplit("}", 1)[-1]
+
+
+def _heading_presentation(xml: str, expected: ExpectedDocument) -> tuple[bool, dict[str, Any]]:
+    """Each visible heading: one whole Poppler line, in order, larger than its section body.
+
+    The reference is the median word height of the lines between a heading and
+    the next one (every expected section has at least one entry), so a large
+    name line or a short document cannot skew it. Any word box that is not
+    finite and positive fails the check. This proves heading-sized presentation
+    of the exact label, not semantic identity: in the trusted template only the
+    heading style produces such a line (and Poppler reports no rotation).
+    """
+
+    root = ET.fromstring(xml)
+    lines: list[tuple[int, float, str, list[float]]] = []
+    invalid = 0
+    pages = [element for element in root.iter() if _tag(element) == "page"]
+    for page_number, page in enumerate(pages, 1):
+        for line in page.iter():
+            if _tag(line) != "line":
+                continue
+            words = [word for word in line if _tag(word) == "word"]
+            if not words:
+                continue
+            sizes = []
+            for word in words:
+                top, bottom = float(word.attrib["yMin"]), float(word.attrib["yMax"])
+                height = bottom - top
+                if not (math.isfinite(top) and math.isfinite(height) and height > 0):
+                    invalid += 1
+                sizes.append(height)
+            text = normalize_extracted_text(" ".join(word.text or "" for word in words))
+            top = min(float(word.attrib["yMin"]) for word in words)
+            lines.append((page_number, top, text, sizes))
+    lines.sort(key=lambda line: (line[0], line[1]))
+    passed = invalid == 0
+    visible = [s.label for s in expected.sections if s.heading_visible]
+    positions: list[int | None] = []
+    for label in visible:
+        wanted = normalize_extracted_text(label)
+        matches = [index for index, line in enumerate(lines) if line[2] == wanted]
+        positions.append(matches[0] if len(matches) == 1 else None)
+    found: list[dict[str, Any]] = []
+    for number, (label, position) in enumerate(zip(visible, positions, strict=True)):
+        if position is None:
+            passed = False
+            found.append({"label": label, "whole_lines": "absent or not unique"})
+            continue
+        later = [p for p in positions[number + 1 :] if p is not None]
+        end = min(later) if later else len(lines)
+        body = [size for line in lines[position + 1 : end] for size in line[3]]
+        heading = min(lines[position][3])
+        previous = positions[number - 1] if number else -1
+        in_order = previous is not None and previous < position
+        if not body or not in_order or invalid:
+            passed = False
+            found.append({"label": label, "page": lines[position][0], "section_body": bool(body)})
+            continue
+        reference = statistics.median(body)
+        ratio = heading / reference
+        passed = passed and ratio >= HEADING_MIN_HEIGHT_RATIO
+        found.append(
+            {
+                "label": label,
+                "page": lines[position][0],
+                "word_height_pt": round(heading, 2),
+                "section_body_height_pt": round(reference, 2),
+                "ratio": round(ratio, 3),
+            }
+        )
+    return passed, {"invalid_word_boxes": invalid, "headings": found}
 
 
 def _geometry(xml: str) -> dict[str, object]:
@@ -418,6 +518,28 @@ def run_pdf_qa(
             ("pass" if geometry_ok else "fail") if bbox.status == "pass" else bbox.status,
             geometry,
             "nonempty text boxes wholly inside measured crop page",
+            "pdftotext -bbox-layout",
+            bbox_version,
+            bbox.diagnostic,
+        )
+        presentation: tuple[bool, dict[str, Any]] | None = None
+        if bbox.status == "pass":
+            try:
+                presentation = _heading_presentation(bbox.output, expected)
+            except (ET.ParseError, KeyError, ValueError, ArithmeticError):
+                presentation = None
+        add(
+            "heading_presentation",
+            (("pass" if presentation[0] else "fail") if presentation else "fail")
+            if bbox.status == "pass"
+            else bbox.status,
+            presentation[1] if presentation else None,
+            {
+                "visible_headings": [s.label for s in expected.sections if s.heading_visible],
+                "rule": "exactly one whole line per heading, in order, word height at least "
+                f"{HEADING_MIN_HEIGHT_RATIO}x the median word height of its section body; "
+                "every word box finite and positive",
+            },
             "pdftotext -bbox-layout",
             bbox_version,
             bbox.diagnostic,
