@@ -18,6 +18,11 @@ Exact terms need normalization but adjacent technologies must not become equival
 
 normalization/aliases.py; tests/fixtures/aliases.json; tests/test_skill_normalization.py. Paths are intended additions unless already present; inspect before editing.
 
+Implemented as `normalization/dictionary.py` (reviewed concepts) and
+`normalization/aliases.py` (matcher, surface normalization, TASK-012 adapter);
+the oracle is `tests/fixtures/normalization/aliases.json`. See
+[JOB_EXTRACTION](../JOB_EXTRACTION.md) and [PROGRESS](../PROGRESS.md).
+
 ## Acceptance criteria
 
 Create small versioned EN/DE internal concept/alias mapping with provenance of mapping decisions. Preserve exact technology distinctions and directional/context restrictions. Retain unmatched surface text. Support positive/negative/context skill mentions without inferring possession.
