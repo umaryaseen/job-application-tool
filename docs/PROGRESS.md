@@ -122,7 +122,7 @@ Typst assets):
 
 | Command | Result |
 | --- | --- |
-| `uv run pytest tests/test_m1_fix008.py` | Exit 0; 0 passed |
+| `uv run pytest tests/test_m1_fix008.py` | Exit 0; 48 passed |
 | `uv run pytest` | Exit 0; 669 passed, no skips |
 | `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 84 files formatted |
 | `uv run mypy src` | Exit 0; 50 source files |
