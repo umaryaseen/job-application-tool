@@ -707,6 +707,23 @@ def test_oversized_correction_leaves_existing_history_readable(root: Path, monke
     assert load_review("synthetic-role", data_root=root).view == before.view
 
 
+def test_head_embedding_an_oversized_revision_is_invalid(root: Path, monkeypatch) -> None:
+    # Review round 4, F-07: recovery must never write a revision a load rejects.
+    _accept_docker_then_terraform(root)
+    newest = len(_stored(root, 2).read_bytes())
+    _stored(root, 2).unlink()  # the newest revision now lives only in the head
+    state = load_review("synthetic-role", data_root=root)
+    fix = correction(state, {"op": "reopen", "candidate_id": state.view.rows[0].candidate_id})
+    folder = _stored(root).parent
+    files = {path.name: path.read_bytes() for path in folder.iterdir()}
+    monkeypatch.setattr(store, "MAX_REVISION_BYTES", newest - 1)  # the head still fits its limit
+    with pytest.raises(ReviewError, match="head is invalid"):
+        load_review("synthetic-role", data_root=root)
+    with pytest.raises(ReviewError, match="head is invalid"):
+        apply(root, fix, minutes=5)
+    assert {path.name: path.read_bytes() for path in folder.iterdir()} == files
+
+
 def test_removing_the_whole_review_store_returns_the_ungated_draft(root: Path) -> None:
     _accept_docker_then_terraform(root)
     import shutil

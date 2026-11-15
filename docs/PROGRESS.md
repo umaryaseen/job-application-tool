@@ -115,16 +115,17 @@ hard gates. A newer JD revision starts unreviewed. Round 1 review (CHANGES
 REQUIRED) added a verified head record and UTC-only times; round 2 (CHANGES
 REQUIRED) led to a head committed before each revision file that embeds it (a
 missing newest file is restored, never rolled back) and an OS writer lock;
-round 3 (CHANGES REQUIRED) added a size check before any write so an oversized
-stored form cannot poison the history. Synthetic tests:
+rounds 3–4 (CHANGES REQUIRED) added size checks before any write and on the
+head's embedded revision, so no oversized stored form can poison the history.
+Synthetic tests:
 `tests/test_requirement_review.py` (A20).
 
 Implementer verification on macOS (Python 3.12, locked environment):
 
 | Command | Result |
 | --- | --- |
-| `uv run pytest tests/test_requirement_review.py` | Exit 0; 48 passed |
-| `uv run pytest` | Exit 0; 668 passed, no skips |
+| `uv run pytest tests/test_requirement_review.py` | Exit 0; 49 passed |
+| `uv run pytest` | Exit 0; 669 passed, no skips |
 | `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 87 files formatted |
 | `uv run mypy src` | Exit 0; 53 source files |
 

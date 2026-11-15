@@ -231,6 +231,10 @@ def _read_head(root: Path, folder: Path, job: JobRevision) -> RequirementReviewH
         head.job_revision,
     ) != (job.job_id, job.revision):
         raise ReviewError("requirement review head is invalid")
+    # The embedded revision may be written out as its own file during recovery,
+    # so it must fit the revision limit, not only the larger head limit.
+    if head.latest is not None and len(_record_bytes(head.latest)) > MAX_REVISION_BYTES:
+        raise ReviewError("requirement review head is invalid")
     return head
 
 
@@ -441,6 +445,8 @@ def _apply_locked(
         _create_folder(root, state.job, folder)
     if history and not (folder / f"v{len(history):06d}.json").exists():
         # A committed revision whose file was not written yet (crash) or was removed.
+        if len(_record_bytes(history[-1])) > MAX_REVISION_BYTES:
+            raise ReviewError("committed requirement review exceeds the revision size limit")
         _publish(folder, len(history), history[-1])
     _commit_head(folder, head)
     path = _publish(folder, number, record)

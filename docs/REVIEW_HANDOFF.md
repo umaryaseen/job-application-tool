@@ -19,7 +19,7 @@ foreign or temporary files, re-signed tampering, time order, changed JD text or
 rules output); newer JD revisions starting unreviewed; private, bounded,
 duplicate-key-free correction input; sanitized errors; no raw posting change.
 Record findings and one verdict in `docs/reviews/TASK-014.md` without modifying
-implementation. Implementer full suite: 668 passed, no skips (after the round-3 correction).
+implementation. Implementer full suite: 669 passed, no skips (after the round-4 correction).
 
 ## Round 2 request
 
@@ -52,3 +52,11 @@ correction serializes the record and head first and refuses before any folder,
 head or file write if either exceeds what loading accepts (head limit is the
 revision limit plus a fixed overhead, shared by writer and reader). Review the
 delta from `026922a`.
+
+## Round 5 request
+
+Round 4 confirmed F-06 fixed and found F-07: restoring a committed-but-missing
+newest file from the head did not check its size, and a head within the head
+limit could embed a revision above the revision limit. A head whose embedded
+revision exceeds the revision limit is now invalid on read, and the restore
+step re-checks the size before writing. Review the delta from `f448ae7`.

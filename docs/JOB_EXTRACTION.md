@@ -241,7 +241,9 @@ exit 2. A missing newest file (a crash between the two writes, or a deletion)
 is taken from the head instead of rolling the review back, and the next
 correction writes it out again. A correction whose stored revision or head
 would exceed the size limits that loading enforces is refused before anything
-is written. Deleting the entire review folder cannot be
+is written, and a head whose embedded revision exceeds the revision limit is
+invalid, so recovery never writes an oversized file. Deleting the entire review
+folder cannot be
 detected; the job then shows its unreviewed draft, which never yields a hard
 gate. Hashes detect accidental or partial changes, not a deliberate rewrite by
 the local account owner (ADR-012). A correction must name the review state it
