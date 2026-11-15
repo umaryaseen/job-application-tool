@@ -14,12 +14,14 @@ from .domain.document import DocumentPlan
 from .domain.job import JobMetadata
 from .domain.profile import ProfileRevision
 from .extraction.classification import classify_saved_job
+from .extraction.review import hard_gates
 from .extraction.rules import extract_saved_job
 from .ingestion.text import ingest_job, load_job_revision, read_source
 from .profile.load import DuplicateJsonKeyError
 from .profile.review import LocalReviewReceipt
 from .rendering.pdf import TEMPLATE_VERSION, PdfRenderError, build_pdf
 from .snapshots.export import ExportError, export_snapshot
+from .snapshots.requirements import apply_correction, load_review, read_correction
 from .snapshots.review import approve_snapshot
 from .snapshots.store import SnapshotBuild, SnapshotError, build_snapshot
 from .verification.support import EvidenceKey
@@ -60,6 +62,22 @@ def build_parser() -> argparse.ArgumentParser:
     classify.add_argument("--job-id", required=True)
     classify.add_argument("--revision", type=int)
     classify.set_defaults(handler=_job_classify)
+    review = subparsers.add_parser(
+        "job-review",
+        help="show requirement quotes, priority, groups, uncertainty and review state",
+    )
+    review.add_argument("--job-id", required=True)
+    review.add_argument("--revision", type=int)
+    review.set_defaults(handler=_job_review)
+    correct = subparsers.add_parser(
+        "job-review-apply",
+        help="store one explicit reviewed correction as an immutable review revision",
+    )
+    correct.add_argument(
+        "--correction", required=True, type=Path, help="correction JSON inside JAE_DATA_DIR"
+    )
+    correct.add_argument("--reviewer-id", required=True)
+    correct.set_defaults(handler=_job_review_apply)
     build = subparsers.add_parser(
         "build-cv",
         help="build a baseline PDF from an explicitly reviewed plan and profile",
@@ -194,6 +212,52 @@ def _job_classify(args: argparse.Namespace) -> int:
         print("jae: private job storage is unavailable", file=sys.stderr)
         return 2
     print(result.model_dump_json(indent=2))
+    return 0
+
+
+def _job_review(args: argparse.Namespace) -> int:
+    try:
+        state = load_review(args.job_id, revision=args.revision)
+    except ValueError as error:
+        print(f"jae: {error}", file=sys.stderr)
+        return 2
+    except OSError:
+        print("jae: private job storage is unavailable", file=sys.stderr)
+        return 2
+    payload = {
+        "latest_job_revision": state.latest_job_revision,
+        "superseded": state.latest_job_revision != state.job.revision,
+        "hard_gate_ids": [row.candidate_id for row in hard_gates(state.view)],
+        "view": state.view.model_dump(mode="json"),
+    }
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _job_review_apply(args: argparse.Namespace) -> int:
+    try:
+        correction = read_correction(args.correction)
+        record, path = apply_correction(
+            correction, reviewer_id=args.reviewer_id, reviewed_at=datetime.now(UTC)
+        )
+    except ValueError as error:
+        print(f"jae: {error}", file=sys.stderr)
+        return 2
+    except OSError:
+        print("jae: correction input or private storage is unavailable", file=sys.stderr)
+        return 2
+    print(
+        json.dumps(
+            {
+                "job_id": record.job_id,
+                "job_revision": record.job_revision,
+                "review_revision": record.review_revision,
+                "view_digest": record.result_view_digest,
+                "path": str(path),
+            },
+            sort_keys=True,
+        )
+    )
     return 0
 
 

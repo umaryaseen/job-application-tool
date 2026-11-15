@@ -175,3 +175,80 @@ come from the caller: `normalize_classification` annotates TASK-012 condition
 terms and marks terms in requirement-negated rows as negated. Nothing records
 possession, approval or a career fact. Matching evidence against requirements
 is TASK-015.
+
+## Review and correct requirements
+
+TASK-014 adds explicit, versioned corrections on top of the deterministic
+draft. Show the current review state of a saved job:
+
+```bash
+uv run jae job-review --job-id example-ai-role
+uv run jae job-review --job-id example-ai-role --revision 1
+```
+
+The JSON lists every row with its literal quote, priority, ALL/ANY condition,
+thresholds, negation, draft `review_reasons`, `edited_fields`, `review_state`
+and `gate`, plus the rules' duplicate groups, `latest_job_revision`,
+`superseded` and `hard_gate_ids`. Its `view` carries the identity a correction
+must quote: `job_revision`, `job_record_digest`, `raw_sha256`,
+`review_revision` and `view_digest`.
+
+A correction is a JSON file inside `$JAE_DATA_DIR`:
+
+```json
+{
+  "job_id": "example-ai-role",
+  "job_revision": 1,
+  "job_record_digest": "<view.job_record_digest>",
+  "raw_sha256": "<view.raw_sha256>",
+  "base_review_revision": 0,
+  "base_view_digest": "<view.view_digest>",
+  "operations": [
+    {"op": "set_priority", "candidate_id": "req-…", "priority": "mandatory"},
+    {"op": "accept", "candidate_id": "req-…", "acknowledged_reasons": []}
+  ]
+}
+```
+
+```bash
+uv run jae job-review-apply --correction corrections/example.json --reviewer-id reviewer-a
+```
+
+Operations apply in order: `set_priority`, `set_condition` (a full ALL/ANY tree
+or `null`), `set_thresholds`, `set_role` (`requirement` or `non_requirement`),
+`accept` and `reopen`. Every corrected span must quote the raw JD exactly and
+lie inside its row's clause (connectives inside their group); the posting text
+is never changed. Priority-marker rows can only be accepted or reopened. Any
+edit returns a row to `draft`; only `accept`, naming exactly the row's displayed
+`review_reasons`, makes it `reviewed`.
+
+Gates: only a reviewed, unnegated, mandatory row with a condition or threshold
+is a `hard_gate`. Unreviewed rows stay `unreviewed`; reviewed rows that are
+negated (`not_required`), carry an uninterpreted negation or no structure
+(`manual_check`), or are preferred/unspecified never exclude an application.
+
+Each correction is stored once as
+`jobs/<job_id>/requirement-reviews/r<job revision>/v<n>.json`, recording the
+reviewer, UTC time (other offsets are refused), JD record and raw digests,
+classification digest, base revision and view digests, the operations and the
+resulting view digest. Writers are serialized by an OS file lock (released if
+the process dies). Each correction first commits `head.json`, which embeds the
+newest revision, then writes that revision's file. Loading re-verifies the JD,
+rebuilds the classification and replays the chain; a gap, a missing head, files
+beyond the head, a newest file that differs from the head, a foreign file, an
+edited or re-signed record, changed JD text or changed rules output fails with
+exit 2. A missing newest file (a crash between the two writes, or a deletion)
+is taken from the head instead of rolling the review back, and the next
+correction writes it out again. A correction whose stored revision or head
+would exceed the size limits that loading enforces is refused before anything
+is written, and a head whose embedded revision exceeds the revision limit is
+invalid, so recovery never writes an oversized file. Deleting the entire review
+folder cannot be
+detected; the job then shows its unreviewed draft, which never yields a hard
+gate. Hashes detect accidental or partial changes, not a deliberate rewrite by
+the local account owner (ADR-012). A correction must name the review state it
+was prepared against, so two reviewers cannot both extend the same state, and a
+newer JD revision starts unreviewed while older reviews remain historical and
+read-only. Limits: negation and duplicate groups are rule observations that
+cannot be edited (a wrongly negated row simply never gates; it can be set to
+`non_requirement`), and there is no editor or model-proposed correction.

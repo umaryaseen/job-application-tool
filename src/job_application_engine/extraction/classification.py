@@ -248,7 +248,8 @@ def _classify(
     )
 
 
-def _condition_spans(node: Condition, depth: int = 1) -> list[SourceSpan]:
+def condition_spans(node: Condition, depth: int = 1) -> list[SourceSpan]:
+    """All spans of a condition tree; rejects excess depth and misordered members."""
     if depth > MAX_CONDITION_DEPTH:
         raise ExtractionError("condition nesting exceeds the supported depth")
     if not isinstance(node, ConditionGroup):
@@ -259,7 +260,7 @@ def _condition_spans(node: Condition, depth: int = 1) -> list[SourceSpan]:
         if child.span.start < previous or child.span.end > node.span.end:
             raise ExtractionError("condition members are outside their group or out of order")
         previous = child.span.end
-        spans.extend(_condition_spans(child, depth + 1))
+        spans.extend(condition_spans(child, depth + 1))
     return spans
 
 
@@ -300,7 +301,7 @@ def _validate_structure(
         own = [cue.span for cue in row.cues if cue.origin == "clause"]
         own += list(row.negation_spans)
         if row.condition is not None:
-            own += _condition_spans(row.condition)
+            own += condition_spans(row.condition)
         for threshold in row.thresholds:
             own += [threshold.span, *([threshold.scope] if threshold.scope else [])]
         for span in own:
