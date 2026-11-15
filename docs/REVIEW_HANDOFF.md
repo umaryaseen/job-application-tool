@@ -19,4 +19,12 @@ compact line and do not loosen checks; template identity; no typography,
 selection or provenance change. Record findings and one verdict in
 `docs/reviews/M1-FIX-008.md` without modifying implementation. Renderer tests
 need macOS `sandbox-exec`: inspect hosted CI for the exact head. Implementer
-full suite: 660 passed, no skips (the QA heading fix is commit 2).
+full suite: 669 passed, no skips.
+
+## Round 3 request
+
+Round 2 (CHANGES REQUIRED, F-01) showed that a body line reading exactly like a
+missing heading passed the text-level checks. The correction adds a separate
+mandatory `heading_presentation` QA check from Poppler `-bbox-layout` word
+heights (task item 5), a real adversarial PDF mutation with identical text and
+body-sized headings, and synthetic XML cases. Review the delta from `a1e5d36`.

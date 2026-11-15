@@ -113,15 +113,17 @@ same text. Fixtures that pinned the two-line layout or the v5 template identity
 are updated to the compact line. Identity: `baseline-v6-m1-fix008-display-labels`.
 PDF QA now finds a section heading only as a whole extracted line equal to its
 label (once, in order), so "Programming Languages:" no longer ends the Skills
-section early and a missing "Languages" heading can no longer pass.
+section early; a new mandatory `heading_presentation` check (Poppler word
+heights, at least 1.2× body) rejects a body line that merely reads like a
+missing heading (round-2 finding F-01).
 
 Implementer verification on macOS (Python 3.12, locked environment, offline
 Typst assets):
 
 | Command | Result |
 | --- | --- |
-| `uv run pytest tests/test_m1_fix008.py` | Exit 0; 40 passed |
-| `uv run pytest` | Exit 0; 660 passed, no skips |
+| `uv run pytest tests/test_m1_fix008.py` | Exit 0; 0 passed |
+| `uv run pytest` | Exit 0; 669 passed, no skips |
 | `uv run ruff check .` / `uv run ruff format --check .` | Exit 0; 84 files formatted |
 | `uv run mypy src` | Exit 0; 50 source files |
 

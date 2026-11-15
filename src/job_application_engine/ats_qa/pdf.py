@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
+import statistics
 import subprocess
 import sys
 import tempfile
@@ -194,6 +195,67 @@ def _text_checks(text: str, expected: ExpectedDocument) -> dict[str, tuple[bool,
             "exact token multiplicity in normalized content",
         )
     return result
+
+
+# A visible section heading must also be presented as one: the template sets
+# headings well above body size (18.1 pt vs 12.9 pt word boxes at 11 pt body).
+# Text alone cannot tell a heading from a body line that reads the same.
+HEADING_MIN_HEIGHT_RATIO = 1.2
+
+
+def _tag(element: ET.Element) -> str:
+    return element.tag.rsplit("}", 1)[-1]
+
+
+def _heading_presentation(xml: str, expected: ExpectedDocument) -> tuple[bool, dict[str, Any]]:
+    """Each visible heading: one whole Poppler line, heading-sized, in order."""
+
+    root = ET.fromstring(xml)
+    lines: list[tuple[int, float, str, float]] = []
+    heights: list[float] = []
+    pages = [element for element in root.iter() if _tag(element) == "page"]
+    for page_number, page in enumerate(pages, 1):
+        for line in page.iter():
+            if _tag(line) != "line":
+                continue
+            words = [word for word in line if _tag(word) == "word"]
+            if not words:
+                continue
+            sizes = [float(w.attrib["yMax"]) - float(w.attrib["yMin"]) for w in words]
+            heights.extend(sizes)
+            text = normalize_extracted_text(" ".join(word.text or "" for word in words))
+            top = min(float(word.attrib["yMin"]) for word in words)
+            lines.append((page_number, top, text, min(sizes)))
+    body = statistics.median(heights) if heights else 0.0
+    passed = body > 0
+    previous: tuple[int, float] | None = None
+    found: list[dict[str, Any]] = []
+    for section in expected.sections:
+        if not section.heading_visible:
+            continue
+        label = normalize_extracted_text(section.label)
+        matches = [
+            line
+            for line in lines
+            if line[2] == label and line[3] >= HEADING_MIN_HEIGHT_RATIO * body
+        ]
+        if len(matches) != 1:
+            passed = False
+            found.append({"label": section.label, "heading_sized_lines": len(matches)})
+            continue
+        page_number, top, _, size = matches[0]
+        if previous is not None and (page_number, top) <= previous:
+            passed = False
+        previous = (page_number, top)
+        found.append(
+            {
+                "label": section.label,
+                "page": page_number,
+                "word_height_pt": round(size, 2),
+                "ratio": round(size / body, 3),
+            }
+        )
+    return passed, {"body_word_height_pt": round(body, 2), "headings": found}
 
 
 def _geometry(xml: str) -> dict[str, object]:
@@ -435,6 +497,27 @@ def run_pdf_qa(
             ("pass" if geometry_ok else "fail") if bbox.status == "pass" else bbox.status,
             geometry,
             "nonempty text boxes wholly inside measured crop page",
+            "pdftotext -bbox-layout",
+            bbox_version,
+            bbox.diagnostic,
+        )
+        presentation: tuple[bool, dict[str, Any]] | None = None
+        if bbox.status == "pass":
+            try:
+                presentation = _heading_presentation(bbox.output, expected)
+            except (ET.ParseError, KeyError, ValueError):
+                presentation = None
+        add(
+            "heading_presentation",
+            (("pass" if presentation[0] else "fail") if presentation else "fail")
+            if bbox.status == "pass"
+            else bbox.status,
+            presentation[1] if presentation else None,
+            {
+                "visible_headings": [s.label for s in expected.sections if s.heading_visible],
+                "rule": "exactly one whole line per heading, in order, word height at least "
+                f"{HEADING_MIN_HEIGHT_RATIO}x the median word height",
+            },
             "pdftotext -bbox-layout",
             bbox_version,
             bbox.diagnostic,

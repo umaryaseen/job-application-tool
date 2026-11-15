@@ -5,11 +5,12 @@ from __future__ import annotations
 import shutil
 from datetime import date
 from pathlib import Path
+from xml.sax.saxutils import escape
 
 import pytest
 
 from job_application_engine.ats_qa.expected import ExpectedDocument, ExpectedEntry, ExpectedSection
-from job_application_engine.ats_qa.pdf import _text_checks
+from job_application_engine.ats_qa.pdf import _heading_presentation, _text_checks
 from job_application_engine.domain.fact import (
     ContactEmail,
     ContactLocation,
@@ -305,3 +306,69 @@ def test_entry_outside_its_section_is_not_found() -> None:
     )
     result = _status(moved)
     assert result["standard_headings"] and not result["entry_claim_sequence"]
+
+
+# Round 2 F-01: text cannot tell a body line "Languages" from the heading, so a
+# separate presentation check uses Poppler word geometry.
+def _xml(lines: list[tuple[str, float, float]], pages: int = 1) -> str:
+    """Synthetic -bbox-layout XML; each line is (text, top, word height)."""
+    body = []
+    per_page = max(1, len(lines) // pages + (len(lines) % pages > 0))
+    for page in range(pages):
+        chunk = lines[page * per_page : (page + 1) * per_page]
+        flows = []
+        for text, top, height in chunk:
+            words = "".join(
+                f'<word xMin="{50 + 40 * i}" yMin="{top}" xMax="{80 + 40 * i}" '
+                f'yMax="{top + height}">{escape(word)}</word>'
+                for i, word in enumerate(text.split())
+            )
+            flows.append(f"<flow><block><line>{words}</line></block></flow>")
+        body.append(f'<page width="595" height="842">{"".join(flows)}</page>')
+    return f"<html><body><doc>{''.join(body)}</doc></body></html>"
+
+
+BODY = [
+    ("Synthetic Example", 40, 12.9),
+    ("Skills", 80, 18.1),
+    ("Programming Languages: Alpha | Zeta", 110, 12.9),
+    ("Quality & Development: pre-commit", 130, 12.9),
+    ("Languages", 160, 18.1),
+    ("German (A1-A2)", 190, 12.9),
+]
+
+
+def _presented(lines: list[tuple[str, float, float]], pages: int = 1) -> bool:
+    return _heading_presentation(_xml(lines, pages), _oracle())[0]
+
+
+def test_text_level_cannot_see_a_body_sized_heading_but_presentation_can() -> None:
+    text = "Synthetic Example\nSkills\nProgramming Languages: Alpha | Zeta\n"
+    text += "Quality & Development: pre-commit\nLanguages\nGerman (A1-A2)\n"
+    assert all(_status(text)[key] for key in ("standard_headings", "entry_claim_sequence"))
+    assert _presented(BODY)
+    body_sized = [line if line[0] != "Languages" else ("Languages", 160, 12.9) for line in BODY]
+    assert not _presented(body_sized)
+
+
+@pytest.mark.parametrize(
+    "lines",
+    [
+        [line for line in BODY if line[0] != "Languages"],  # heading missing
+        [*BODY, ("Languages", 220, 18.1)],  # two heading-sized lines
+        [("Languages", 60, 18.1) if line[0] == "Languages" else line for line in BODY],  # order
+        [("Skills Languages", 80, 18.1) if line[0] == "Skills" else line for line in BODY],
+        [("Skills", 80, 15.0) if line[0] == "Skills" else line for line in BODY],  # 1.16x
+        [],
+    ],
+)
+def test_presentation_fails_closed(lines: list[tuple[str, float, float]]) -> None:
+    assert not _presented(lines)
+
+
+def test_presentation_order_spans_pages_and_reports_measurements() -> None:
+    assert _presented(BODY, pages=2)
+    passed, measured = _heading_presentation(_xml(BODY), _oracle())
+    assert passed and measured["body_word_height_pt"] == 12.9
+    assert [h["label"] for h in measured["headings"]] == ["Skills", "Languages"]
+    assert all(h["ratio"] > 1.2 for h in measured["headings"])
