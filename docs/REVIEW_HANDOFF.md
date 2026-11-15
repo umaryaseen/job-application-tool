@@ -1,13 +1,21 @@
-# Review handoff: TASK-015 scoped constraints and experience intervals
+# Review handoff: M1-FIX-009 compact contacts, unbroken items, sticky entries
 
-**Status: APPROVED — AWAITING MERGE** (round 2 on `223eeff`). See
-[the review](reviews/TASK-015.md) and the
-[fixture review](reviews/TASK-015-FIXTURES.md).
+Implementer: Claude Code. Independent reviewer: a separate Codex session.
+Base: main `deee9aa`. Branch: `task/009-m1-fix-009-compact-contacts`.
 
-## Scoped closure check (pending)
+Read AGENTS, PROGRESS, [the task](tasks/M1-FIX-009.md), REVIEW_PROTOCOL and
+SECURITY_AND_PRIVACY; M1-FIX-004 (contact URL guard), M1-FIX-007 (atomic
+compounds) and M1-FIX-008 (skill-group leads, QA headings) are the closest
+context.
 
-After `223eeff` the branch only adds a documentation closure: the verbatim
-round-2 report with provenance (including hosted CI run `43747494384` on
-`223eeff`), the PROGRESS status and next action, and this handoff. Confirm the
-delta introduces no code and the records are accurate; do not repeat runtime
-reviews.
+Focus: contact compaction order and kinds, and that URLs keep their own
+guarded lines; the item contract (presentation items, token `items`/`lines`,
+the worker's exact-shape check, text equality) and escaping of every item in
+the generated Typst; that boxes carry trailing separators so no line can start
+with "|" and no item splits, with extraction unchanged; the item width guard
+(fails before publication, never clips); sticky employment headers and dates;
+the language line format; that fixture/test updates only move to the new
+display; template identity; no typography, selection or provenance change.
+Record findings and one verdict in `docs/reviews/M1-FIX-009.md` without
+modifying implementation. Renderer tests need macOS `sandbox-exec`: inspect
+hosted CI for the exact head.

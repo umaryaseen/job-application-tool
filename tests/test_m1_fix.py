@@ -453,7 +453,7 @@ def test_m1_real_pdf_qa_and_snapshot_export_preserve_claims(tmp_path: Path) -> N
     pypdf = "\n".join(page.extract_text() or "" for page in PdfReader(pdf).pages)
     expected_lines = [
         "Synthetic Example",
-        "Email: synthetic@example.com",
+        "synthetic@example.com",
         "Professional Summary",
         "Synthetic Engineer",
         "Professional Experience",
@@ -474,7 +474,7 @@ def test_m1_real_pdf_qa_and_snapshot_export_preserve_claims(tmp_path: Path) -> N
         "Skills",
         "Data Engineering & Analytics: Größe Ä Ö Ü ß (study, recent experience)",
         "Languages",
-        "German (CEFR B2)",
+        "German: CEFR B2",
     ]
     normalized_poppler = normalize_extracted_text(poppler)
     normalized_pypdf = normalize_extracted_text(pypdf)
