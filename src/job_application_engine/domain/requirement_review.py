@@ -134,25 +134,29 @@ class RequirementReviewRevision(StrictModel):
 
 
 class RequirementReviewHead(StrictModel):
-    """The acknowledged end of one review history.
+    """The committed end of one review history, written before its revision file.
 
-    Revision files are immutable; this small record is replaced (atomically)
-    after each publication, so a missing tail, a missing only revision or a
-    re-signed last revision no longer matches it. Interior changes already
-    break the hash chain.
+    It embeds the newest revision, so a missing newest file is restored from the
+    head rather than rolled back, a re-signed newest file no longer matches it,
+    and a missing head fails. Interior changes already break the hash chain.
     """
 
     schema_version: Literal["1.0"] = "1.0"
     job_id: StableId
     job_revision: int = Field(strict=True, ge=1, le=999999)
     review_revision: int = Field(strict=True, ge=0, le=999999)
-    revision_digest: Sha256 | None
+    latest: RequirementReviewRevision | None
     head_digest: Sha256
 
     @model_validator(mode="after")
-    def empty_head(self) -> RequirementReviewHead:
-        if (self.review_revision == 0) != (self.revision_digest is None):
-            raise ValueError("a head digest exists exactly when revisions exist")
+    def latest_matches(self) -> RequirementReviewHead:
+        if (self.review_revision == 0) != (self.latest is None):
+            raise ValueError("a head embeds its newest revision exactly when revisions exist")
+        if self.latest is not None and (
+            self.latest.review_revision != self.review_revision
+            or (self.latest.job_id, self.latest.job_revision) != (self.job_id, self.job_revision)
+        ):
+            raise ValueError("the embedded revision does not belong to this head")
         return self
 
 

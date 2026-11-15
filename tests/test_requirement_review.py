@@ -262,24 +262,23 @@ def test_concurrent_reviews_from_the_same_base_cannot_both_land(root: Path) -> N
     assert load_review("synthetic-role", data_root=root).view.review_revision == 1
 
 
-def test_racing_writer_loses_at_the_exclusive_link(root: Path, monkeypatch) -> None:
+def test_a_second_writer_is_refused_while_one_holds_the_lock(root: Path) -> None:
     state = load_review("synthetic-role", data_root=root)
-    row = rows_by_quote(state)["Docker."]
-    fix = correction(
-        state, {"op": "accept", "candidate_id": row.candidate_id, "acknowledged_reasons": []}
-    )
-    original = store._publish
+    fix = correction(state, accept(rows_by_quote(state)["Docker."]))
+    with store._writer_lock(root, "synthetic-role", 1):
+        with pytest.raises(ConcurrentReviewError, match="being stored"):
+            apply(root, fix)
+    apply(root, fix)  # the lock is released with its holder
+    assert load_review("synthetic-role", data_root=root).view.review_revision == 1
 
-    def racing(folder: Path, number: int, record: RequirementReviewRevision) -> Path:
-        # Another reviewer publishes the same revision number first.
-        original(folder, number, record.model_copy(update={"reviewer_id": "reviewer-b"}))
-        return original(folder, number, record)
 
-    monkeypatch.setattr(store, "_publish", racing)
-    with pytest.raises(ConcurrentReviewError):
-        apply(root, fix)
-    folder = root / "jobs/synthetic-role/requirement-reviews/r000001"
-    assert sorted(p.name for p in folder.iterdir()) == ["head.json", "v000001.json"]
+def test_a_revision_file_is_never_replaced(root: Path) -> None:
+    _accept_docker_then_terraform(root)
+    folder = _stored(root).parent
+    record = RequirementReviewRevision.model_validate_json(_stored(root).read_text())
+    with pytest.raises(ReviewError, match="inconsistent"):
+        store._publish(folder, 1, record.model_copy(update={"reviewer_id": "reviewer-b"}))
+    assert RequirementReviewRevision.model_validate_json(_stored(root).read_text()) == record
 
 
 def test_changed_jd_invalidates_prior_review(root: Path) -> None:
@@ -585,7 +584,8 @@ def test_cli_shows_review_and_applies_a_private_correction(root: Path, monkeypat
     assert json.loads(capsys.readouterr().out)["hard_gate_ids"] == [python["candidate_id"]]
 
 
-# Round 1 review: F-01 (tail loss), F-02 (re-signed last revision), F-03 (UTC).
+# Review rounds 1-2: the head is committed first and embeds the newest revision,
+# so missing newest files are restored, never rolled back; writers are serialized.
 def _head_path(root: Path) -> Path:
     return _stored(root).parent / "head.json"
 
@@ -593,29 +593,56 @@ def _head_path(root: Path) -> Path:
 @pytest.mark.parametrize(
     "tamper",
     [
-        lambda root: _stored(root, 2).unlink(),  # newest tail missing
-        lambda root: (_stored(root, 2).unlink(), _stored(root).unlink()),  # all files, head kept
+        lambda root: (_stored(root, 2).unlink(), _stored(root).unlink()),  # two files short
         lambda root: _head_path(root).unlink(),  # head missing
         lambda root: _head_path(root).write_text(
-            _head_path(root).read_text().replace('"review_revision":2', '"review_revision":1')
+            _head_path(root).read_text().replace('"review_revision":2', '"review_revision":1', 1)
         ),  # head edited without its digest
         lambda root: _head_path(root).write_text("{}"),
         lambda root: _head_path(root).rename(_head_path(root).with_name("old-head.json")),
+        lambda root: _stored(root, 3).write_bytes(_stored(root, 2).read_bytes()),  # beyond head
     ],
 )
-def test_missing_tail_head_or_history_fails(root: Path, tamper) -> None:
+def test_missing_head_or_unexplained_history_fails(root: Path, tamper) -> None:
     _accept_docker_then_terraform(root)
     tamper(root)
     with pytest.raises(ReviewError):
         load_review("synthetic-role", data_root=root)
 
 
-def test_deleting_the_only_revision_fails(root: Path) -> None:
+def test_deleted_newest_file_is_restored_from_the_head(root: Path) -> None:
+    _accept_docker_then_terraform(root)
+    before = load_review("synthetic-role", data_root=root).view
+    stored = _stored(root, 2).read_bytes()
+    _stored(root, 2).unlink()
+    assert load_review("synthetic-role", data_root=root).view == before
+    # The next correction writes the committed file back before adding its own.
+    state = load_review("synthetic-role", data_root=root)
+    apply(
+        root,
+        correction(state, {"op": "reopen", "candidate_id": state.view.rows[0].candidate_id}),
+        minutes=2,
+    )
+    assert _stored(root, 2).read_bytes() == stored and _stored(root, 3).exists()
+
+
+def test_deleting_a_reopen_cannot_restore_an_old_hard_gate(root: Path) -> None:
+    state = load_review("synthetic-role", data_root=root)
+    python = rows_by_quote(state)["Python or Java is required."]
+    apply(root, correction(state, accept(python)))
+    state = load_review("synthetic-role", data_root=root)
+    apply(root, correction(state, {"op": "reopen", "candidate_id": python.candidate_id}), minutes=1)
+    _stored(root, 2).unlink()
+    after = load_review("synthetic-role", data_root=root)
+    assert after.view.review_revision == 2 and hard_gates(after.view) == []
+
+
+def test_deleting_the_only_revision_restores_it_from_the_head(root: Path) -> None:
     state = load_review("synthetic-role", data_root=root)
     apply(root, correction(state, accept(rows_by_quote(state)["Docker."])))
+    before = load_review("synthetic-role", data_root=root).view
     _stored(root).unlink()
-    with pytest.raises(ReviewError, match="head"):
-        load_review("synthetic-role", data_root=root)
+    assert load_review("synthetic-role", data_root=root).view == before
 
 
 def test_resigned_last_revision_metadata_fails(root: Path) -> None:
@@ -632,38 +659,28 @@ def test_resigned_last_revision_metadata_fails(root: Path) -> None:
     assert load_review("synthetic-role", data_root=root).view.review_revision == 1
 
 
-def test_head_lagging_by_one_valid_revision_is_a_recoverable_crash(root: Path, monkeypatch) -> None:
+def test_crash_between_head_commit_and_file_write_is_recovered(root: Path, monkeypatch) -> None:
     state = load_review("synthetic-role", data_root=root)
     rows = rows_by_quote(state)
     apply(root, correction(state, accept(rows["Docker."])))
     state = load_review("synthetic-role", data_root=root)
-    with monkeypatch.context() as patch:
-        patch.setattr(store, "_write_head", lambda *args: None)  # crash before acknowledgement
-        apply(root, correction(state, accept(rows["Terraform experience."])), minutes=1)
-    lagging = load_review("synthetic-role", data_root=root)
-    assert lagging.view.review_revision == 2
-    assert json.loads(_head_path(root).read_text())["review_revision"] == 1
-    # A second unacknowledged revision is not a crash state: publication verification
-    # and every later load fail closed.
-    with monkeypatch.context() as patch:
-        patch.setattr(store, "_write_head", lambda *args: None)
-        python = rows["Python or Java is required."]
-        with pytest.raises(ReviewError, match="head"):
-            apply(root, correction(lagging, accept(python)), minutes=2)
-    with pytest.raises(ReviewError, match="head"):
-        load_review("synthetic-role", data_root=root)
 
+    def crash(*args: object) -> Path:
+        raise OSError("simulated crash after the head commit")
 
-def test_next_publication_acknowledges_a_lagging_head(root: Path, monkeypatch) -> None:
-    state = load_review("synthetic-role", data_root=root)
-    rows = rows_by_quote(state)
     with monkeypatch.context() as patch:
-        patch.setattr(store, "_write_head", lambda *args: None)
-        apply(root, correction(state, accept(rows["Docker."])))
-    assert json.loads(_head_path(root).read_text())["review_revision"] == 0
-    state = load_review("synthetic-role", data_root=root)
-    apply(root, correction(state, accept(rows["Terraform experience."])), minutes=1)
-    assert json.loads(_head_path(root).read_text())["review_revision"] == 2
+        patch.setattr(store, "_publish", crash)
+        with pytest.raises(OSError):
+            apply(root, correction(state, accept(rows["Terraform experience."])), minutes=1)
+    assert not _stored(root, 2).exists()
+    recovered = load_review("synthetic-role", data_root=root)
+    assert recovered.view.review_revision == 2
+    assert rows["Terraform experience."].candidate_id not in {
+        r.candidate_id for r in recovered.view.rows if r.review_state == "draft"
+    }
+    apply(root, correction(recovered, accept(rows["Python or Java is required."])), minutes=2)
+    assert _stored(root, 2).exists() and _stored(root, 3).exists()
+    assert load_review("synthetic-role", data_root=root).view.review_revision == 3
 
 
 def test_removing_the_whole_review_store_returns_the_ungated_draft(root: Path) -> None:

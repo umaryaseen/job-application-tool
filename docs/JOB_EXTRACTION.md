@@ -231,17 +231,19 @@ Each correction is stored once as
 `jobs/<job_id>/requirement-reviews/r<job revision>/v<n>.json`, recording the
 reviewer, UTC time (other offsets are refused), JD record and raw digests,
 classification digest, base revision and view digests, the operations and the
-resulting view digest. A small `head.json` (created with the folder, advanced
-atomically after each publication) records the expected revision count and the
-last revision digest. Loading re-verifies the JD, rebuilds the classification
-and replays the chain; a gap, missing tail or head, foreign file, edited or
-re-signed record, changed JD text or changed rules output fails with exit 2. A
-head one revision behind a valid newer revision (a crash between publishing and
-acknowledging) is accepted and caught up by the next correction. Deleting the
-entire review folder cannot be detected; the job then shows its unreviewed
-draft, which never yields a hard gate. Hashes detect accidental or partial
-changes, not a deliberate rewrite by the local account owner (ADR-012). A correction must name the review state it was
-prepared against, so two reviewers cannot both extend the same state, and a
+resulting view digest. Writers are serialized by an OS file lock (released if
+the process dies). Each correction first commits `head.json`, which embeds the
+newest revision, then writes that revision's file. Loading re-verifies the JD,
+rebuilds the classification and replays the chain; a gap, a missing head, files
+beyond the head, a newest file that differs from the head, a foreign file, an
+edited or re-signed record, changed JD text or changed rules output fails with
+exit 2. A missing newest file (a crash between the two writes, or a deletion)
+is taken from the head instead of rolling the review back, and the next
+correction writes it out again. Deleting the entire review folder cannot be
+detected; the job then shows its unreviewed draft, which never yields a hard
+gate. Hashes detect accidental or partial changes, not a deliberate rewrite by
+the local account owner (ADR-012). A correction must name the review state it
+was prepared against, so two reviewers cannot both extend the same state, and a
 newer JD revision starts unreviewed while older reviews remain historical and
 read-only. Limits: negation and duplicate groups are rule observations that
 cannot be edited (a wrongly negated row simply never gates; it can be set to

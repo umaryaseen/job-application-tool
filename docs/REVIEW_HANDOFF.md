@@ -19,7 +19,7 @@ foreign or temporary files, re-signed tampering, time order, changed JD text or
 rules output); newer JD revisions starting unreviewed; private, bounded,
 duplicate-key-free correction input; sanitized errors; no raw posting change.
 Record findings and one verdict in `docs/reviews/TASK-014.md` without modifying
-implementation. Implementer full suite: 664 passed, no skips (after the round-1 correction).
+implementation. Implementer full suite: 666 passed, no skips (after the round-2 correction).
 
 ## Round 2 request
 
@@ -31,3 +31,14 @@ never moved backwards; replay requires it to match the revision count and last
 digest, tolerating only a one-revision lag after a crash. Review times must be
 UTC. Whole-folder deletion is documented as undetectable and fail-safe (no
 hard gates). Review the delta from `18bd782`.
+
+## Round 3 request
+
+Round 2 (CHANGES REQUIRED) showed that the one-revision lag allowance let a
+deleted unacknowledged revision roll the review back (F-04) and that concurrent
+head advances could move the head backwards (F-05). The correction commits the
+head first, embedding the newest revision, then writes the revision file; a
+missing newest file is taken from the head and rewritten by the next
+correction; files beyond the head or a larger shortfall fail. Writers hold an
+OS `flock` on `requirement-reviews/r<job revision>.lock` for the whole
+load–check–commit–publish sequence. Review the delta from `5d034b9`.
