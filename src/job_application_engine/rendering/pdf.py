@@ -46,10 +46,10 @@ HYPHENATED_COMPOUND_WIDTH_ERROR = (
     "approved typography; "
     "use an approved shorter wording"
 )
-# Whitespace-delimited tokens joined by a hyphen or slash ("full-stack",
-# "CI/CD", "ISO/DIN") are atomic: a line break inside them would change the
-# extracted text that applicant-tracking systems read.
-_HYPHENATED_TOKEN = re.compile(r"(?<!\S)(?P<token>\S*[-/]\S+)")
+# Whitespace-delimited tokens containing a hyphen or slash anywhere ("full-stack",
+# "CI/CD", "ISO/DIN", "trailing/", a lone "/") are atomic: a line break inside
+# them would change the extracted text that applicant-tracking systems read.
+_HYPHENATED_TOKEN = re.compile(r"(?<!\S)(?P<token>\S*[-/]\S*)")
 
 
 class PdfRenderError(RuntimeError):

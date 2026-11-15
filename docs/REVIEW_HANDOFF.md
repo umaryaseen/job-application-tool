@@ -1,5 +1,7 @@
 # Review handoff: M1-FIX-007 slash-joined compounds
 
+Round 2: re-review `df9e9bb..<candidate>` for round-1 F-01 (joiner anywhere in a token), F-02 (exact identity assertion) and F-03 (line-start witness); append a "Round 2" section to `docs/reviews/M1-FIX-007.md`.
+
 Implementer: Claude Code. Independent reviewer: a separate Codex session.
 Base: main `68aa5369db17efb3e9c878328bffeee8983afd62`. Branch:
 `task/009-m1-fix-007`. M1-FIX-006 is merged (see
